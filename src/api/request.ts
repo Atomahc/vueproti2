@@ -1,16 +1,19 @@
 /**
  * 通用请求封装 (基于 fetch)
  */
-const BASE_URL = 'http://192.168.2.13:8080'
+
 interface RequestOptions extends RequestInit {
   params?: Record<string, any>
 }
 
 async function request<T = any>(url: string, options: RequestOptions = {}): Promise<T> {
+  if (url.startsWith('/') && !url.startsWith('/api-cas') && !url.startsWith('/api-loca')) {
+    url = '/api-loca' + url
+  }
   const { params, headers, ...restOptions } = options
 
-  // 处理 URL 拼接
-  let fetchUrl = url.startsWith('http') ? url : `${BASE_URL}${url}`
+  let fetchUrl = url
+
 
   // 处理 Query 参数
   if (params) {
@@ -46,7 +49,7 @@ async function request<T = any>(url: string, options: RequestOptions = {}): Prom
     if (response.status === 401) {
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
-      window.location.href = '/login'
+      triggerSSOLogin()
       throw new Error('鉴权失效，请重新登录')
     }
 
@@ -59,6 +62,26 @@ async function request<T = any>(url: string, options: RequestOptions = {}): Prom
   } catch (error) {
     console.error('Request Error:', error)
     throw error
+  }
+}
+
+export const triggerSSOLogin = async () => {
+  try {
+    const res: any = await http.get('/member/auth/sso/url?client=portal')
+    const ssoUrl = res.url || res.data?.url
+    console.log('SSO 登录地址:', ssoUrl)
+    if (!ssoUrl) {
+      throw new Error('获取 SSO 登录地址失败')
+    }
+    const urlObj = new URL(ssoUrl)
+    const state = urlObj.searchParams.get('state')
+    if (!state) {
+      throw new Error('SSO state 无效')
+    }
+    sessionStorage.setItem('sso_state', state)
+    window.location.href = ssoUrl
+  } catch (err: any) {
+    alert(err.message || '网络请求错误')
   }
 }
 

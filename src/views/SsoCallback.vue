@@ -12,7 +12,7 @@ onMounted(async () => {
 
   if (!code || !state) {
     alert('缺少授权参数，请重新发起登录')
-    router.replace('/login')
+    router.replace('/')
     return
   }
 
@@ -20,7 +20,7 @@ onMounted(async () => {
   if (state !== savedState) {
     alert('状态校验失败，可能存在安全风险，请重新发起登录')
     sessionStorage.removeItem('sso_state')
-    router.replace('/login')
+    router.replace('/')
     return
   }
 
@@ -45,7 +45,7 @@ onMounted(async () => {
   } catch (error: any) {
     console.error('SSO 回调处理失败:', error)
     alert('SSO 登录失败: ' + (error.message || '未知错误'))
-    router.replace('/login')
+    router.replace('/')
   }
 })
 </script>

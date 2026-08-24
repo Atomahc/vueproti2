@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
+import { ref, onMounted } from 'vue'
+import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
@@ -8,156 +10,66 @@ import TheNavBar from '../../components/TheNavBar.vue'
 const activeSubTab = ref<'personal' | 'enterprise_bs' | 'enterprise_fw'>('personal')
 
 // 1. 个人办事 数据
-const personalCategories = [
-  {
-    title: '社保',
-    color: '#00c4cc',
-    bgColor: '#e6fcfc',
-    items: [
-      { name: '社保服务', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
-      { name: '社保查询', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
-      { name: '养老保险', icon: 'M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z' },
-      { name: '医保缴费', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-      { name: '失业保险', icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.605 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z' },
-      { name: '工伤认定', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
-    ]
-  },
-  {
-    title: '健康医保',
-    color: '#1890ff',
-    bgColor: '#e6f7ff',
-    items: [
-      { name: '医保查询', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-      { name: '异地就医', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9' },
-      { name: '门诊报销', icon: 'M12 4v16m8-8H4' },
-      { name: '慢病申请', icon: 'M9 12h6m-3-3v6m-9 1V7a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z' },
-      { name: '健康档案', icon: 'M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z' }
-    ]
-  },
-  {
-    title: '不动产',
-    color: '#2f54eb',
-    bgColor: '#f0f5ff',
-    items: [
-      { name: '产权查询', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9' },
-      { name: '过户办理', icon: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
-      { name: '抵押登记', icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' },
-      { name: '不动产证', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-      { name: '档案查询', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' }
-    ]
-  },
-  {
-    title: '不动产2',
-    titleDisplay: '不动产',
-    color: '#52c41a',
-    bgColor: '#f6ffed',
-    items: [
-      { name: '公租房申请', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-      { name: '住房公积金', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-      { name: '房产证明', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-      { name: '物业备案', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
-      { name: '装修许可', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' }
-    ]
-  },
-  {
-    title: '婚育服务',
-    color: '#fa8c16',
-    bgColor: '#fff7e6',
-    items: [
-      { name: '婚姻登记', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
-      { name: '生育登记', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-      { name: '出生证明', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-      { name: '计生服务', icon: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V6a2 2 0 10-2 2h2zm0 13C10.832 19.877 8 16.924 8 13V8.5h8V13c0 3.924-2.832 6.877-4 8z' },
-      { name: '儿童保健', icon: 'M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' }
-    ]
-  },
-  {
-    title: '退休服务',
-    color: '#fa541c',
-    bgColor: '#fff2e8',
-    items: [
-      { name: '退休审批', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
-      { name: '养老金测算', icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
-      { name: '老年优待', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
-      { name: '退休证', icon: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 012-2h2a2 2 0 012 2v1m-6 0h6' },
-      { name: '养老机构', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9' }
-    ]
-  }
-]
+const personalCategories = ref<any[]>([])
 
 // 2. 企业办事 数据
-const enterpriseBsCategories = [
-  {
-    title: '企业变更',
-    color: '#00c4cc',
-    bgColor: '#e6fcfc',
-    items: [
-      { name: '股权出质变更登记', icon: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
-      { name: '企业变更登记(备案)', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9' },
-      { name: '社会团体变更登记', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
-      { name: '单位(项目)基本信息变更', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-      { name: '民办非企业单位变更登记', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
-    ]
-  },
-  {
-    title: '优待抚恤',
-    color: '#2f54eb',
-    bgColor: '#f0f5ff',
-    items: [
-      { name: '法律援助补贴发放', icon: 'M3 6l9-4 9 4v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-5.45-9-12V6z' },
-      { name: '就业见习补贴申领', icon: 'M21 132000' },
-      { name: '稳岗返还(稳岗补贴)申领', icon: 'M21 132000' },
-      { name: '一次性工伤医疗补助金申请', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-      { name: '高校毕业生社保补贴申领', icon: 'M12 14l9-5-9-5-9 5 9 5z' }
-    ]
-  },
-  {
-    title: '企业注销',
-    color: '#1890ff',
-    bgColor: '#e6f7ff',
-    items: [
-      { name: '参保单位注销', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-      { name: '社会团体注销登记', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857' },
-      { name: '民办非企业单位注销登记', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0z' },
-      { name: '企业注销登记单位注销', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16' }
-    ]
-  },
-  {
-    title: '小微企业',
-    color: '#52c41a',
-    bgColor: '#f6ffed',
-    items: [
-      { name: '企业社会保险登记', icon: 'M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999' },
-      { name: '企业设立登记', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11' },
-      { name: '企业变更登记(备案)', icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15' },
-      { name: '企业注销登记', icon: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z' }
-    ]
-  },
-  {
-    title: '社会团体/社会组织',
-    color: '#fa8c16',
-    bgColor: '#fff7e6',
-    items: [
-      { name: '企业社会保险登记', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5' },
-      { name: '社会团体成立登记', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5' },
-      { name: '社会团体变更登记', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11' },
-      { name: '社会团体注销登记', icon: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2' },
-      { name: '社会团体修改章程核准', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11' }
-    ]
-  },
-  {
-    title: '个体工商户',
-    color: '#fa541c',
-    bgColor: '#fff2e8',
-    items: [
-      { name: '单位变更登记', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5' },
-      { name: '单位注销登记', icon: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2' },
-      { name: '单位成立登记', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5' },
-      { name: '单位修改章程核准', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11' },
-      { name: '户外招牌设施登记备案', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16' }
-    ]
+const enterpriseBsCategories = ref<any[]>([])
+
+// Fallback colors for categories since API doesn't provide them
+const defaultColors = ['#00c4cc', '#1890ff', '#2f54eb', '#52c41a', '#fa8c16', '#fa541c']
+const defaultBgColors = ['#e6fcfc', '#e6f7ff', '#f0f5ff', '#f6ffed', '#fff7e6', '#fff2e8']
+
+const fetchGovServices = async () => {
+  try {
+    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+      zoneType: 'gov_service',
+      platform: 'portal',
+      userType: ''
+    })
+    
+    if (res.code === 0 && res.data && res.data.gov_service) {
+      const govServices = res.data.gov_service
+      
+      // 个人办事
+      const personalData = govServices.find((item: any) => item.name === '个人办事' || item.name?.includes('个人'))
+      if (personalData && personalData.children) {
+        personalCategories.value = personalData.children.map((cat: any, index: number) => ({
+          title: cat.name,
+          color: defaultColors[index % defaultColors.length],
+          bgColor: defaultBgColors[index % defaultBgColors.length],
+          icon: cat.icon,
+          items: (cat.children || []).map((item: any) => ({
+            name: item.name,
+            icon: item.bgImage,
+            url: item.url
+          }))
+        }))
+      }
+      
+      // 企业办事
+      const enterpriseData = govServices.find((item: any) => item.name === '企业办事' || item.name?.includes('企业办'))
+      if (enterpriseData && enterpriseData.children) {
+        enterpriseBsCategories.value = enterpriseData.children.map((cat: any, index: number) => ({
+          title: cat.name,
+          color: defaultColors[index % defaultColors.length],
+          bgColor: defaultBgColors[index % defaultBgColors.length],
+          icon: cat.icon,
+          items: (cat.children || []).map((item: any) => ({
+            name: item.name,
+            icon: item.bgImage,
+            url: item.url
+          }))
+        }))
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch gov services', error)
   }
-]
+}
+
+onMounted(() => {
+  fetchGovServices()
+})
 
 // 3. 企业服务 数据 (根据 2-3-政企服务.png)
 const enterpriseArticles = [
@@ -212,7 +124,8 @@ const enterpriseArticles = [
             <div class="card-items">
               <div v-for="(item, i) in cat.items" :key="i" class="item-badge">
                 <div class="icon-box" :style="{ backgroundColor: cat.color }">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <img v-if="item.icon && (item.icon.includes('/') || item.icon.includes('.'))" :src="item.icon.startsWith('http') ? item.icon : minioPrefix + item.icon" style="width: 40px; height: 40px; object-fit: contain;" />
+                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path :d="item.icon" />
                   </svg>
                 </div>
@@ -234,7 +147,8 @@ const enterpriseArticles = [
             <div class="card-items">
               <div v-for="(item, i) in cat.items" :key="i" class="item-badge">
                 <div class="icon-box" :style="{ backgroundColor: cat.color }">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <img v-if="item.icon && (item.icon.includes('/') || item.icon.includes('.'))" :src="item.icon.startsWith('http') ? item.icon : minioPrefix + item.icon" style="width: 40px; height: 40px; object-fit: contain; " />
+                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path :d="item.icon" />
                   </svg>
                 </div>
@@ -259,7 +173,9 @@ const enterpriseArticles = [
                   </div>
                   <h2>企业画像与政策匹配</h2>
                 </div>
-                <span class="arrow-right">&gt;</span>
+                <span class="arrow-right">
+                  <svg data-v-dac29979="" t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path data-v-dac29979="" d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg>
+                </span>
               </div>
               <div class="match-banner">
                 <div class="match-info">
@@ -282,7 +198,7 @@ const enterpriseArticles = [
                   </div>
                   <h2>招商引资服务</h2>
                 </div>
-                <span class="arrow-right">&gt;</span>
+                <span class="arrow-right"><svg data-v-dac29979="" t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path data-v-dac29979="" d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
               </div>
               <div class="attract-tags">
                 <span class="tag-item">重点产业</span>
@@ -391,7 +307,7 @@ const enterpriseArticles = [
 .main-content {
   position: relative;
   z-index: 5;
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 120px 24px 40px 24px;
   width: 100%;
@@ -553,9 +469,10 @@ const enterpriseArticles = [
 }
 
 .icon-box {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -650,7 +567,10 @@ const enterpriseArticles = [
   font-size: 18px;
   color: #64748b;
 }
-
+.arrow-right .icon{
+  width: 16px;
+  height: 16px ;
+}
 .match-banner {
   background: #ffffff;
   border-radius: 6px;

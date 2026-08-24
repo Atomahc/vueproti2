@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { http } from '@/api/request'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { http, triggerSSOLogin } from '@/api/request'
+import { useRouter } from 'vue-router'
 
 defineProps<{
   isInternal?: boolean
@@ -8,13 +9,48 @@ defineProps<{
 
 defineEmits(['toggleInternal'])
 
+const router = useRouter()
+const searchKeyword = ref('')
+const handleSearch = () => {
+  if (searchKeyword.value.trim()) {
+    router.push({ path: '/search', query: { keyword: searchKeyword.value } })
+  }
+}
+
 const isLoggedIn = ref(false)
+const showDropdown = ref(false)
+
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value
+}
+
 const userInfo = ref({
   name: '用户',
   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
 })
 
+const currentDateTime = ref('')
+let timer: any = null
+
+const updateDateTime = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  const date = now.getDate()
+  const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+  const day = days[now.getDay()]
+  
+  const h = String(now.getHours()).padStart(2, '0')
+  const m = String(now.getMinutes()).padStart(2, '0')
+  const s = String(now.getSeconds()).padStart(2, '0')
+  
+  currentDateTime.value = `${year}年${month}月${date}日 ${day} ${h}:${m}:${s}`
+}
+
 onMounted(async () => {
+  updateDateTime()
+  timer = setInterval(updateDateTime, 1000)
+
   const token = localStorage.getItem('access_token')
   if (token) {
     isLoggedIn.value = true
@@ -37,10 +73,26 @@ onMounted(async () => {
   }
 })
 
+const closeDropdown = () => {
+  showDropdown.value = false
+}
+
+onMounted(() => {
+  window.addEventListener('click', closeDropdown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('click', closeDropdown)
+  if (timer) clearInterval(timer)
+})
+
 const handleLogout = () => {
   localStorage.removeItem('access_token')
   localStorage.removeItem('refresh_token')
+  sessionStorage.removeItem('sso_state')
   isLoggedIn.value = false
+  showDropdown.value = false
+  window.location.reload()
 }
 </script>
 
@@ -57,12 +109,12 @@ const handleLogout = () => {
          
         </div>
         <div class="top-right">
-          <span class="date-text">2026年7月25日 星期六</span>
+          <span class="date-text">{{ currentDateTime }}</span>
           <span class="divider">|</span>
           <template v-if="isLoggedIn">
             <div class="user-profile user-dropdown">
-              <span class="username">{{ userInfo.name }}</span>
-              <div class="dropdown-content">
+              <span class="username" @click.stop="toggleDropdown">{{ userInfo.name }}</span>
+              <div class="dropdown-content" :class="{ 'show': showDropdown }" @click.stop>
                 <router-link to="/certify?type=enterprise">企业认证</router-link>
                 <router-link to="/certify?type=gov">机关认证</router-link>
                 <a href="#" class="logout-btn" @click.prevent="handleLogout">退出登录</a>
@@ -70,11 +122,11 @@ const handleLogout = () => {
             </div>
           </template>
           <template v-else>
-            <router-link to="/login" class="top-link">登录注册</router-link>
+            <a href="#" @click.prevent="triggerSSOLogin" class="top-link">登录注册</a>
           </template>
           <span class="divider">|</span>
           <div class="dropdown-lang">
-            <span>语言切换 ∨</span>
+            <span>语言切换</span>
           </div>
         </div>
       </div>
@@ -89,8 +141,8 @@ const handleLogout = () => {
         </div>
 
         <div class="search-box">
-          <input type="text" placeholder="搜索政府服务、企业信息、便民事项..." class="search-input" />
-          <button class="search-btn">
+          <input type="text" placeholder="搜索政府服务、企业信息、便民事项..." class="search-input" v-model="searchKeyword" @keyup.enter="handleSearch" />
+          <button class="search-btn" @click="handleSearch">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -110,6 +162,7 @@ const handleLogout = () => {
   width: 100vw;
   height: 120px;
   box-sizing: border-box;
+  z-index: 100;;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
 
@@ -178,7 +231,7 @@ const handleLogout = () => {
 
 .main-header-inner {
   width: 100%;
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 24px;
   box-sizing: border-box;
@@ -302,9 +355,11 @@ const handleLogout = () => {
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.2s;
+  z-index: 100;
 }
 
-.user-dropdown:hover .dropdown-content {
+.user-dropdown:hover .dropdown-content,
+.dropdown-content.show {
   visibility: visible;
   opacity: 1;
 }

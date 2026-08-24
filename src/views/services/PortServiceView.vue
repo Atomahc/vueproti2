@@ -1,68 +1,44 @@
 <script setup lang="ts">
+const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
+import { ref, onMounted } from 'vue'
+import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
 
-import f80 from '@/assets/other/Frame 80@2x.png'
-import f80_1 from '@/assets/other/Frame 80@2x(1).png'
-import f80_2 from '@/assets/other/Frame 80@2x(2).png'
-import f80_3 from '@/assets/other/Frame 80@2x(3).png'
+const foreignServices = ref<any>({ children: [] })
+const portCloudItems = ref<any>({ children: [] })
+const passServices = ref<any>({ children: [] })
+const coopServices = ref<any>({ children: [] })
 
-import f81 from '@/assets/other/Frame 81@2x.png'
-import f81_1 from '@/assets/other/Frame 81@2x(1).png'
-import f81_2 from '@/assets/other/Frame 81@2x(2).png'
-import f81_3 from '@/assets/other/Frame 81@2x(3).png'
+const fetchCrossBorder = async () => {
+  try {
+    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+      zoneType: 'cross_border',
+      platform: 'portal',
+      userType: ''
+    })
+    if (res.code === 0 && res.data && res.data.cross_border) {
+      const list = res.data.cross_border
+      foreignServices.value = list.find((item: any) => item.name === '境外人员便利化专区') || { children: [] }
+      portCloudItems.value = list.find((item: any) => item.name === '口岸云集') || { children: [] }
+      passServices.value = list.find((item: any) => item.name === '霍数通·通关服务') || { children: [] }
+      coopServices.value = list.find((item: any) => item.name === '中哈合作中心智慧服务') || { children: [] }
+    }
+  } catch (e) {
+    console.error('Failed to fetch cross border data:', e)
+  }
+}
 
-import f82 from '@/assets/other/Frame 82@2x.png'
-import f82_1 from '@/assets/other/Frame 82@2x(1).png'
-import f82_2 from '@/assets/other/Frame 82@2x(2).png'
-import f82_3 from '@/assets/other/Frame 82@2x(3).png'
+const handleNavigate = (url: string) => {
+  if (url) {
+    window.location.href = url
+  }
+}
 
-import f83 from '@/assets/other/Frame 83@2x.png'
-import f83_1 from '@/assets/other/Frame 83@2x(1).png'
-import f83_2 from '@/assets/other/Frame 83@2x(2).png'
-
-import dd from '@/assets/other/ddd.png'
-
-import k1 from '@/assets/other/k1.png'
-import k2 from '@/assets/other/k2.png'
-import k3 from '@/assets/other/k3.png'
-import k4 from '@/assets/other/k4.png'
-import k5 from '@/assets/other/k5.png'
-import k6 from '@/assets/other/k6.png'
-// 1. 境外人员便利化服务
-const foreignServices = [
-  { name: '出入境须知', img: f80 },
-  { name: '乐食霍尔果斯', img: f81 },
-  { name: '乐游霍尔果斯', img: f82 },
-  { name: '乐购霍尔果斯', img: f83 }
-]
-
-// 2. 口岸云集 (使用 f81系列 和 f84)
-const portCloudItems = [
-  { name: '边民互市', img: k1 },
-  { name: '品味新疆', img: k2 },
-  { name: '跨级递送', img: k3 },
-  { name: '中亚专区', img: k4 },
-  { name: '源头采集', img: k5 },
-  { name: '商贸货代专区', img: k6 }
-]
-
-// 3. 霍数通·通关服务
-const passServices = [
-  { name: '出境重车预约', img: f81_2 },
-  { name: '物流服务', img: f82_2 },
-  { name: '出境商品车预约', img: f81_2 }
-]
-
-// 4. 中哈合作中心智慧服务
-const coopServices = [
-  { name: '资讯公示', img: f80_3 },
-  { name: '审批协同', img: f81_3 },
-  { name: '人车通关与商户信息', img: f82_3 },
-  { name: '旅游购物', img: f83_2 },
-  { name: '企业服务', img: dd } // fallback reusing f82
-]
+onMounted(() => {
+  fetchCrossBorder()
+})
 </script>
 
 <template>
@@ -76,91 +52,91 @@ const coopServices = [
       <div class="content-box">
         <div class="cross-grid">
           <!-- 1. 境外人员便利化服务 (左上) -->
-          <div class="cross-card yellow-tint-card">
+          <div class="cross-card yellow-tint-card" v-if="foreignServices.id">
             <div class="card-title-header">
               <div class="title-with-square yellow">
-                <img src="@/assets/other/Group 58@2x.png" alt="境外人员便利化服务">
+                <img :src="foreignServices.icon ? (foreignServices.icon.startsWith('http') ? foreignServices.icon : minioPrefix + foreignServices.icon) : ''" alt="境外人员便利化服务">
               </div>
               <div>
-                <h3>境外人员便利化服务</h3>
-                <p class="subtitle">多语种·一站式涉外服务</p>
+                <h3>{{ foreignServices.name }}</h3>
+                <p class="subtitle">{{ foreignServices.remark }}</p>
               </div>
             </div>
 
             <div class="image-cards-grid grid-4">
-              <div v-for="(item, i) in foreignServices" :key="i" class="image-item-box">
+              <div v-for="(item, i) in foreignServices.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
                 <span class="box-title" style="color: #634F00;">{{ item.name }}</span>
                 <div class="img-wrapper">
-                  <img :src="item.img" :alt="item.name" />
-                  <button class="arrow-btn yellownext">&rarr;</button>
+                  <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
+                  <button class="arrow-btn yellownext" >&rarr;</button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- 2. 口岸云集 (右上) -->
-          <div class="cross-card blue-tint-card">
+          <div class="cross-card blue-tint-card" v-if="portCloudItems.id">
             <div class="card-title-header">
               <div class="title-with-square blue">
-                <img src="@/assets/other/Group 58@2x(1).png" alt="">
+                <img :src="portCloudItems.icon ? (portCloudItems.icon.startsWith('http') ? portCloudItems.icon : minioPrefix + portCloudItems.icon) : ''" alt="">
               </div>
               <div>
-                <h3>口岸云集</h3>
-                <p class="subtitle">口岸综合数据·实时态势</p>
+                <h3>{{ portCloudItems.name }}</h3>
+                <p class="subtitle">{{ portCloudItems.remark }}</p>
               </div>
             </div>
 
             <div class="image-cards-grid grid-5">
-              <div v-for="(item, i) in portCloudItems" :key="i" class="image-item-box">
+              <div v-for="(item, i) in portCloudItems.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
                 <span class="box-title" style="color: #001A49;">{{ item.name }}</span>
                 <div class="img-wrapper">
-                  <img :src="item.img" :alt="item.name" />
-                  <button class="arrow-btn bluenext">&rarr;</button>
+                  <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
+                  <button class="arrow-btn bluenext" >&rarr;</button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- 3. 霍数通·通关服务 (左下) -->
-          <div class="cross-card cyan-tint-card">
+          <div class="cross-card cyan-tint-card" v-if="passServices.id">
             <div class="card-title-header">
               <div class="title-with-square cyan">
-                  <img src="@/assets/other/Group 58@2x(2).png" alt="">
+                  <img :src="passServices.icon ? (passServices.icon.startsWith('http') ? passServices.icon : minioPrefix + passServices.icon) : ''" alt="">
               </div>
               <div>
-                <h3>霍数通·通关服务</h3>
-                <p class="subtitle">通关预约·一码通行</p>
+                <h3>{{ passServices.name }}</h3>
+                <p class="subtitle">{{ passServices.remark }}</p>
               </div>
             </div>
 
             <div class="image-cards-grid grid-3">
-              <div v-for="(item, i) in passServices" :key="i" class="image-item-box">
+              <div v-for="(item, i) in passServices.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
                 <span class="box-title" style="color: #005562;">{{ item.name }}</span>
                 <div class="img-wrapper">
-                  <img :src="item.img" :alt="item.name" />
-                  <button class="arrow-btn lightblue">&rarr;</button>
+                  <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
+                  <button class="arrow-btn lightblue" >&rarr;</button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- 4. 中哈合作中心智慧服务 (右下) -->
-          <div class="cross-card purple-tint-card">
+          <div class="cross-card purple-tint-card" v-if="coopServices.id">
             <div class="card-title-header">
               <div class="title-with-square purple">
-                <img src="@/assets/other/Group 58@2x(3).png" alt="">
+                <img :src="coopServices.icon ? (coopServices.icon.startsWith('http') ? coopServices.icon : minioPrefix + coopServices.icon) : ''" alt="">
               </div>
-              <div>              <h3>中哈合作中心智慧服务</h3>
-                <p class="subtitle">跨境购物·旅游·商贸</p>
+              <div>              <h3>{{ coopServices.name }}</h3>
+                <p class="subtitle">{{ coopServices.remark }}</p>
               </div>
             </div>
 
             <div class="image-cards-grid grid-5">
-              <div v-for="(item, i) in coopServices" :key="i" class="image-item-box">
+              <div v-for="(item, i) in coopServices.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
                 <span class="box-title" style="color: #000741;">{{ item.name }}</span>
                 <div class="img-wrapper">
-                  <img :src="item.img" :alt="item.name" />
-                  <button class="arrow-btn purplenext">&rarr;</button>
+                  <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
+                  <button class="arrow-btn purplenext" >&rarr;</button>
                 </div>
               </div>
             </div>
@@ -175,6 +151,31 @@ const coopServices = [
 </template>
 
 <style scoped>
+
+.grid-4 .image-item-box {
+  width: calc(25% - 10px);
+}
+.image-item-box img {
+  width: 100%;
+  object-fit: cover;
+}
+
+.grid-5 .image-item-box {
+  width: calc(33% - 10px);
+}
+
+.grid-3 .image-item-box {
+  width: calc(33% - 10px);
+}
+
+
+.purple-tint-card .grid-5 .image-item-box {
+  width: calc(20% - 10px);
+}
+
+.blue-tint-card .img-wrapper .arrow-btn{
+  top: 40px;
+}
 .image-item-box{
   position: relative;
 }
@@ -182,18 +183,25 @@ const coopServices = [
 
   display: inline-block;
 }
-.img-wrapper img{
- 
+.img-wrapper{
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.img-wrapper:hover img{
+  transform: scale(1.05);
+  transition: transform 0.8s ease;
 }
 .box-title{
   position: absolute;
   top: 10px;
   left: 10px;
+  z-index: 111;
 
 }
 .img-wrapper .arrow-btn {
   position: absolute;
-  top: 40px;
+  top: 60px;
   left: 10px;
   color: white;
   border: none;
@@ -242,7 +250,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 562px;
+  width: 602px;
 }
 .blue-tint-card {
   background: linear-gradient( 180deg, rgba(0,89,255,0.2) 0%, rgba(0,89,255,0.02) 100%), #FFFFFF;
@@ -259,7 +267,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width:460px
+  width:500px
 }
 
 .purple-tint-card {
@@ -285,7 +293,7 @@ h3 {
 .main-content {
   position: relative;
   z-index: 5;
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 120px 24px 40px 24px;
   width: 100%;

@@ -1,7 +1,65 @@
 <script setup lang="ts">
+const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
+import { ref, onMounted } from 'vue'
+import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
 import TheNavBar from '../components/TheNavBar.vue'
+
+import gg1 from '@/assets/other/gg1.png'
+import gg2 from '@/assets/other/gg2.png'
+import gg3 from '@/assets/other/gg3.png'
+import gg4 from '@/assets/other/gg4.png'
+
+const statSection = ref<any>({ children: [] })
+const visSection = ref<any>({ children: [] })
+
+const statCardsBackup = [
+  { name: '统计公报', remark: '年度/季度', bg: gg1 },
+  { name: '统计年鉴', remark: '历年汇编', bg: gg2 },
+  { name: '调查数据', remark: '专项调查', bg: gg3 }
+]
+
+const visCardsBackup = [
+  { name: 'GDP增速', number: '8.2', unit: '%', progress: 82 },
+  { name: '口岸过货量', number: '3,856', unit: '万吨', progress: 65 },
+  { name: 'GDP增速', number: '8.2', unit: '%', progress: 82 }
+]
+
+const fetchDataOpen = async () => {
+  try {
+    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+      zoneType: 'data_open',
+      platform: 'portal',
+      userType: ''
+    })
+    if (res.code === 0 && res.data && res.data.data_open) {
+      const list = res.data.data_open
+      
+      const stat = list.find((item: any) => item.name === '统计数据查阅')
+      if (stat) {
+        statSection.value = stat
+      }
+
+      const vis = list.find((item: any) => item.name === '数据可视化看板')
+      if (vis) {
+        visSection.value = vis
+      }
+    }
+  } catch (e) {
+    console.error('Failed to fetch data open:', e)
+  }
+}
+
+const handleNavigate = (url: string) => {
+  if (url) {
+    window.location.href = url
+  }
+}
+
+onMounted(() => {
+  fetchDataOpen()
+})
 </script>
 
 <template>
@@ -16,43 +74,26 @@ import TheNavBar from '../components/TheNavBar.vue'
         <section class="data-section">
           <div class="section-header">
             <div class="header-icon orange-icon">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <img v-if="statSection.icon" :src="statSection.icon.startsWith('http') ? statSection.icon : minioPrefix + '/' + statSection.icon.replace(/^\/+/, '')" style="object-fit: contain;" alt="" />
+              <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="18" height="18" rx="2" />
                 <path d="M7 7h10M7 11h10M7 15h6" />
               </svg>
             </div>
             <div class="header-text">
-              <h2>统计数据查阅</h2>
-              <p>统计公报/年鉴/调查数据</p>
+              <h2>{{ statSection.name || '统计数据查阅' }}</h2>
+              <p>{{ statSection.subtitle || '统计公报/年鉴/调查数据' }}</p>
             </div>
           </div>
 
           <div class="cards-grid">
-            <div class="data-card orange-card">
+            <div v-for="(card, i) in (statSection.children.length > 0 ? statSection.children : statCardsBackup)" :key="i" class="data-card orange-card clickable-card" @click="handleNavigate(card.url)">
               <div class="card-info">
-                <h3>统计公报</h3>
-                <p>年度/季度</p>
+                <h3>{{ card.name }}</h3>
+                <p>{{ card.remark }}</p>
               </div>
               <div class="card-img-placeholder">
-                 <img src="@/assets/other/gg1.png" alt="统计公报" />
-              </div>
-            </div>
-            <div class="data-card orange-card">
-              <div class="card-info">
-                <h3>统计年鉴</h3>
-                <p>历年汇编</p>
-              </div>
-              <div class="card-img-placeholder">
-                 <img src="@/assets/other/gg2.png" alt="统计年鉴" />
-              </div>
-            </div>
-            <div class="data-card orange-card">
-              <div class="card-info">
-                <h3>调查数据</h3>
-                <p>专项调查</p>
-              </div>
-              <div class="card-img-placeholder">
-                 <img src="@/assets/other/gg3.png" alt="调查数据" />
+                 <img :src="card.bannerImage ? (card.bannerImage.startsWith('http') ? card.bannerImage : minioPrefix + '/' + card.bannerImage.replace(/^\/+/, '')) : card.bg" :alt="card.name" />
               </div>
             </div>
           </div>
@@ -62,47 +103,30 @@ import TheNavBar from '../components/TheNavBar.vue'
         <section class="data-section">
           <div class="section-header">
             <div class="header-icon green-icon">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <img v-if="visSection.icon" :src="visSection.icon.startsWith('http') ? visSection.icon : minioPrefix + '/' + visSection.icon.replace(/^\/+/, '')" style="object-fit: contain;" alt="" />
+              <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 3v18h18" />
                 <path d="M18 9l-5 5-4-4-5 5" />
               </svg>
             </div>
             <div class="header-text">
-              <h2>数据可视化看板</h2>
-              <p>经济运行 · 口岸贸易 · 人口</p>
+              <h2>{{ visSection.name || '数据可视化看板' }}</h2>
+              <p>{{ visSection.subtitle || '经济运行 · 口岸贸易 · 人口' }}</p>
             </div>
           </div>
 
           <div class="cards-grid">
-            <div class="data-card green-card">
+            <div v-for="(card, i) in (visSection.children.length > 0 ? visSection.children : visCardsBackup)" :key="i" class="data-card green-card clickable-card" @click="handleNavigate(card.url)">
               <div class="card-info">
-                <h3>GDP增速</h3>
-                <div class="number">8.2<span>%</span></div>
+                <h3>{{ card.name }}</h3>
+                <div class="number">{{ (visCardsBackup as any)[i] ? (visCardsBackup as any)[i].number : '0' }}<span>{{ (visCardsBackup as any)[i] ? (visCardsBackup as any)[i].unit : '' }}</span></div>
               </div>
               <div class="progress-bar-container">
-                <div class="progress-bar" style="width: 82%;"></div>
+                <div class="progress-bar" :style="{ width: ((visCardsBackup as any)[i] ? (visCardsBackup as any)[i].progress : 0) + '%' }"></div>
               </div>
-              <div class="card-bg-sketch"></div>
-            </div>
-            <div class="data-card green-card">
-              <div class="card-info">
-                <h3>口岸过货量</h3>
-                <div class="number">3,856<span>万吨</span></div>
+              <div class="card-bg-sketch">
+                <img v-if="card.bannerImage" :src="card.bannerImage.startsWith('http') ? card.bannerImage : minioPrefix + '/' + card.bannerImage.replace(/^\/+/, '')" style="width: 100%; height: 100%; object-fit: contain; opacity: 0.2;" alt="" />
               </div>
-              <div class="progress-bar-container">
-                <div class="progress-bar" style="width: 65%;"></div>
-              </div>
-              <div class="card-bg-sketch"></div>
-            </div>
-            <div class="data-card green-card">
-              <div class="card-info">
-                <h3>GDP增速</h3>
-                <div class="number">8.2<span>%</span></div>
-              </div>
-              <div class="progress-bar-container">
-                <div class="progress-bar" style="width: 82%;"></div>
-              </div>
-              <div class="card-bg-sketch"></div>
             </div>
           </div>
         </section>
@@ -127,7 +151,7 @@ import TheNavBar from '../components/TheNavBar.vue'
 .main-content {
   position: relative;
   z-index: 5;
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 120px 24px 40px 24px;
   width: 100%;
@@ -163,6 +187,7 @@ import TheNavBar from '../components/TheNavBar.vue'
   width: 48px;
   height: 48px;
   border-radius: 8px;
+  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -306,4 +331,13 @@ import TheNavBar from '../components/TheNavBar.vue'
   z-index: 1;
 }
 
+.clickable-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.clickable-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
 </style>

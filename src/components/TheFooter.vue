@@ -1,7 +1,7 @@
 <template>
   <footer class="footer-wrapper">
     <div class="banner-inner">
-      <span class="banner-text">数字霍尔果斯 · 全域统一综合服务门户 · 首页布局改版方案</span>
+      <span class="banner-text">主办：霍尔果斯市人民政府办公室     关于我们  |  版权保护  |  隐私声明  |  联系我们</span>
       <span class="banner-text">数字霍尔果斯 · 全域统一综合服务门户 · 首页布局改版方案</span>
     </div>
   </footer>

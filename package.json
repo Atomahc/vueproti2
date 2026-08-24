@@ -17,9 +17,10 @@
   "dependencies": {
     "echarts": "^6.0.0",
     "pinia": "^3.0.4",
-    "swiper": "^12.1.4",
+    "swiper": "^12.2.0",
     "vue": "^3.5.32",
     "vue-echarts": "^8.0.1",
+    "vue-i18n": "^11.4.9",
     "vue-router": "^5.0.4"
   },
   "devDependencies": {

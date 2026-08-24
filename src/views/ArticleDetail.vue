@@ -1,45 +1,39 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
+import TheNavBar from '../components/TheNavBar.vue'
 
 const route = useRoute()
 const router = useRouter()
 const isInternal = ref(false)
 
-// 模拟的后端数据源
-const displayNewsItems: Record<string, { title: string; date: string; content: string }[]> = {
-  政务动态: [
-    { 
-      title: '霍尔果斯市召开政务公开工作推进会', 
-      date: '2026-06-01',
-      content: '<p>为了进一步提升政务公开水平，打造阳光透明的政府形象，今日我市隆重召开了政务公开工作推进会。会议强调了利用数字门户统一分发政务信息的重要性...</p><p>各级部门要切实抓好“一网通办”、“一网统管”工作的深化落实，确保广大市民与企业能够及时、准确地获取相关信息，实现数据多跑路，群众少跑腿。</p>'
-    },
-    { title: '市委领导调研重点项目建设情况', date: '2026-05-28', content: '<p>市委主要领导带队深入一线重点项目工地，实地察看了工程进度、质量控制及安全生产等情况...</p>' },
-    { title: '我市多措并举优化营商环境', date: '2026-05-25', content: '<p>为吸引更多优质企业落户，我市出台了一系列优化营商环境的硬核措施...</p>' },
-    { title: '政务服务中心推出“午间不打烊”服务', date: '2026-05-22', content: '<p>为了方便上班族办理业务，政务大厅自本周起实行“午间不打烊”制度，确保全天候服务...</p>' },
-    { title: '市财政局加强预算管理提高资金使用效益', date: '2026-05-20', content: '<p>市财政局召开专门会议，部署下一步预算资金的分配与审计监管工作...</p>' },
-  ],
-  公示公告: [
-    { title: '关于拟表彰全市先进集体和先进个人的公示', date: '2026-06-05', content: '<p>根据相关评选规定，现将拟表彰的先进集体和先进个人名单予以公示，公示期为5个工作日...</p>' },
-    { title: '2026年市直事业单位招聘工作人员公告', date: '2026-06-02', content: '<p>为满足市直属事业单位用人需求，现面向社会公开招聘优秀人才...</p>' },
-    { title: '关于部分道路实行临时交通管制的公告', date: '2026-05-30', content: '<p>因城市管网升级改造施工，自明日起将对人民路北段实行部分封闭的临时交通管制...</p>' },
-    { title: '市自然资源局国有建设用地使用权出让公告', date: '2026-05-27', content: '<p>经批准，市自然资源局决定以挂牌方式出让三宗国有建设用地使用权...</p>' },
-    { title: '关于开展全民健身活动的通知', date: '2026-05-24', content: '<p>为倡导健康生活方式，我市将于下月初在市体育馆举办全民健身启动仪式...</p>' },
-  ],
-}
-
 const articleData = ref<{ title: string; date: string; content: string } | null>(null)
 
 // 根据路由参数加载文章数据
-const fetchArticle = () => {
-  const id = parseInt(route.params.id as string)
-  const tab = (route.query.tab as string) || '政务动态'
+const fetchArticle = async () => {
+  const nameId = route.params.id as string
+  const fullId = nameId.includes('/') ? nameId : `hgsso/${nameId}`
   
-  if (displayNewsItems[tab] && displayNewsItems[tab][id]) {
-    articleData.value = displayNewsItems[tab][id]
-  } else {
+  try {
+    const res: any = await http.get('/api-cas/api/get-article', { id: fullId })
+    if (res.status === 'ok' && res.data) {
+      const data = res.data
+      const dateObj = new Date(data.publishTime || data.createdTime)
+      const dateStr = dateObj.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-')
+      
+      articleData.value = {
+        title: data.displayName || data.title,
+        date: dateStr,
+        content: data.content || '<p style="text-align:center; color:#999; margin-top: 50px;">此文章暂无内容。</p>'
+      }
+    } else {
+      throw new Error('未找到内容')
+    }
+  } catch (error) {
+    console.error('Failed to fetch article', error)
     articleData.value = {
       title: '文章未找到或已删除',
       date: 'N/A',
@@ -64,14 +58,7 @@ watch(() => route.params.id, () => {
     <TheHeader :isInternal="isInternal" @toggleInternal="isInternal = !isInternal" />
 
     <main class="article-main" v-if="articleData">
-      <!-- 面包屑导航 -->
-      <nav class="breadcrumb">
-        <router-link to="/">首页</router-link>
-        <span class="separator">/</span>
-        <span class="current">{{ route.query.tab || '资讯' }}</span>
-        <span class="separator">/</span>
-        <span class="current-title">正文</span>
-      </nav>
+      <TheNavBar activeId="" />
 
       <article class="article-container">
         <header class="article-header">
@@ -104,10 +91,7 @@ watch(() => route.params.id, () => {
         </header>
 
         <div class="article-body">
-          <div class="cover-image">
-            <img src="../assets/img/1178770891944486913.jpg" alt="文章配图" />
-          </div>
-          
+ 
           <div class="content-html" v-html="articleData.content"></div>
         </div>
 
@@ -133,59 +117,26 @@ watch(() => route.params.id, () => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f8fafc;
+  background-color: transparent;
 }
 
 .article-main {
   flex: 1;
-  max-width: 1000px;
+  max-width: 1280px;
   width: 100%;
   margin: 0 auto;
-  padding: 40px 20px 80px;
+  padding: 150px 20px 80px;
 }
 
-/* 面包屑导航 */
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  color: #64748b;
-  margin-bottom: 30px;
-}
-
-.breadcrumb a {
-  color: #0084ff;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.breadcrumb a:hover {
-  text-decoration: underline;
-}
-
-.breadcrumb .separator {
-  margin: 0 10px;
-  color: #cbd5e1;
-}
-
-.breadcrumb .current {
-  color: #475569;
-}
-
-.breadcrumb .current-title {
-  color: #94a3b8;
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 文章容器 */
 .article-container {
   background: #ffffff;
   border-radius: 16px;
+  
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
   padding: 60px;
+  height:500px;
+  overflow: auto;
+  margin-top: 20px;
 }
 
 /* 文章头部 */

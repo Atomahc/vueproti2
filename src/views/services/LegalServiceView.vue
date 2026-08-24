@@ -1,4 +1,7 @@
 <script setup lang="ts">
+const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
+import { ref, onMounted } from 'vue'
+import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
@@ -6,12 +9,8 @@ import yb from '@/assets/other/Group 60.png'
 import yb2 from '@/assets/other/Group 61.png'
 import yb3 from '@/assets/other/Group 62.png'
 
-import yb4 from '@/assets/other/Group 61(1).png'
-import yb5 from '@/assets/other/Group 61(2).png'
-import yb6 from '@/assets/other/Group 61(3).png'
-import yb7 from '@/assets/other/Group 61(4).png'
-// 上半区 驿路法务通 数据
-const yiluColumns = [
+// 上半区 驿路法务通 数据 (保留本地静态数据供后续对接文章接口)
+const yiluColumns = ref([
   {
     title: '律师/律所',
     sub: '律师/律所',
@@ -42,15 +41,83 @@ const yiluColumns = [
       { left: '法治公开课', right: '07/03' }
     ]
   }
-]
+])
 
-// 下半区 驿路国际法务区 数据
-const intlCards = [
-  { title: '涉外政务服务指南', img: yb4 },
-  { title: '涉外知识普及', img: yb5 },
-  { title: '国外法律法规说明', img: yb6 },
-  { title: '涉外法律在线法律咨询', img: yb7 }
-]
+const yiluHeader = ref<any>({})
+const intlHeader = ref<any>({})
+const intlCards = ref<any[]>([])
+
+const fetchCloudLegal = async () => {
+  try {
+    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+      zoneType: 'cloud_legal',
+      platform: 'portal',
+      userType: ''
+    })
+    if (res.code === 0 && res.data && res.data.cloud_legal) {
+      const list = res.data.cloud_legal
+      
+      const yilu = list.find((item: any) => item.name === '驿路法务通')
+      if (yilu) {
+        yiluHeader.value = yilu
+        if (yilu.children && yilu.children.length > 0) {
+          yiluColumns.value.forEach(col => {
+            const matched = yilu.children.find((child: any) => child.name === col.title)
+            if (matched) {
+              col.sub = matched.subtitle || col.sub
+              if (matched.icon) {
+                col.icon = matched.icon.startsWith('http') ? matched.icon : minioPrefix + '/' + matched.icon.replace(/^\/+/, '')
+              }
+              if (matched.bgImage) {
+                (col as any).bgImage = matched.bgImage.startsWith('http') ? matched.bgImage : minioPrefix + '/' + matched.bgImage.replace(/^\/+/, '')
+              }
+              (col as any).url = matched.url || ''
+
+              if (matched.code === 'lawyer_firm' && matched.data) {
+                const arr = []
+                if (matched.data.lawFirms && matched.data.lawFirms.length > 0) {
+                  arr.push(...matched.data.lawFirms.map((f: any) => ({ left: f.name, right: f.specialty || '律所' })))
+                }
+                if (matched.data.lawyers && matched.data.lawyers.length > 0) {
+                  arr.push(...matched.data.lawyers.map((l: any) => ({ left: l.name, right: l.title || '律师' })))
+                }
+                if (arr.length > 0) col.items = arr.slice(0, 3)
+              } else if (matched.code === 'case' && matched.data && Array.isArray(matched.data)) {
+                col.items = matched.data.slice(0, 3).map((c: any) => ({
+                  left: c.title,
+                  right: c.caseType || c.updateTime?.split(' ')[0] || ''
+                }))
+              } else if (matched.code === 'news' && matched.data && Array.isArray(matched.data)) {
+                col.items = matched.data.slice(0, 3).map((n: any) => ({
+                  left: n.title || n.name,
+                  right: n.publishTime?.split(' ')[0] || n.updateTime?.split(' ')[0] || ''
+                }))
+              }
+            }
+          })
+        }
+      }
+
+      const intl = list.find((item: any) => item.name === '驿路国际法务区')
+      if (intl) {
+        intlHeader.value = intl
+        intlCards.value = intl.children || []
+      }
+    }
+  } catch (e) {
+    console.error('Failed to fetch cloud legal data:', e)
+  }
+}
+
+const handleNavigate = (url: string) => {
+  if (url) {
+    window.location.href = url
+  }
+}
+
+onMounted(() => {
+  fetchCloudLegal()
+})
 </script>
 
 <template>
@@ -66,18 +133,22 @@ const intlCards = [
         <div class="legal-block">
           <div class="block-header">
             <div class="icon-square blue">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <img v-if="yiluHeader.icon" :src="yiluHeader.icon.startsWith('http') ? yiluHeader.icon : minioPrefix + yiluHeader.icon" style="" alt="" />
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                 <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <div class="header-text">
-              <h2>驿路法务通</h2>
-              <p>基础法律服务 · 普惠便民</p>
+              <h2>{{ yiluHeader.name || '驿路法务通' }}</h2>
+              <p>{{ yiluHeader.remark || '基础法律服务 · 普惠便民' }}</p>
             </div>
           </div>
           
           <div class="yilu-grid">
-            <div v-for="(col, idx) in yiluColumns" :key="idx" class="yilu-col-card">
+            <div v-for="(col, idx) in yiluColumns" :key="idx" class="yilu-col-card" 
+                 :style="(col as any).bgImage ? { backgroundImage: `url(${(col as any).bgImage})` } : {}"
+                 @click="handleNavigate((col as any).url)"
+                 style="cursor: pointer;">
               <div class="col-head">
                 <div class="col-title-wrap">
                   <h3>{{ col.title }} <span class="arrow">→</span></h3>
@@ -100,24 +171,25 @@ const intlCards = [
         <div class="legal-block mt-40" style="background:#fff;border:1px solid #ddd">
           <div class="block-header">
             <div class="icon-square cyan">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <img v-if="intlHeader.icon" :src="intlHeader.icon.startsWith('http') ? intlHeader.icon : minioPrefix + intlHeader.icon" style="" alt="" />
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                 <path d="M3 3h18v18H3z M12 8v8 M8 12h8" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
             </div>
             <div class="header-text">
-              <h2>驿路国际法务区</h2>
-              <p>涉外法律服务 · 跨境商事</p>
+              <h2>{{ intlHeader.name || '驿路国际法务区' }}</h2>
+              <p>{{ intlHeader.remark || '涉外法律服务 · 跨境商事' }}</p>
             </div>
           </div>
 
           <div class="intl-grid">
-            <div v-for="(card, i) in intlCards" :key="i" class="intl-card">
+            <div v-for="(card, i) in intlCards" :key="i" class="intl-card" @click="handleNavigate(card.url)">
               <div class="intl-title-wrap">
-                <h3>{{ card.title }}</h3>
+                <h3>{{ card.name }}</h3>
                 <span class="arrow">→</span>
               </div>
-              <img :src="card.img" alt="illustration" class="intl-img" />
+              <img :src="card.bgImage ? (card.bgImage.startsWith('http') ? card.bgImage : minioPrefix + card.bgImage) : ''" alt="illustration" class="intl-img" />
             </div>
           </div>
         </div>
@@ -140,7 +212,7 @@ const intlCards = [
 .main-content {
   position: relative;
   z-index: 5;
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 120px 24px 40px 24px;
   width: 100%;
@@ -175,6 +247,7 @@ const intlCards = [
   width: 44px;
   height: 44px;
   border-radius: 8px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -212,6 +285,12 @@ const intlCards = [
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
   border-radius: 6px;
   padding: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.yilu-col-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 .col-head {
@@ -267,11 +346,20 @@ const intlCards = [
   font-size: 13px;
   color: #475569;
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 8px;
 }
 
 .list-item .right-text {
   font-size: 13px;
   color: #64748b;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
 }
 
 /* 驿路国际法务区 四列 */

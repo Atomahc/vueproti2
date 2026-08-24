@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
@@ -16,21 +17,52 @@ const router = useRouter()
 const newsTab = ref('要闻')
 const newsTabs = ['要闻', '通知公告', '政策解读']
 
-const newsList = ref([
-  { title: '霍尔果斯口岸单日通关量创新...', date: '07/06' },
-  { title: '数字链计划一期建设成果发布会', date: '07/06' },
-  { title: '霍尔果斯口岸单日通关量创新...', date: '07/06' },
-  { title: '霍尔果斯口岸单日通关量创新...', date: '07/06' },
-  { title: '数字链计划一期建设成果发布会', date: '07/06' },
-  { title: '数字链计划一期建设成果发布会', date: '07/06' },
-  { title: '霍尔果斯口岸单日通关量创新...', date: '07/06' }
-])
+const newsList = ref<any[]>([])
+
+const fetchNews = async (category: string) => {
+  try {
+    const res: any = await http.get('/api-cas/api/get-articles', {
+      categoryIds: category,
+      owner: 'hgsso'
+    })
+    if (res.status === 'ok' && res.data) {
+      newsList.value = res.data.slice(0, 7).map((item: any) => {
+        const dateObj = new Date(item.publishTime || item.createdTime)
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+        const day = String(dateObj.getDate()).padStart(2, '0')
+        return {
+          title: item.displayName,
+          date: `${month}/${day}`,
+          name: item.name,
+          fullDate: (item.publishTime || item.createdTime).split('T')[0],
+          content: item.content
+        }
+      })
+    }
+  } catch (error) {
+    console.error('Failed to fetch news', error)
+  }
+}
+
+const goToArticle = (item: any) => {
+  sessionStorage.setItem('currentArticle', JSON.stringify(item))
+  router.push({
+    name: 'article-detail',
+    params: { id: item.name || '0' },
+    query: { tab: newsTab.value }
+  })
+}
+
+watch(newsTab, (newTab) => {
+  fetchNews(newTab)
+})
 
 const quickServices = ref<any[]>([])
 
 const swiperModules = [Pagination, Autoplay]
 const bannerList = ref<any[]>([])
 onMounted(async () => {
+  fetchNews(newsTab.value)
   try {
     const res: any = await http.get('/ncmanagement/class/zones-tree', {
       zoneType: 'home',
@@ -44,7 +76,7 @@ onMounted(async () => {
         title: item.name,
         desc: item.remark || defaultDesc[index % defaultDesc.length],
         iconBg: defaultColors[index % defaultColors.length],
-        icon: item.icon ? (item.icon.startsWith('http') ? item.icon : `http://192.168.2.13:8080${item.icon}`) : '',
+        icon: item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : `${minioPrefix}${item.bgImage}`) : '',
         path: item.url,
         isExternal: item.linkType === 'url' || item.url?.startsWith('http')
       }))
@@ -63,7 +95,7 @@ onMounted(async () => {
     if (res.code === 0 && res.data && res.data.list) {
       bannerList.value = res.data.list.map((item: any) => ({
         ...item,
-        coverImage: item.coverImage ? (item.coverImage.startsWith('http') ? item.coverImage : `http://192.168.2.13:8080${item.coverImage}`) : ''
+        coverImage: item.coverImage ? (item.coverImage.startsWith('http') ? item.coverImage : `${minioPrefix}${item.coverImage}`) : ''
       }))
     }
   } catch (error) {
@@ -161,7 +193,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
           </div>
 
           <ul class="news-list">
-            <li v-for="(item, index) in newsList" :key="index" class="news-item">
+            <li v-for="(item, index) in newsList" :key="index" class="news-item" @click="goToArticle(item)">
               <span class="news-dot">•</span>
               <span class="news-item-title">{{ item.title }}</span>
               <span class="news-item-date">{{ item.date }}</span>
@@ -183,7 +215,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
         <div class="quick-grid">
           <div v-for="(qs, idx) in quickServices" :key="idx" class="quick-card" @click="handleQuickClick(qs.path, qs.isExternal)">
             <div class="quick-icon-wrapper" :style="{ backgroundColor: qs.iconBg }">
-              <img v-if="qs.icon" :src="qs.icon" alt="icon" style="width: 22px; height: 22px; object-fit: contain;" />
+              <img v-if="qs.icon" :src="qs.icon" alt="icon" style="width: 40px; height: 40px; object-fit: contain;" />
             </div>
             <div class="quick-info">
               <h4>{{ qs.title }} <span class="arrow-icon">›</span></h4>
@@ -217,7 +249,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 .main-content {
   position: relative;
   z-index: 5;
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 120px 24px 40px 24px;
   width: 100%;
@@ -451,6 +483,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  height:300px;
 }
 
 .news-item {
@@ -553,7 +586,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 .quick-icon-wrapper {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;

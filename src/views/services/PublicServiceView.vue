@@ -1,44 +1,137 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
+import { ref, onMounted } from 'vue'
+import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
 
 // 随手拍表单
-const activeReportType = ref('占道经营')
-const reportTypes = ['占道经营', '车辆违停', '路灯故障', '井盖缺失', '道路不洁', '不文明行为']
-const reportInput = ref('')
+const snapshotSubmitting = ref(false)
+const uploadedImages = ref<string[]>([])
+const snapshotForm = ref({
+  reportType: 'occupying_business',
+  content: '',
+  imageUrls: '[]',
+  longitude: '',
+  latitude: '',
+  address: '',
+  community: 'none',
+  contactName: '',
+  contactPhone: ''
+})
+const handleNavigate = (url: string) => {
+  if (url) {
+    window.location.href = url
+  }
+}
+const handleImageUpload = (e: any) => {
+  const file = e.target.files[0]
+  if (!file) return
+  if (uploadedImages.value.length >= 9) {
+    alert('最多只能上传9张图片')
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = (event) => {
+    uploadedImages.value.push(event.target?.result as string)
+    snapshotForm.value.imageUrls = JSON.stringify(uploadedImages.value)
+  }
+  reader.readAsDataURL(file)
+}
 
-// 劳道智工 热门职务
+const removeImage = (index: number) => {
+  uploadedImages.value.splice(index, 1)
+  snapshotForm.value.imageUrls = JSON.stringify(uploadedImages.value)
+}
+
+const submitSnapshotForm = async () => {
+  if (!snapshotForm.value.content || !snapshotForm.value.contactName || !snapshotForm.value.contactPhone || !snapshotForm.value.address) {
+    alert('请填写完整信息')
+    return
+  }
+  snapshotSubmitting.value = true
+  try {
+    const res: any = await http.post('/portal/complaint/snapshot/create', null, { params: snapshotForm.value })
+    if (res.code === 0 || String(res.code) === '0') {
+      alert('提交成功')
+      uploadedImages.value = []
+      snapshotForm.value = {
+        reportType: 'occupying_business', content: '', imageUrls: '[]', longitude: '', latitude: '', address: '', community: 'none', contactName: '', contactPhone: ''
+      }
+    } else {
+      alert('提交失败: ' + res.msg)
+    }
+  } catch (e: any) {
+    alert('提交出错: ' + (e.message || '未知错误'))
+  } finally {
+    snapshotSubmitting.value = false
+  }
+}
+
+const laodaoInfo = ref<any>({})
+const laodaoTags = ref<any[]>([])
 const hotJobsCount = ref(6)
 
-// 社区便民 5列2行 10个服务 (蓝色细线图标)
-const communityServices = [
-  { name: '民政救助', icon: 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-  { name: '身份户籍', icon: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 012-2h2a2 2 0 012 2v1m-6 0h6' },
-  { name: '出境入境', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
-  { name: '军优服务', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-  { name: '医疗健康', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
-  { name: '社保医保', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
-  { name: '教育科技', icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.605 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z' },
-  { name: '爱心助残', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
-  { name: '创业就业', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-  { name: '金色暖阳', icon: 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z' }
-]
+const zhongyaInfo = ref<any>({})
 
-// 生活服务 5列2行 10个服务 (精确匹配设计图)
-const lifeServices = [
-  { name: '交通驾驶', icon: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
-  { name: '学历证书', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-  { name: '企业信息', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9' },
-  { name: '出入境', icon: 'M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z' },
-  { name: '被执行人', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
-  { name: '个税查询', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-  { name: '学籍信息', icon: 'M12 14l9-5-9-5-9 5 9 5z' },
-  { name: '征信查询', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
-  { name: '招考查询', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16' },
-  { name: '法律法规', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' }
-]
+const communityServices = ref<any[]>([])
+const lifeServices = ref<any[]>([])
+const bottomCards = ref<any[]>([])
+
+const activeModal = ref<any>(null)
+
+const openModal = (info: any) => {
+  activeModal.value = info
+}
+
+const closeModal = () => {
+  activeModal.value = null
+}
+
+const fetchConvenience = async () => {
+  try {
+    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+      zoneType: 'convenience',
+      platform: 'portal',
+      userType: ''
+    })
+    if (res.code === 0 && res.data && res.data.convenience) {
+      const list = res.data.convenience
+      
+      const ld = list.find((item: any) => item.name === '劳道智工')
+      if (ld) {
+        laodaoInfo.value = ld
+        laodaoTags.value = ld.children || []
+      }
+      
+      const zy = list.find((item: any) => item.name?.includes('中亚直通桥'))
+      if (zy) {
+        zhongyaInfo.value = zy
+      }
+      
+      const sq = list.find((item: any) => item.name === '社区便民')
+      if (sq) {
+        communityServices.value = sq.children || []
+      }
+      
+      const sh = list.find((item: any) => item.name === '生活服务')
+      if (sh) {
+        lifeServices.value = sh.children || []
+      }
+
+      bottomCards.value = list.filter((item: any) => 
+        ['青少年活动中心', '文旅服务', '志愿者服务(霍尔果斯云)'].includes(item.name)
+      )
+    }
+  } catch(e) {
+    console.error('Failed to fetch convenience services', e)
+  }
+}
+
+onMounted(() => {
+  fetchConvenience()
+})
 </script>
 
 <template>
@@ -68,23 +161,68 @@ const lifeServices = [
             </div>
 
             <div class="shoot-body">
-              <label class="form-label">上报类型</label>
-              <div class="type-tags">
-                <button
-                  v-for="t in reportTypes"
-                  :key="t"
-                  :class="['tag-btn', { active: activeReportType === t }]"
-                  @click="activeReportType = t"
-                >
-                  {{ t }}
-                </button>
+              <div class="row-group">
+                <div class="col" style="margin-right: 10px;">
+                  <label class="form-label">上报类型</label>
+                  <select class="shoot-input" v-model="snapshotForm.reportType">
+                      <option value="occupying_business">占道经营</option>
+                      <option value="illegal_parking">违章停车</option>
+                      <option value="streetlight_fault">路灯故障</option>
+                      <option value="manhole_missing">井盖缺失</option>
+                      <option value="road_dirty">道路不洁</option>
+                      <option value="uncivilized_behavior">不文明行为</option>
+                  </select>
+                </div>
+                <div class="col">
+                  <label class="form-label">所属社区</label>
+                  <select class="shoot-input" v-model="snapshotForm.community">
+                    <option value="none">无社区</option>
+                    <option value="cooperation_zone">合作区</option>
+                    <option value="kalasu">卡拉苏社区</option>
+                    <option value="silu">丝路社区</option>
+                    <option value="suolun">索伦社区</option>
+                    <option value="yingtarr">英塔尔社区</option>
+                    <option value="hongqiao">红桥社区</option>
+                  </select>
+                </div>
               </div>
-              <textarea
-                v-model="reportInput"
-                placeholder="请输入..."
-                class="shoot-textarea"
-              ></textarea>
-              <button class="submit-btn green">立即上传</button>
+
+              <label class="form-label" style="margin-top: 10px;">问题描述</label>
+              <div class="textarea-with-upload">
+                <div class="upload-container">
+                  <div v-for="(img, index) in uploadedImages" :key="index" class="upload-item">
+                    <img :src="img" class="upload-preview" />
+                    <button type="button" class="btn-remove-img" @click="removeImage(index)">×</button>
+                  </div>
+                  <div class="upload-btn" v-if="uploadedImages.length < 9">
+                    <span>+ 图片</span>
+                    <input type="file" accept="image/*" @change="handleImageUpload" />
+                  </div>
+                </div>
+                <textarea
+                  v-model="snapshotForm.content"
+                  placeholder="请输入问题描述..."
+                  class="shoot-textarea-inner"
+                ></textarea>
+              </div>
+
+              <div class="row-group" style="margin-top: 10px;">
+                <div class="col" style="margin-right: 10px;">
+                  <label class="form-label">姓名</label>
+                  <input type="text" class="shoot-input" v-model="snapshotForm.contactName" placeholder="姓名" />
+                </div>
+                <div class="col">
+                  <label class="form-label">联系电话</label>
+                  <input type="text" class="shoot-input" v-model="snapshotForm.contactPhone" placeholder="电话" />
+                </div>
+              </div>
+              
+              <label class="form-label" style="margin-top: 10px;">地址</label>
+              <input type="text" class="shoot-input" v-model="snapshotForm.address" placeholder="请输入地址" style="margin-bottom: 16px;" />
+
+              <button class="submit-btn green" @click="submitSnapshotForm" :disabled="snapshotSubmitting">
+                {{ snapshotSubmitting ? '提交中...' : '立即上传' }}
+              </button>
             </div>
           </div>
 
@@ -93,27 +231,23 @@ const lifeServices = [
             <div class="card-header-flex">
               <div class="header-title-box">
                 <div class="icon-square teal">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
+                  <img v-if="laodaoInfo.bgImage && (laodaoInfo.bgImage.includes('/') || laodaoInfo.bgImage.includes('.'))" :src="laodaoInfo.bgImage.startsWith('http') ? laodaoInfo.bgImage : minioPrefix + laodaoInfo.bgImage" style="width: 36px; height: 36px; object-fit: contain; " />
+                  <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
                     <path d="M12 14l9-5-9-5-9 5 9 5z" />
                   </svg>
                 </div>
-                <h2>劳道智工 · <span>短期工</span></h2>
+                <h2>{{ laodaoInfo.name ? laodaoInfo.name : '劳道智工' }} · <span>短期工</span></h2>
               </div>
-              <span class="arrow">&gt;</span>
+              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
 
             <div class="short-job-body">
               <div class="job-tags-grid">
-                <span class="j-tag">零工市场</span>
-                <span class="j-tag">高薪职位</span>
-                <span class="j-tag">网络职位</span>
-                <span class="j-tag">今日招聘</span>
-                <span class="j-tag">附近职位</span>
-                <span class="j-tag">同城信息</span>
+                <span class="j-tag" v-for="(tag, idx) in laodaoTags" :key="idx">{{ tag.name }}</span>
               </div>
               <div class="hot-job-banner">
                 <span>热门职务 <strong>*{{ hotJobsCount }}</strong></span>
-                <a href="#" class="view-link">查看 &rarr;</a>
+                <a href="javascript:void(0)" class="view-link" @click.prevent="openModal(laodaoInfo)">查看 &rarr;</a>
               </div>
             </div>
           </div>
@@ -123,18 +257,19 @@ const lifeServices = [
             <div class="card-header-flex">
               <div class="header-title-box">
                 <div class="icon-square orange">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
+                  <img v-if="zhongyaInfo.bgImage && (zhongyaInfo.bgImage.includes('/') || zhongyaInfo.bgImage.includes('.'))" :src="zhongyaInfo.bgImage.startsWith('http') ? zhongyaInfo.bgImage : minioPrefix + zhongyaInfo.bgImage" style="width: 36px; height: 36px; object-fit: contain;" />
+                  <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
                     <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
                   </svg>
                 </div>
-                <h2>中亚直通桥 · <span>长期工</span></h2>
+                <h2>{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : '中亚直通桥' }} · <span>长期工</span></h2>
               </div>
-              <span class="arrow">&gt;</span>
+              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
 
             <div class="long-job-body">
-              <p class="desc-text">集成长期岗位，与劳道智工短期工形成短期+长期全覆盖就业服务体系。</p>
-              <button class="yellow-action-btn">
+              <p class="desc-text">{{ zhongyaInfo.remark || '集成长期岗位，与劳道智工短期工形成短期+长期全覆盖就业服务体系。' }}</p>
+              <button class="yellow-action-btn" @click="openModal(zhongyaInfo)">
                 找人才/找工作 <span class="sub-link">职位列表 &rarr;</span>
               </button>
             </div>
@@ -144,12 +279,13 @@ const lifeServices = [
           <div class="bm-card blue-tint-card">
             <div class="card-header-flex">
               <h2>社区便民</h2>
-              <span class="arrow">&gt;</span>
+              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
             <div class="services-icon-grid">
-              <div v-for="(s, i) in communityServices" :key="i" class="icon-item-box">
+              <div v-for="(s, i) in communityServices" :key="i" class="icon-item-box" @click="handleNavigate(s.url)">
                 <div class="svg-icon-blue">
-                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <img v-if="s.bgImage && (s.bgImage.includes('/') || s.bgImage.includes('.'))" :src="s.bgImage.startsWith('http') ? s.bgImage : minioPrefix + s.bgImage " style="width: 36px; height: 36px; object-fit: contain; filter: none;" />
+                  <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path :d="s.icon" />
                   </svg>
                 </div>
@@ -162,12 +298,13 @@ const lifeServices = [
           <div class="bm-card blue-tint-card">
             <div class="card-header-flex">
               <h2>生活服务</h2>
-              <span class="arrow">&gt;</span>
+              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
             <div class="services-icon-grid">
-              <div v-for="(s, i) in lifeServices" :key="i" class="icon-item-box">
+              <div v-for="(s, i) in lifeServices" :key="i" class="icon-item-box" @click="handleNavigate(s.url)">
                 <div class="svg-icon-blue">
-                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <img v-if="s.bgImage && (s.bgImage.includes('/') || s.bgImage.includes('.'))" :src="s.bgImage.startsWith('http') ? s.bgImage : minioPrefix + s.bgImage " style="width: 36px; height: 36px; object-fit: contain; filter: none;" />
+                  <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path :d="s.icon" />
                   </svg>
                 </div>
@@ -177,44 +314,17 @@ const lifeServices = [
           </div>
 
           <!-- 底部三列横向入口卡片 -->
-          <div class="bm-card footer-small-card">
-            <div class="small-card-content">
-              <div class="card-icon-square purple">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
+            <div v-for="(bc, i) in bottomCards" :key="i" class="bm-card footer-small-card" @click="handleNavigate(bc.url)">
+              <div class="small-card-content">
+                <div class="card-icon-square" :class="['purple', 'cyan', 'yellow'][i % 3]">
+                <img v-if="bc.bgImage && (bc.bgImage.includes('/') || bc.bgImage.includes('.'))" :src="bc.bgImage.startsWith('http') ? bc.bgImage : minioPrefix + bc.bgImage" style="width: 40px; height: 40px; object-fit: contain;" />
+                <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
                   <path d="M12 14l9-5-9-5-9 5 9 5z" />
                 </svg>
               </div>
               <div class="text-info">
-                <h3>青少年活动中心 &rarr;</h3>
-                <p>兴趣课程查询/报名/成果展示</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bm-card footer-small-card">
-            <div class="small-card-content">
-              <div class="card-icon-square cyan">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
-                  <path d="M12 3v1m0 16v1m9-9h-1M4 12H3" />
-                </svg>
-              </div>
-              <div class="text-info">
-                <h3>文旅服务 &rarr;</h3>
-                <p>兴趣课程查询/报名/成果展示</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bm-card footer-small-card">
-            <div class="small-card-content">
-              <div class="card-icon-square yellow">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
-                  <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </div>
-              <div class="text-info">
-                <h3>志愿者服务<span class="sub">(霍尔果斯云)</span> &rarr;</h3>
-                <p>活动报名/积分商城</p>
+                <h3>{{ bc.name.replace('(霍尔果斯云)', '') }} <span class="sub" v-if="bc.name.includes('(霍尔果斯云)')">(霍尔果斯云)</span> &rarr;</h3>
+                <p>{{ bc.remark || '暂无描述' }}</p>
               </div>
             </div>
           </div>
@@ -222,6 +332,37 @@ const lifeServices = [
         </div>
       </div>
     </main>
+
+    <!-- 弹窗 -->
+    <div class="modal-overlay" v-if="activeModal" @click.self="closeModal">
+      <div class="modal-content">
+        <button class="modal-close-btn" @click="closeModal">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="modal-header">
+          <div class="modal-icon-box" :class="{ 'green': activeModal.name?.includes('劳道'), 'yellow': activeModal.name?.includes('中亚') }">
+            <img v-if="activeModal.bgImage && (activeModal.bgImage.includes('/') || activeModal.bgImage.includes('.'))" :src="activeModal.bgImage.startsWith('http') ? activeModal.bgImage : minioPrefix + activeModal.bgImage" style="" />
+            <svg v-else viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2">
+              <path d="M12 14l9-5-9-5-9 5 9 5z" />
+            </svg>
+          </div>
+          <h2 class="modal-title">{{ activeModal.name ? activeModal.name.split('·')[0] : '' }}简介</h2>
+        </div>
+        <p class="modal-desc">{{ activeModal.linkDesc || '暂无简介' }}</p>
+        <div class="modal-qrcode-section" :class="{ 'green-bg': activeModal.name?.includes('劳道'), 'yellow-bg': activeModal.name?.includes('中亚') }">
+          <div class="qrcode-title">请扫描下方二维码进入小程序</div>
+          <div class="qrcode-wrapper">
+            <img v-if="activeModal.qrcode" :src="activeModal.qrcode.startsWith('http') ? activeModal.qrcode : minioPrefix + activeModal.qrcode" alt="QR Code" class="qrcode-img" />
+            <!-- Fallback QR code images if no dynamic one -->
+            <img v-else-if="activeModal.name?.includes('劳道')" src="@/assets/img/indexbg.png" style="width: 140px; height: 140px; object-fit: contain; opacity: 0.5;" alt="QR Code" class="qrcode-img" />
+            <img v-else src="@/assets/img/indexbg.png" style="width: 140px; height: 140px; object-fit: contain; opacity: 0.5;" alt="QR Code" class="qrcode-img" />
+          </div>
+        </div>
+      </div>
+    </div>
 
     <TheFooter />
   </div>
@@ -242,7 +383,7 @@ const lifeServices = [
 .main-content {
   position: relative;
   z-index: 5;
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 120px 24px 40px 24px;
   width: 100%;
@@ -270,7 +411,15 @@ const lifeServices = [
   padding: 20px;
   box-sizing: border-box;
 }
-
+.footer-small-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  transform: scale(1.05);
+  transition: all 0.2s; 
+  cursor: pointer;
+}
+.footer-small-card{
+  border:1px solid #eee
+}
 .shoot-card {
   grid-row: span 2;
   background: #e6f9f0;
@@ -302,6 +451,7 @@ const lifeServices = [
   width: 36px;
   height: 36px;
   border-radius: 6px;
+  overflow:hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -351,21 +501,128 @@ const lifeServices = [
   border-color: #10b981;
 }
 
-.shoot-textarea {
-  width: 100%;
-  height: 140px;
+.textarea-with-upload {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: stretch;
   border: 1px solid #cbd5e1;
   border-radius: 4px;
-  padding: 12px;
-  box-sizing: border-box;
+  background: #ffffff;
+  padding: 8px;
+  transition: border-color 0.2s;
+}
+.textarea-with-upload:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.shoot-textarea-inner {
+  flex: 1;
+  min-height: 60px;
+  border: none;
   font-size: 13px;
   outline: none;
   resize: none;
-  background: #ffffff;
-  margin-bottom: 16px;
+  background: transparent;
+  margin-bottom: 0;
 }
 
-.submit-btn.green {
+.shoot-textarea:focus,
+.shoot-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.shoot-input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  font-size: 13px;
+  outline: none;
+  background: #ffffff;
+  transition: border-color 0.2s;
+}
+
+.row-group {
+  display: flex;
+}
+.row-group .col {
+  flex: 1;
+}
+
+/* 上传框样式 */
+.upload-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 130px;
+  align-content: flex-start;
+}
+.upload-item {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  overflow: hidden;
+}
+.upload-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.btn-remove-img {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.upload-btn {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  border: 1px dashed #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 10px;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all 0.2s;
+  text-align: center;
+  padding: 0 4px;
+}
+.upload-btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+.upload-btn input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.submit-btn {
   background: #10b981;
   color: #ffffff;
   border: none;
@@ -400,7 +657,11 @@ const lifeServices = [
   color: #94a3b8;
   font-size: 16px;
 }
-
+.arrow svg {
+  width: 16px;
+  height: 16px;
+  stroke: #94a3b8;
+}
 /* 劳道智工 (Teal) */
 .teal-tint {
   background: #f0fdfa;
@@ -500,7 +761,7 @@ const lifeServices = [
 /* 社区便民 & 生活服务 (Blue) */
 .blue-tint-card {
   background: #f8fafc;
-  border: 1px solid #f1f5f9;
+  border: 1px solid #ddd;
   grid-column: span 1;
 }
 
@@ -508,7 +769,7 @@ const lifeServices = [
 .footer-small-card {
   padding: 16px;
   background: #f8fafc;
-  border: 1px solid #f1f5f9;
+  border: 1px solid #ddd;
   grid-column: span 1;
 }
 
@@ -522,6 +783,7 @@ const lifeServices = [
   width: 40px;
   height: 40px;
   border-radius: 8px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -555,7 +817,7 @@ const lifeServices = [
 .services-icon-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
+  gap: 16px 0px;
   margin-top: 10px;
 }
 
@@ -569,9 +831,10 @@ const lifeServices = [
 }
 
 .icon-item-box .svg-icon-blue {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   background: #eff6ff;
+  overflow: hidden;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -580,7 +843,6 @@ const lifeServices = [
 }
 
 .icon-item-box:hover .svg-icon-blue {
-  background: #0066ff;
   transform: translateY(-2px);
 }
 
@@ -589,7 +851,7 @@ const lifeServices = [
 }
 
 .icon-item-box span {
-  font-size: 13px;
+  font-size: 12px;
   color: #334155;
 }
 
@@ -605,5 +867,120 @@ const lifeServices = [
   height: 300px;
   color: #94a3b8;
   font-size: 18px;
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 440px;
+  padding: 30px;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+  color: #0f172a;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.modal-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-icon-box.green { background: #10b981; }
+.modal-icon-box.yellow { background: #f59e0b; }
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.modal-desc {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+  text-align: justify;
+}
+
+.modal-qrcode-section {
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.modal-qrcode-section.green-bg {
+  background: linear-gradient(180deg, #e6f9f0 0%, #ffffff 100%);
+}
+
+.modal-qrcode-section.yellow-bg {
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+}
+
+.qrcode-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  background: #ffffff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.qrcode-wrapper {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.qrcode-img {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
 }
 </style>

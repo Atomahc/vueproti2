@@ -1,6 +1,13 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
+// 修复 hash 模式下 SSO 回调参数丢失的问题
+if (window.location.pathname.endsWith('/login/sso-callback')) {
+  const search = window.location.search
+  const basePath = window.location.pathname.replace(/\/login\/sso-callback$/, '')
+  window.history.replaceState(null, '', `${basePath}/#/login/sso-callback${search}`)
+}
+
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
@@ -16,6 +23,11 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: () => import('../views/SearchView.vue'),
     },
     {
       path: '/article/:id',
