@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
@@ -8,6 +9,8 @@ import TheNavBar from '../../components/TheNavBar.vue'
 
 // 二级 Tab 切换: 'personal' | 'enterprise_bs' | 'enterprise_fw'
 const activeSubTab = ref<'personal' | 'enterprise_bs' | 'enterprise_fw'>('personal')
+
+const router = useRouter()
 
 // 1. 个人办事 数据
 const personalCategories = ref<any[]>([])
@@ -21,7 +24,7 @@ const defaultBgColors = ['#e6fcfc', '#e6f7ff', '#f0f5ff', '#f6ffed', '#fff7e6', 
 
 const fetchGovServices = async () => {
   try {
-    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
       zoneType: 'gov_service',
       platform: 'portal',
       userType: ''
@@ -264,7 +267,7 @@ const enterpriseArticles = [
               </div>
               <p class="card-desc">供需发布平台，产业链上下游资源互补与协作</p>
               <div class="action-btn-row">
-                <button class="outline-btn teal">立即跳转 &rarr;</button>
+                <button class="outline-btn teal" @click="router.push('/supply-demand')">立即跳转 &rarr;</button>
               </div>
             </div>
 
@@ -365,7 +368,6 @@ const enterpriseArticles = [
 /* 内容卡片外壳 */
 .content-box {
   background: #ffffff;
-  border-radius: 4px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   padding: 24px;
 }

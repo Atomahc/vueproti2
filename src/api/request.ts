@@ -7,11 +7,7 @@ interface RequestOptions extends RequestInit {
 }
 
 async function request<T = any>(url: string, options: RequestOptions = {}): Promise<T> {
-  if (url.startsWith('/') && !url.startsWith('/api-cas') && !url.startsWith('/api-loca')) {
-    url = '/api-loca' + url
-  }
   const { params, headers, ...restOptions } = options
-
   let fetchUrl = url
 
 
@@ -67,7 +63,7 @@ async function request<T = any>(url: string, options: RequestOptions = {}): Prom
 
 export const triggerSSOLogin = async () => {
   try {
-    const res: any = await http.get('/member/auth/sso/url?client=portal')
+    const res: any = await http.get('/api-loca/member/auth/sso/url?client=portal')
     const ssoUrl = res.url || res.data?.url
     console.log('SSO 登录地址:', ssoUrl)
     if (!ssoUrl) {

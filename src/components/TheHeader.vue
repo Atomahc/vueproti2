@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { http, triggerSSOLogin } from '@/api/request'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 defineProps<{
   isInternal?: boolean
@@ -55,7 +56,7 @@ onMounted(async () => {
   if (token) {
     isLoggedIn.value = true
     try {
-      const res: any = await http.get('/member/auth/user-info')
+      const res: any = await http.get('/api-loca/member/auth/user-info')
       const userData = res.data || res
 
       if (userData) {
@@ -73,9 +74,24 @@ onMounted(async () => {
   }
 })
 
+
+const { t, locale } = useI18n()
+
+const showLangDropdown = ref(false)
+const toggleLangDropdown = () => {
+  showLangDropdown.value = !showLangDropdown.value
+}
+const changeLanguage = (lang: string) => {
+  locale.value = lang
+  showLangDropdown.value = false
+}
+
+// close event listener updates
 const closeDropdown = () => {
   showDropdown.value = false
+  showLangDropdown.value = false
 }
+
 
 onMounted(() => {
   window.addEventListener('click', closeDropdown)
@@ -103,9 +119,11 @@ const handleLogout = () => {
       <div class="top-bar-inner">
         <div class="top-left">
 
-          <a href="#" class="top-link">移动版</a>
+          <a href="#" class="top-link" @click.prevent="router.push('/site-group')">站群导航</a>
           <span class="divider">|</span>
-          <a href="#" class="top-link">政务电话</a>
+          <a href="#" class="top-link">{{ t('header.mobile') }}</a>
+          <span class="divider">|</span>
+          <a href="#" class="top-link">{{ t('header.govPhone') }}</a>
          
         </div>
         <div class="top-right">
@@ -115,18 +133,24 @@ const handleLogout = () => {
             <div class="user-profile user-dropdown">
               <span class="username" @click.stop="toggleDropdown">{{ userInfo.name }}</span>
               <div class="dropdown-content" :class="{ 'show': showDropdown }" @click.stop>
-                <router-link to="/certify?type=enterprise">企业认证</router-link>
-                <router-link to="/certify?type=gov">机关认证</router-link>
-                <a href="#" class="logout-btn" @click.prevent="handleLogout">退出登录</a>
+                <router-link to="/certify?type=enterprise">{{ t('header.enterpriseCert') }}</router-link>
+                <router-link to="/certify?type=gov">{{ t('header.govCert') }}</router-link>
+                <a href="#" class="logout-btn" @click.prevent="handleLogout">{{ t('header.logout') }}</a>
               </div>
             </div>
           </template>
           <template v-else>
-            <a href="#" @click.prevent="triggerSSOLogin" class="top-link">登录注册</a>
+            <a href="#" @click.prevent="triggerSSOLogin" class="top-link">{{ t('header.loginRegister') }}</a>
           </template>
           <span class="divider">|</span>
-          <div class="dropdown-lang">
-            <span>语言切换</span>
+          <div class="dropdown-lang user-dropdown">
+            <span @click.stop="toggleLangDropdown">{{ t('header.language') }} ({{ locale.toUpperCase() }})</span>
+            <div class="dropdown-content" :class="{ 'show': showLangDropdown }" @click.stop>
+              <a href="#" @click.prevent="changeLanguage('zh')">中文</a>
+              <a href="#" @click.prevent="changeLanguage('ru')">Русский</a>
+              <a href="#" @click.prevent="changeLanguage('kk')">Қазақша</a>
+              <a href="#" @click.prevent="changeLanguage('en')">English</a>
+            </div>
           </div>
         </div>
       </div>
@@ -137,11 +161,11 @@ const handleLogout = () => {
       <div class="main-header-inner">
         <div class="brand-section">
       
-          <h1 class="portal-title">数字霍尔果斯·向西开放桥头堡</h1>
+          <h1 class="portal-title">{{ t('header.title') }}</h1>
         </div>
 
         <div class="search-box">
-          <input type="text" placeholder="搜索政府服务、企业信息、便民事项..." class="search-input" v-model="searchKeyword" @keyup.enter="handleSearch" />
+          <input type="text" :placeholder="t('header.searchPlaceholder')" class="search-input" v-model="searchKeyword" @keyup.enter="handleSearch" />
           <button class="search-btn" @click="handleSearch">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
@@ -210,6 +234,7 @@ const handleLogout = () => {
 .dropdown-lang {
   cursor: pointer;
   color: #4a5568;
+  position: relative;
 }
 
 .dropdown-lang:hover {
@@ -347,8 +372,8 @@ const handleLogout = () => {
   visibility: hidden;
   opacity: 0;
   position: absolute;
-  top: 100%;
-  right: 0;
+  top: 30px;
+  right: -100px;
   background: white;
   min-width: 120px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);

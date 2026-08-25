@@ -13,7 +13,7 @@ const coopServices = ref<any>({ children: [] })
 
 const fetchCrossBorder = async () => {
   try {
-    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
       zoneType: 'cross_border',
       platform: 'portal',
       userType: ''
@@ -313,7 +313,6 @@ h3 {
 /* 内容卡片外壳 */
 .content-box {
   background: #ffffff;
-  border-radius: 4px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   padding: 24px;
 

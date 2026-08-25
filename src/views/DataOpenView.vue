@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
@@ -10,6 +11,8 @@ import gg1 from '@/assets/other/gg1.png'
 import gg2 from '@/assets/other/gg2.png'
 import gg3 from '@/assets/other/gg3.png'
 import gg4 from '@/assets/other/gg4.png'
+
+const router = useRouter()
 
 const statSection = ref<any>({ children: [] })
 const visSection = ref<any>({ children: [] })
@@ -28,7 +31,7 @@ const visCardsBackup = [
 
 const fetchDataOpen = async () => {
   try {
-    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
       zoneType: 'data_open',
       platform: 'portal',
       userType: ''
@@ -55,6 +58,13 @@ const handleNavigate = (url: string) => {
   if (url) {
     window.location.href = url
   }
+}
+
+const handleStatCardClick = (card: any) => {
+  router.push({
+    name: 'news-list',
+    query: { tab: card.name }
+  })
 }
 
 onMounted(() => {
@@ -87,7 +97,7 @@ onMounted(() => {
           </div>
 
           <div class="cards-grid">
-            <div v-for="(card, i) in (statSection.children.length > 0 ? statSection.children : statCardsBackup)" :key="i" class="data-card orange-card clickable-card" @click="handleNavigate(card.url)">
+            <div v-for="(card, i) in (statSection.children.length > 0 ? statSection.children : statCardsBackup)" :key="i" class="data-card orange-card clickable-card" @click="handleStatCardClick(card)">
               <div class="card-info">
                 <h3>{{ card.name }}</h3>
                 <p>{{ card.remark }}</p>

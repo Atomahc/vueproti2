@@ -87,7 +87,7 @@ const submitEnterprise = async () => {
 
   isSubmitting.value = true
   try {
-    await http.post('/portal/enterprise-certify/apply', {
+    await http.post('/api-loca/portal/enterprise-certify/apply', {
       ...enterpriseForm,
       id: 0,
       memberId: 0,
@@ -147,7 +147,7 @@ const submitGov = async () => {
 
   isSubmitting.value = true
   try {
-    await http.post('/portal/gov-certify/apply', {
+    await http.post('/api-loca/portal/gov-certify/apply', {
       ...govForm,
       id: 0,
       memberId: 0,

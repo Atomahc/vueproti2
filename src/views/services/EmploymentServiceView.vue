@@ -29,7 +29,7 @@ const themes = ['red', 'orange', 'blue', 'cyan', 'green', 'purple']
 
 const fetchPublicOpinion = async () => {
   try {
-    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
       zoneType: 'public_opinion',
       platform: 'portal',
       userType: ''
@@ -78,7 +78,7 @@ const submitForm = async () => {
   }
   submitting.value = true
   try {
-    const res: any = await http.post('/portal/complaint/direct/create', null, { params: formData.value })
+    const res: any = await http.post('/api-loca/portal/complaint/direct/create', null, { params: formData.value })
     if (res.code === 0 || String(res.code) === '0') {
       alert('提交成功')
       showModal.value = false
@@ -244,7 +244,7 @@ onMounted(() => {
 .main-content {
   position: relative;
   z-index: 5;
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 120px 24px 40px 24px;
   width: 100%;
@@ -253,7 +253,6 @@ onMounted(() => {
 
 .content-box {
   background: #ffffff;
-  border-radius: 4px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   padding: 30px;
 }

@@ -52,7 +52,7 @@ const submitSnapshotForm = async () => {
   }
   snapshotSubmitting.value = true
   try {
-    const res: any = await http.post('/portal/complaint/snapshot/create', null, { params: snapshotForm.value })
+    const res: any = await http.post('/api-loca/portal/complaint/snapshot/create', null, { params: snapshotForm.value })
     if (res.code === 0 || String(res.code) === '0') {
       alert('提交成功')
       uploadedImages.value = []
@@ -91,7 +91,7 @@ const closeModal = () => {
 
 const fetchConvenience = async () => {
   try {
-    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
       zoneType: 'convenience',
       platform: 'portal',
       userType: ''
@@ -393,7 +393,6 @@ onMounted(() => {
 /* 内容卡片外壳 */
 .content-box {
   background: #ffffff;
-  border-radius: 4px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   padding: 24px;
 }

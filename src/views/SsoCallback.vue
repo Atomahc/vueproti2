@@ -27,7 +27,7 @@ onMounted(async () => {
   try {
     sessionStorage.removeItem('sso_state')
     // 提交 code 和 state 到后端换取 access_token
-    const res: any = await http.post('/member/auth/sso/callback', { code, state })
+    const res: any = await http.post('/api-loca/member/auth/sso/callback', { code, state })
     
     const token = res.token || res.data?.token || res.access_token || res.data?.access_token
     

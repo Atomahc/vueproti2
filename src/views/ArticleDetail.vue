@@ -14,32 +14,45 @@ const articleData = ref<{ title: string; date: string; content: string } | null>
 
 // 根据路由参数加载文章数据
 const fetchArticle = async () => {
-  const nameId = route.params.id as string
-  const fullId = nameId.includes('/') ? nameId : `hgsso/${nameId}`
-  
-  try {
-    const res: any = await http.get('/api-cas/api/get-article', { id: fullId })
-    if (res.status === 'ok' && res.data) {
-      const data = res.data
-      const dateObj = new Date(data.publishTime || data.createdTime)
-      const dateStr = dateObj.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-')
-      
+  // 1. 优先从 sessionStorage 读取，实现直接渲染，避免白屏等待
+  const cached = sessionStorage.getItem('currentArticle')
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached)
       articleData.value = {
-        title: data.displayName || data.title,
+        title: parsed.title || parsed.displayName,
+        date: parsed.fullDate || parsed.date || parsed.publishTime || '未知',
+        content: parsed.content || '<p style="text-align:center; color:#999; margin-top: 50px;">此文章暂无内容。</p>'
+      }
+    } catch (e) {
+      console.error('解析缓存文章数据失败', e)
+    }
+  }
+
+  const nameId = route.params.id as string
+  if (!nameId) return
+
+  // 2. 根据 id 使用新接口获取完整最新渲染数据
+  try {
+    const json = await http.get(`/api-loca/portal/article/${nameId}`)
+    if (json.code === 0 && json.data) {
+      const data = json.data
+      let dateStr = data.publishTime || 'N/A'
+      // 日期格式化，保留 "2026-07-23" 部分
+      if (dateStr.includes(' ')) {
+        dateStr = dateStr.split(' ')[0]
+      }
+      articleData.value = {
+        title: data.title,
         date: dateStr,
         content: data.content || '<p style="text-align:center; color:#999; margin-top: 50px;">此文章暂无内容。</p>'
       }
-    } else {
-      throw new Error('未找到内容')
+      return // 新接口获取成功，直接返回，不再执行旧接口逻辑
     }
   } catch (error) {
-    console.error('Failed to fetch article', error)
-    articleData.value = {
-      title: '文章未找到或已删除',
-      date: 'N/A',
-      content: '<p style="text-align:center; color:#999; margin-top: 50px;">抱歉，未能找到您请求的文章内容。</p>'
-    }
+    console.warn('请求新接口 http://192.168.2.11:8080/portal/article 失败或跨域，尝试原有接口', error)
   }
+
 }
 
 onMounted(() => {
@@ -130,13 +143,10 @@ watch(() => route.params.id, () => {
 
 .article-container {
   background: #ffffff;
-  border-radius: 16px;
-  
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
   padding: 60px;
   height:500px;
   overflow: auto;
-  margin-top: 20px;
 }
 
 /* 文章头部 */

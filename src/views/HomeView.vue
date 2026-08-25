@@ -64,7 +64,7 @@ const bannerList = ref<any[]>([])
 onMounted(async () => {
   fetchNews(newsTab.value)
   try {
-    const res: any = await http.get('/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
       zoneType: 'home',
       platform: 'portal',
       userType: ''
@@ -86,7 +86,7 @@ onMounted(async () => {
   }
 
   try {
-    const res: any = await http.get('/portal/section/page', {
+    const res: any = await http.get('/api-loca/portal/section/page', {
       page: 1,
       limit: 10,
       sectionType: 'banner',
@@ -145,7 +145,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
             
             <!-- Banner右侧两个竖向3D入口模块 -->
             <div class="banner-side-overlay">
-              <div class="vr-card">
+              <div class="vr-card" @click="handleQuickClick('https://www.720yun.com/t/5avkOl8758e?scene_id=50999361', true)">
                 <div class="vr-icon-box">
                   <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
                     <rect x="2" y="6" width="20" height="12" rx="3"></rect>
@@ -159,7 +159,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
                 </div>
               </div>
 
-              <div class="vr-card">
+              <div class="vr-card" @click="handleQuickClick('https://www.720yun.com/t/5avkOl8758e?scene_id=50999361', true)">
                 <div class="vr-icon-box">
                   <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
                     <rect x="2" y="6" width="20" height="12" rx="3"></rect>
@@ -201,7 +201,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
           </ul>
 
           <div class="news-more">
-            <a href="#">查看更多 &gt;</a>
+            <a href="javascript:void(0)" @click="router.push({ path: '/news', query: { tab: newsTab } })">查看更多 &gt;</a>
           </div>
         </div>
       </div>
