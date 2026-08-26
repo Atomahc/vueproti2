@@ -148,7 +148,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 .search-box-content {
   padding: 30px;
   background-color: #ffffff;
-  flex: 1;
+  height:500px;
   border-radius: 4px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   overflow-y: auto;

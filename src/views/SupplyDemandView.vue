@@ -233,7 +233,6 @@ const getTypeColor = (type: string) => {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: #f1f5f9;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
   box-sizing: border-box;
 }

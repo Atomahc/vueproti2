@@ -124,6 +124,13 @@ const handleLogout = () => {
           <a href="#" class="top-link">{{ t('header.mobile') }}</a>
           <span class="divider">|</span>
           <a href="#" class="top-link">{{ t('header.govPhone') }}</a>
+          <span class="divider">|</span>
+          <div class="user-dropdown hover-menu-left">
+            <a href="#" class="top-link" @click.prevent>请销假平台</a>
+            <div class="dropdown-content left-dropdown">
+              <img src="@/assets/other/mmexport1787650392605.jpg" alt="请销假平台" class="hover-qr-code" />
+            </div>
+          </div>
          
         </div>
         <div class="top-right">
@@ -399,5 +406,25 @@ const handleLogout = () => {
 
 .dropdown-content a:hover {
   background: #f1f5f9;
+}
+
+.hover-menu-left {
+  position: relative;
+  display: inline-block;
+}
+
+.left-dropdown {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px;
+  min-width: auto;
+}
+
+.hover-qr-code {
+  display: block;
+  width: 140px;
+  height: auto;
+  border-radius: 4px;
 }
 </style>

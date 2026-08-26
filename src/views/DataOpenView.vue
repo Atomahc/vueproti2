@@ -24,9 +24,9 @@ const statCardsBackup = [
 ]
 
 const visCardsBackup = [
-  { name: 'GDP增速', number: '8.2', unit: '%', progress: 82 },
+  { name: 'GDP累计同比增速', number: '5.4', unit: '%', progress: 82 },
   { name: '口岸过货量', number: '3,856', unit: '万吨', progress: 65 },
-  { name: 'GDP增速', number: '8.2', unit: '%', progress: 82 }
+  { name: '规上工业增加值增速', number: '5.28', unit: '%', progress: 82 }
 ]
 
 const fetchDataOpen = async () => {
@@ -126,7 +126,7 @@ onMounted(() => {
           </div>
 
           <div class="cards-grid">
-            <div v-for="(card, i) in (visSection.children.length > 0 ? visSection.children : visCardsBackup)" :key="i" class="data-card green-card clickable-card" @click="handleNavigate(card.url)">
+            <div v-for="(card, i) in visCardsBackup" :key="i" class="data-card green-card clickable-card" @click="handleNavigate(card.url)">
               <div class="card-info">
                 <h3>{{ card.name }}</h3>
                 <div class="number">{{ (visCardsBackup as any)[i] ? (visCardsBackup as any)[i].number : '0' }}<span>{{ (visCardsBackup as any)[i] ? (visCardsBackup as any)[i].unit : '' }}</span></div>

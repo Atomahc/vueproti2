@@ -214,7 +214,15 @@ watch(() => route.params.id, () => {
 .content-html :deep(img) {
   max-width: 100%;
   border-radius: 8px;
-  margin: 20px 0;
+  display: block;
+  margin: 20px auto;
+}
+
+.content-html :deep(video) {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+  margin: 20px auto;
 }
 
 /* 文章尾部 */

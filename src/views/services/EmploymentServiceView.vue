@@ -39,7 +39,7 @@ const fetchPublicOpinion = async () => {
         ...item,
         theme: themes[index % themes.length],
         bg: defaultBgs[index % defaultBgs.length],
-        imgIcon: item.bgImage ? (item.icon.startsWith('http') ? item.bgImage : minioPrefix + '/' + item.icon.replace(/^\/+/, '')) : '',
+        imgIcon: item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + '/' + item.bgImage.replace(/^\/+/, '')) : '',
         icon: defaultIcons[index % defaultIcons.length]
       }))
     }
@@ -375,7 +375,7 @@ onMounted(() => {
 .btn-green:hover { background: #ecfdf5; }
 .appeal-card.green { background: linear-gradient(to right, #ecfdf5 0%, #ffffff 30%); border-color: #6ee7b7; }
 
-.bg-purple { background-color: #a855f7; }
+.bg-purple { }
 .btn-purple { color: #a855f7; border-color: #d8b4fe; }
 .btn-purple:hover { background: #faf5ff; }
 .appeal-card.purple { background: linear-gradient(to right, #faf5ff 0%, #ffffff 30%); border-color: #d8b4fe; }

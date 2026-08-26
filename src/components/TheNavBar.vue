@@ -37,7 +37,7 @@ const currentActiveId = computed(() => {
   return 'home'
 })
 
-const handleNavClick = (item: typeof navTabs[number]) => {
+const handleNavClick = (item: any) => {
   if (item.path) {
     router.push(item.path)
   }

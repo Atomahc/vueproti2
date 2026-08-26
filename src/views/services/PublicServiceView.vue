@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
@@ -20,9 +21,19 @@ const snapshotForm = ref({
   contactName: '',
   contactPhone: ''
 })
-const handleNavigate = (url: string) => {
-  if (url) {
-    window.location.href = url
+const router = useRouter()
+
+const handleNavigate = (item: any) => {
+  if (item.name === '文旅服务') {
+    router.push('/service/culture')
+    return
+  }
+  if (item.name === '志愿者服务(霍尔果斯云)' || item.linkType === 'qrcode') {
+    openModal(item)
+    return
+  }
+  if (item.url) {
+    window.location.href = item.url
   }
 }
 const handleImageUpload = (e: any) => {
@@ -105,7 +116,7 @@ const fetchConvenience = async () => {
         laodaoTags.value = ld.children || []
       }
       
-      const zy = list.find((item: any) => item.name?.includes('中亚直通桥'))
+      const zy = list.find((item: any) => item.name?.includes('中亚职通桥'))
       if (zy) {
         zhongyaInfo.value = zy
       }
@@ -252,7 +263,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- 3. 中亚直通桥 · 长期工 -->
+          <!-- 3. 中亚职通桥 · 长期工 -->
           <div class="bm-card yellow-tint">
             <div class="card-header-flex">
               <div class="header-title-box">
@@ -262,7 +273,7 @@ onMounted(() => {
                     <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
                   </svg>
                 </div>
-                <h2>{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : '中亚直通桥' }} · <span>长期工</span></h2>
+                <h2>{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : '中亚职通桥' }} · <span>长期工</span></h2>
               </div>
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
@@ -282,7 +293,7 @@ onMounted(() => {
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
             <div class="services-icon-grid">
-              <div v-for="(s, i) in communityServices" :key="i" class="icon-item-box" @click="handleNavigate(s.url)">
+              <div v-for="(s, i) in communityServices" :key="i" class="icon-item-box" @click="handleNavigate(s)">
                 <div class="svg-icon-blue">
                   <img v-if="s.bgImage && (s.bgImage.includes('/') || s.bgImage.includes('.'))" :src="s.bgImage.startsWith('http') ? s.bgImage : minioPrefix + s.bgImage " style="width: 36px; height: 36px; object-fit: contain; filter: none;" />
                   <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -301,7 +312,7 @@ onMounted(() => {
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
             <div class="services-icon-grid">
-              <div v-for="(s, i) in lifeServices" :key="i" class="icon-item-box" @click="handleNavigate(s.url)">
+              <div v-for="(s, i) in lifeServices" :key="i" class="icon-item-box" @click="handleNavigate(s)">
                 <div class="svg-icon-blue">
                   <img v-if="s.bgImage && (s.bgImage.includes('/') || s.bgImage.includes('.'))" :src="s.bgImage.startsWith('http') ? s.bgImage : minioPrefix + s.bgImage " style="width: 36px; height: 36px; object-fit: contain; filter: none;" />
                   <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -314,7 +325,7 @@ onMounted(() => {
           </div>
 
           <!-- 底部三列横向入口卡片 -->
-            <div v-for="(bc, i) in bottomCards" :key="i" class="bm-card footer-small-card" @click="handleNavigate(bc.url)">
+            <div v-for="(bc, i) in bottomCards" :key="i" class="bm-card footer-small-card" @click="handleNavigate(bc)">
               <div class="small-card-content">
                 <div class="card-icon-square" :class="['purple', 'cyan', 'yellow'][i % 3]">
                 <img v-if="bc.bgImage && (bc.bgImage.includes('/') || bc.bgImage.includes('.'))" :src="bc.bgImage.startsWith('http') ? bc.bgImage : minioPrefix + bc.bgImage" style="width: 40px; height: 40px; object-fit: contain;" />
@@ -357,8 +368,6 @@ onMounted(() => {
           <div class="qrcode-wrapper">
             <img v-if="activeModal.qrcode" :src="activeModal.qrcode.startsWith('http') ? activeModal.qrcode : minioPrefix + activeModal.qrcode" alt="QR Code" class="qrcode-img" />
             <!-- Fallback QR code images if no dynamic one -->
-            <img v-else-if="activeModal.name?.includes('劳道')" src="@/assets/img/indexbg.png" style="width: 140px; height: 140px; object-fit: contain; opacity: 0.5;" alt="QR Code" class="qrcode-img" />
-            <img v-else src="@/assets/img/indexbg.png" style="width: 140px; height: 140px; object-fit: contain; opacity: 0.5;" alt="QR Code" class="qrcode-img" />
           </div>
         </div>
       </div>
@@ -715,7 +724,7 @@ onMounted(() => {
   font-weight: 500;
 }
 
-/* 中亚直通桥 (Yellow) */
+/* 中亚职通桥 (Yellow) */
 .yellow-tint {
   background: #fffbeb;
   border: 1px solid #fef3c7;
@@ -923,6 +932,9 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.modal-icon-box img {
+  width:100%
 }
 
 .modal-icon-box.green { background: #10b981; }

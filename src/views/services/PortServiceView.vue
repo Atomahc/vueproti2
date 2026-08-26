@@ -30,9 +30,26 @@ const fetchCrossBorder = async () => {
   }
 }
 
+const activeModal = ref<any>(null)
+
 const handleNavigate = (url: string) => {
   if (url) {
     window.location.href = url
+  }
+}
+
+const handleCloudClick = (item: any) => {
+  activeModal.value = item
+}
+
+const closeModal = () => {
+  activeModal.value = null
+}
+
+const showIntroModal = () => {
+  activeModal.value = {
+    name: '口岸云集平台',
+    linkDesc: '本平台以可信数字身份为核心底座，覆盖全场景口岸服务，助力提升口岸运营效率、规范市场秩序、带动边民增收、促进产业集聚，实现政府监管精准化、企业服务一体化、群众办事便捷化，为霍尔果斯高质量发展提供数字化支撑。'
   }
 }
 
@@ -76,18 +93,24 @@ onMounted(() => {
 
           <!-- 2. 口岸云集 (右上) -->
           <div class="cross-card blue-tint-card" v-if="portCloudItems.id">
-            <div class="card-title-header">
-              <div class="title-with-square blue">
-                <img :src="portCloudItems.icon ? (portCloudItems.icon.startsWith('http') ? portCloudItems.icon : minioPrefix + portCloudItems.icon) : ''" alt="">
+            <div class="card-title-header" style="justify-content: space-between;">
+              <div style="display: flex; align-items: center;">
+                <div class="title-with-square blue">
+                  <img :src="portCloudItems.icon ? (portCloudItems.icon.startsWith('http') ? portCloudItems.icon : minioPrefix + portCloudItems.icon) : ''" alt="">
+                </div>
+                <div>
+                  <h3>{{ portCloudItems.name }}</h3>
+                  <p class="subtitle">{{ portCloudItems.remark }}</p>
+                </div>
               </div>
-              <div>
-                <h3>{{ portCloudItems.name }}</h3>
-                <p class="subtitle">{{ portCloudItems.remark }}</p>
+              <div style="display: flex; gap: 10px;">
+                <button class="action-btn" @click="handleNavigate('https://ca.kouanyun.com/home/index.html')">进入平台</button>
+                <button class="action-btn" @click="showIntroModal">平台简介</button>
               </div>
             </div>
 
             <div class="image-cards-grid grid-5">
-              <div v-for="(item, i) in portCloudItems.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
+              <div v-for="(item, i) in portCloudItems.children" :key="i" class="image-item-box" @click="handleCloudClick(item)">
                 <span class="box-title" style="color: #001A49;">{{ item.name }}</span>
                 <div class="img-wrapper">
                   <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
@@ -145,6 +168,17 @@ onMounted(() => {
         </div>
       </div>
     </main>
+
+    <!-- 简介弹窗 -->
+    <div class="modal-overlay" v-if="activeModal" @click.self="closeModal">
+      <div class="modal-content">
+        <button class="modal-close-btn" @click="closeModal">&times;</button>
+        <div class="modal-header">
+          <h2 class="modal-title">{{ activeModal.name }}简介</h2>
+        </div>
+        <p class="modal-desc">{{ activeModal.linkDesc || '暂无简介' }}</p>
+      </div>
+    </div>
 
     <TheFooter />
   </div>
@@ -344,4 +378,34 @@ h3 {
   border-top: 1px dashed #e2e8f0;
   padding-top: 30px;
 }
+
+/* modal styles */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 9999;
+}
+.modal-content {
+  background: #fff; width: 400px; padding: 24px; border-radius: 8px; position: relative;
+}
+.modal-close-btn {
+  position: absolute; top: 12px; right: 12px;
+  background: transparent; border: none; font-size: 24px; cursor: pointer; color: #64748b;
+}
+.modal-title { font-size: 18px; margin-bottom: 12px; color: #0f172a; font-weight: bold; }
+.modal-desc { font-size: 14px; color: #475569; line-height: 1.6; }
+.action-btn {
+  background-color: #0059FF;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.action-btn:hover {
+  background-color: #004ecc;
+}
+
 </style>

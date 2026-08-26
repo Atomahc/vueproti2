@@ -14,8 +14,8 @@ import { Pagination, Autoplay } from 'swiper/modules'
 const router = useRouter()
 
 // 新闻选项卡
-const newsTab = ref('要闻')
-const newsTabs = ['要闻', '通知公告', '政策解读']
+const newsTab = ref('城市形象')
+const newsTabs = ['城市形象', '重大活动', '图文宣传']
 
 const newsList = ref<any[]>([])
 
@@ -26,7 +26,7 @@ const fetchNews = async (category: string) => {
       owner: 'hgsso'
     })
     if (res.status === 'ok' && res.data) {
-      newsList.value = res.data.slice(0, 7).map((item: any) => {
+      newsList.value = res.data.slice(0, 9).map((item: any) => {
         const dateObj = new Date(item.publishTime || item.createdTime)
         const month = String(dateObj.getMonth() + 1).padStart(2, '0')
         const day = String(dateObj.getDate()).padStart(2, '0')
@@ -35,7 +35,9 @@ const fetchNews = async (category: string) => {
           date: `${month}/${day}`,
           name: item.name,
           fullDate: (item.publishTime || item.createdTime).split('T')[0],
-          content: item.content
+          content: item.content,
+          articleType: item.articleType,
+          externalUrl: item.externalUrl
         }
       })
     }
@@ -45,6 +47,11 @@ const fetchNews = async (category: string) => {
 }
 
 const goToArticle = (item: any) => {
+  if (item.articleType === 'external_link' && item.externalUrl) {
+    window.open(item.externalUrl, '_blank')
+    return
+  }
+
   sessionStorage.setItem('currentArticle', JSON.stringify(item))
   router.push({
     name: 'article-detail',
@@ -131,6 +138,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
         <div class="banner-card">
           <div class="banner-media">
             <swiper
+              v-if="bannerList.length > 0"
               :modules="swiperModules"
               :pagination="{ clickable: true }"
               :autoplay="{ delay: 5000, disableOnInteraction: false }"
@@ -379,13 +387,14 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
   width: 160px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
   z-index: 3;
+  padding:8px;
 }
 
 .vr-card {
   flex: 1;
-  background: rgba(30, 90, 140, 0.75);
+  background: rgba(0,0,0,0.3);
   backdrop-filter: blur(10px);
   color: #ffffff;
   display: flex;
@@ -399,7 +408,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 }
 
 .vr-card:hover {
-  background: rgba(0, 102, 255, 0.85);
+  background: rgba(0, 102, 255, 0.466);
 }
 
 .vr-icon-box {
@@ -455,7 +464,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
   background: #f1f5f9;
   border-radius: 4px;
   padding: 3px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .news-tab-item {
@@ -483,7 +492,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  height:300px;
+  height:320px;
 }
 
 .news-item {

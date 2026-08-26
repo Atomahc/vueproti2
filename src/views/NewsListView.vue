@@ -12,33 +12,49 @@ const route = useRoute()
 const activeCategory = ref((route.query.tab as string) || '')
 const loading = ref(false)
 
-// 所有新闻
-const allNews = ref<any[]>([])
+// 当前页的新闻
+const paginatedNews = ref<any[]>([])
+const currentPage = ref(1)
+const pageSize = 7
+const totalPages = ref(1)
+const totalElements = ref(0)
 
 // 获取新闻列表
 const fetchArticles = async () => {
   loading.value = true
   try {
     const params: any = {
-      owner: 'hgsso'
+      owner: 'hgsso',
+      p: currentPage.value,
+      pageSize: pageSize
     }
     if (activeCategory.value && activeCategory.value !== '全部') {
       params.categoryIds = activeCategory.value
     }
     const res: any = await http.get('/api-cas/api/get-articles', params)
-    if (res.status === 'ok' && res.data) {
-      allNews.value = res.data.map((item: any) => ({
-        id: item.name, 
-        title: item.displayName || item.title,
-        date: item.publishTime ? item.publishTime.split('T')[0] : (item.createdTime ? item.createdTime.split('T')[0] : ''),
-        originalData: item
-      }))
+    if (res.status === 'ok') {
+      if (res.data) {
+        paginatedNews.value = res.data.map((item: any) => ({
+          id: item.name, 
+          title: item.displayName || item.title,
+          date: item.publishTime ? item.publishTime.split('T')[0] : (item.createdTime ? item.createdTime.split('T')[0] : ''),
+          originalData: item
+        }))
+      } else {
+        paginatedNews.value = []
+      }
+      totalElements.value = res.data2 || 0
+      totalPages.value = Math.ceil(totalElements.value / pageSize) || 1
     } else {
-      allNews.value = []
+      paginatedNews.value = []
+      totalElements.value = 0
+      totalPages.value = 1
     }
   } catch (error) {
     console.error('获取文章列表失败', error)
-    allNews.value = []
+    paginatedNews.value = []
+    totalElements.value = 0
+    totalPages.value = 1
   } finally {
     loading.value = false
   }
@@ -48,26 +64,21 @@ onMounted(() => {
   fetchArticles()
 })
 
-// 分页逻辑
-const currentPage = ref(1)
-const pageSize = 15 // 常规列表可以多展示一些
-
-const paginatedNews = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  return allNews.value.slice(start, end)
-})
-
-const totalPages = computed(() => Math.ceil(allNews.value.length / pageSize))
-
 const goToPage = (page: number) => {
   if (page < 1 || page > totalPages.value) return
   currentPage.value = page
+  fetchArticles()
   window.scrollTo({ top: 300, behavior: 'smooth' })
 }
 
 const goToDetail = (news: any) => {
-  sessionStorage.setItem('currentArticle', JSON.stringify(news.originalData || news))
+  const original = news.originalData || news
+  if (original.articleType === 'external_link' && original.externalUrl) {
+    window.open(original.externalUrl, '_blank')
+    return
+  }
+  
+  sessionStorage.setItem('currentArticle', JSON.stringify(original))
   router.push({
     name: 'article-detail',
     params: { id: news.id || '0' }
@@ -207,7 +218,8 @@ const goToDetail = (news: any) => {
 }
 
 .news-list-container {
-  height: 350px;
+  height: 400px;
+  overflow: hidden;
 }
 
 .simple-news-list {

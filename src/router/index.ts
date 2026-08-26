@@ -78,6 +78,11 @@ const router = createRouter({
       component: () => import('../views/services/ForeignServiceView.vue'),
     },
     {
+      path: '/service/culture',
+      name: 'service-culture',
+      component: () => import('../views/services/CultureServiceView.vue'),
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),
