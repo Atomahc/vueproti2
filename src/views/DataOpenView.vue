@@ -56,7 +56,7 @@ const fetchDataOpen = async () => {
 
 const handleNavigate = (url: string) => {
   if (url) {
-    window.location.href = url
+    window.open(url, '_blank')
   }
 }
 
@@ -159,23 +159,24 @@ onMounted(() => {
 }
 
 .main-content {
+  height: 850px;
   position: relative;
   z-index: 5;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 120px 24px 40px 24px;
+  padding: 120px 0px 40px 0px;
   width: 100%;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+ 
 }
 
 .data-open-body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 20px;
+  padding: 24px;
   background:#fff;
+  height:600px;
 }
 
 .data-section {

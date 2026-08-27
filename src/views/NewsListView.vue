@@ -175,12 +175,12 @@ const goToDetail = (news: any) => {
 }
 
 .main-content {
+  height: 850px;
   position: relative;
   z-index: 5;
-  max-width: 1280px;
+  width: 1280px;
   margin: 0 auto;
-  padding: 120px 24px 40px 24px;
-  width: 100%;
+  padding: 120px 0px 40px 0px;
   flex: 1;
   box-sizing: border-box;
   display: flex;
@@ -189,9 +189,10 @@ const goToDetail = (news: any) => {
 
 .hero-box {
   background: #ffffff;
-  padding: 30px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
+  height:600px
 }
 
 /* 页面标题 */

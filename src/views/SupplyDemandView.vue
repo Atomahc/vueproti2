@@ -451,12 +451,12 @@ const getTypeColor = (type: string) => {
 }
 
 .main-content {
+  height: 850px;
   position: relative;
   z-index: 5;
-  max-width: 1200px;
+  width: 1280px;
   margin: 0 auto;
-  padding: 100px 20px 40px;
-  width: 100%;
+  padding: 100px 0px 40px 0px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -464,7 +464,7 @@ const getTypeColor = (type: string) => {
 
 .hero-box {
   background: #ffffff;
-  padding: 30px;
+  padding: 24px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;

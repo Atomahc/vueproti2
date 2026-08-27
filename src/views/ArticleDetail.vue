@@ -138,14 +138,14 @@ watch(() => route.params.id, () => {
   max-width: 1280px;
   width: 100%;
   margin: 0 auto;
-  padding: 150px 20px 80px;
+  padding: 120px 0px 80px;
 }
 
 .article-container {
   background: #ffffff;
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
-  padding: 60px;
-  height:500px;
+  padding: 24px 60px;
+  height:600px;
   overflow: auto;
 }
 

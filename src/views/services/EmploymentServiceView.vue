@@ -67,7 +67,7 @@ const handleNavigate = (card: any) => {
     return
   }
   if (card.url) {
-    window.location.href = card.url
+    window.open(card.url, '_blank')
   }
 }
 
@@ -242,19 +242,20 @@ onMounted(() => {
 }
 
 .main-content {
+  height: 850px;
   position: relative;
   z-index: 5;
-  max-width: 1280px;
+  width: 1280px;
   margin: 0 auto;
-  padding: 120px 24px 40px 24px;
-  width: 100%;
+  padding: 120px 0px 40px 0px;
   box-sizing: border-box;
 }
 
 .content-box {
   background: #ffffff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-  padding: 30px;
+  padding: 24px;
+    height:600px
 }
 
 .appeals-grid {

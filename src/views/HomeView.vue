@@ -26,7 +26,7 @@ const fetchNews = async (category: string) => {
       owner: 'hgsso'
     })
     if (res.status === 'ok' && res.data) {
-      newsList.value = res.data.slice(0, 9).map((item: any) => {
+      newsList.value = res.data.slice(0, 10).map((item: any) => {
         const dateObj = new Date(item.publishTime || item.createdTime)
         const month = String(dateObj.getMonth() + 1).padStart(2, '0')
         const day = String(dateObj.getDate()).padStart(2, '0')
@@ -255,30 +255,20 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 }
 
 .main-content {
+  height: 850px;
   position: relative;
   z-index: 5;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 120px 24px 40px 24px;
+  padding: 120px 0px 40px 0px;
   width: 100%;
-  height: 100vh;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
  
 }
 
-/* 导航栏样式 */
-.nav-bar {
-  background: rgba(30, 64, 120, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 4px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  margin-top: 10px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
+
 
 .nav-list {
   display: flex;
@@ -318,8 +308,9 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 }
 
 .hero-box{
-  padding: 20px;
+  padding: 24px;
   background-color: #ffffff;
+  height:600px
 
 }
 /* 核心Hero区域 */
@@ -492,7 +483,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  height:320px;
+  height:375px;
 }
 
 .news-item {
@@ -567,11 +558,13 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 }
 
 .quick-grid {
-  flex: 1;
+  flex:1;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   padding: 16px 20px;
   gap: 16px;
+  box-sizing: border-box;
+  height: 100px;
 }
 
 .quick-card {

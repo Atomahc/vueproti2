@@ -187,11 +187,12 @@ const handleSelectChange = (event: Event) => {
 }
 
 .main-content {
+  height: 850px;
   position: relative;
   z-index: 5;
-  max-width: 1280px;
+  width: 1280px;
   margin: 0 auto;
-  padding: 120px 24px 40px 24px;
+  padding: 120px 0px 40px 0px;
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -200,10 +201,10 @@ const handleSelectChange = (event: Event) => {
 
 .hero-box {
   background: #ffffff;
-  padding: 40px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  min-height: 500px;
+  height:600px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 

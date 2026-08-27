@@ -265,7 +265,6 @@ const handleLogout = () => {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
   box-sizing: border-box;
   display: flex;
   justify-content: space-between;

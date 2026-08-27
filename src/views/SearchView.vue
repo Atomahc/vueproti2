@@ -133,13 +133,12 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 }
 
 .main-content {
+  height: 850px;
   position: relative;
   z-index: 5;
-  max-width: 1280px;
+  width: 1280px;
   margin: 0 auto;
-  padding: 120px 24px 40px 24px;
-  width: 100%;
-  height: 100vh;
+  padding: 120px 0px 40px 0px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

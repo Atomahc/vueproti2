@@ -248,31 +248,26 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- 招商引资服务 -->
-            <div class="big-card yellow-tint" @click="handleLink(enterpriseFwData['招商引资服务']?.url)" style="cursor: pointer;">
+            <!-- 营商环境监测 -->
+            <div class="big-card blue-tint">
               <div class="card-title-row">
                 <div class="title-with-icon">
-                  <div class="card-icon-square yellow">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  <div class="card-icon-square blue">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
+                      <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9" />
                     </svg>
                   </div>
-                  <h2>{{ enterpriseFwData['招商引资服务']?.name || '招商引资服务' }}</h2>
+                  <h2>{{ enterpriseFwData['营商环境监测']?.name || '营商环境监测' }}</h2>
                 </div>
-                <span class="arrow-right"><svg data-v-dac29979="" t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path data-v-dac29979="" d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
+                <span class="view-more" @click="router.push({ path: '/news', query: { tab: '营商环境监测' } })" style="font-size: 13px; color: #0066ff; cursor: pointer;">查看更多 &rarr;</span>
               </div>
-              <div class="attract-tags">
-                <template v-if="enterpriseFwData['招商引资服务']?.children?.length">
-                  <span 
-                    class="tag-item" 
-                    v-for="tag in enterpriseFwData['招商引资服务'].children" 
-                    :key="tag.id"
-                    @click.stop="handleTagClick(tag)"
-                  >
-                    {{ tag.name }}
-                  </span>
-                </template>
-              </div>
+              <p class="card-desc">{{ enterpriseFwData['营商环境监测']?.remark || '改革举措/成效数据/典型案例集中展示' }}</p>
+              <ul class="article-list">
+                <li v-for="(item, i) in enterpriseArticles" :key="i" @click="goToArticleDetail(item)" style="cursor: pointer;">
+                  <span class="art-title">{{ item.title }}</span>
+                  <span class="art-date">{{ item.date }}</span>
+                </li>
+              </ul>
             </div>
           </div>
 
@@ -296,26 +291,31 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- 营商环境监测 -->
-            <div class="fw-card border-blue">
+            <!-- 招商引资服务 -->
+            <div class="fw-card border-orange" @click="handleLink(enterpriseFwData['招商引资服务']?.url)" style="cursor: pointer;">
               <div class="card-title-row">
                 <div class="title-with-icon">
-                  <div class="card-icon-square blue">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
-                      <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9" />
+                  <div class="card-icon-square yellow">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   </div>
-                  <h3>{{ enterpriseFwData['营商环境监测']?.name || '营商环境监测' }}</h3>
+                  <h3>{{ enterpriseFwData['招商引资服务']?.name || '招商引资服务' }}</h3>
                 </div>
-                <span class="view-more" @click="router.push({ path: '/news', query: { tab: '营商环境监测' } })" style="font-size: 13px; color: #0066ff; cursor: pointer;">查看更多 &rarr;</span>
+                <span class="arrow-right"><svg data-v-dac29979="" t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path data-v-dac29979="" d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
               </div>
-              <p class="card-desc">{{ enterpriseFwData['营商环境监测']?.remark || '改革举措/成效数据/典型案例集中展示' }}</p>
-              <ul class="article-list">
-                <li v-for="(item, i) in enterpriseArticles" :key="i" @click="goToArticleDetail(item)" style="cursor: pointer;">
-                  <span class="art-title">{{ item.title }}</span>
-                  <span class="art-date">{{ item.date }}</span>
-                </li>
-              </ul>
+              <div class="attract-tags">
+                <template v-if="enterpriseFwData['招商引资服务']?.children?.length">
+                  <span 
+                    class="tag-item" 
+                    v-for="tag in enterpriseFwData['招商引资服务'].children" 
+                    :key="tag.id"
+                    @click.stop="handleTagClick(tag)"
+                  >
+                    {{ tag.name }}
+                  </span>
+                </template>
+              </div>
             </div>
 
             <!-- 企业供需对接 -->
@@ -394,12 +394,12 @@ onMounted(() => {
 }
 
 .main-content {
+  height: 850px;
   position: relative;
   z-index: 5;
-  max-width: 1280px;
+  width: 1280px;
   margin: 0 auto;
-  padding: 120px 24px 40px 24px;
-  width: 100%;
+  padding: 120px 0px 40px 0px;
   box-sizing: border-box;
 }
 
@@ -456,6 +456,7 @@ onMounted(() => {
   background: #ffffff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   padding: 24px;
+  height:600px
 }
 
 /* 二级 Tab */
@@ -466,7 +467,7 @@ onMounted(() => {
   background: #f1f5f9;
   border-radius: 4px;
   padding: 4px;
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 .sub-tabs {
@@ -537,10 +538,10 @@ onMounted(() => {
 }
 
 .card-items {
-  padding: 20px 16px;
+  padding: 16px;
   display: flex;
   flex-wrap: wrap;
-  gap: 16px 24px;
+  gap: 10px 24px;
 }
 
 .item-badge {

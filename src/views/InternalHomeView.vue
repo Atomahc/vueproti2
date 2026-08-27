@@ -194,11 +194,11 @@ const menuItems = [
 }
 
 .main-content {
+  height: 850px;
   display: flex;
   flex: 1;
-  max-width: 1400px;
+  width: 1280px;
   margin: 20px auto;
-  width: calc(100% - 40px);
   gap: 20px;
 }
 
