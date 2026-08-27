@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       proxy: {
         '/api-cas': {
-          target: (env.VITE_API_CAS_PREFIX || 'http://cas.nsenz.cn').replace('http://', 'https://'),
+          target: (env.VITE_API_CAS_PREFIX ).replace('http://', 'https://'),
           changeOrigin: true,
           secure: false, // 禁用SSL校验以防证书问题
           autoRewrite: true,
@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
           }
         },
         '/api-loca': {
-          target: env.VITE_API_LOCAL_PREFIX || 'http://192.168.2.11:8080',
+          target: env.VITE_API_LOCAL_PREFIX ,
           changeOrigin: true,
           autoRewrite: true,
           rewrite: (path) => path.replace(/^\/api-loca/, ''),

@@ -23,7 +23,7 @@ const statCardsBackup = [
   { name: '调查数据', remark: '专项调查', bg: gg3 }
 ]
 
-const visCardsBackup = [
+const visCardsBackup: any[] = [
   { name: 'GDP累计同比增速', number: '5.4', unit: '%', progress: 82 },
   { name: '口岸过货量', number: '3,856', unit: '万吨', progress: 65 },
   { name: '规上工业增加值增速', number: '5.28', unit: '%', progress: 82 }
