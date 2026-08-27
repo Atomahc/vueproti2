@@ -193,7 +193,6 @@ const handleSelectChange = (event: Event) => {
   width: 1280px;
   margin: 0 auto;
   padding: 120px 0px 40px 0px;
-  width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

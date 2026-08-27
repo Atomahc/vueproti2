@@ -91,7 +91,30 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- 2. 口岸云集 (右上) -->
+          <!-- 3. 霍数通·通关服务 (右上) -->
+          <div class="cross-card cyan-tint-card" v-if="passServices.id">
+            <div class="card-title-header">
+              <div class="title-with-square cyan">
+                  <img :src="passServices.icon ? (passServices.icon.startsWith('http') ? passServices.icon : minioPrefix + passServices.icon) : ''" alt="">
+              </div>
+              <div>
+                <h3>{{ passServices.name }}</h3>
+                <p class="subtitle">{{ passServices.remark }}</p>
+              </div>
+            </div>
+
+            <div class="image-cards-grid grid-3">
+              <div v-for="(item, i) in passServices.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
+                <span class="box-title" style="color: #005562;">{{ item.name }}</span>
+                <div class="img-wrapper">
+                  <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
+                  <button class="arrow-btn lightblue" >&rarr;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 口岸云集 (左下) -->
           <div class="cross-card blue-tint-card" v-if="portCloudItems.id">
             <div class="card-title-header" style="justify-content: space-between;">
               <div style="display: flex; align-items: center;">
@@ -115,29 +138,6 @@ onMounted(() => {
                 <div class="img-wrapper">
                   <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
                   <button class="arrow-btn bluenext" >&rarr;</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. 霍数通·通关服务 (左下) -->
-          <div class="cross-card cyan-tint-card" v-if="passServices.id">
-            <div class="card-title-header">
-              <div class="title-with-square cyan">
-                  <img :src="passServices.icon ? (passServices.icon.startsWith('http') ? passServices.icon : minioPrefix + passServices.icon) : ''" alt="">
-              </div>
-              <div>
-                <h3>{{ passServices.name }}</h3>
-                <p class="subtitle">{{ passServices.remark }}</p>
-              </div>
-            </div>
-
-            <div class="image-cards-grid grid-3">
-              <div v-for="(item, i) in passServices.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
-                <span class="box-title" style="color: #005562;">{{ item.name }}</span>
-                <div class="img-wrapper">
-                  <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
-                  <button class="arrow-btn lightblue" >&rarr;</button>
                 </div>
               </div>
             </div>
@@ -284,7 +284,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 602px;
+  width: 606px;
 }
 .blue-tint-card {
   background: linear-gradient( 180deg, rgba(0,89,255,0.2) 0%, rgba(0,89,255,0.02) 100%), #FFFFFF;
@@ -292,7 +292,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 562px;
+  width: 540px;
 }
 
 .cyan-tint-card {
@@ -301,7 +301,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width:500px
+  width: 606px;
 }
 
 .purple-tint-card {
@@ -310,7 +310,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width:664px
+  width: 672px;
 }
 
 .port-page-container {

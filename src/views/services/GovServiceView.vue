@@ -223,7 +223,8 @@ onMounted(() => {
         <div v-else-if="activeSubTab === 'enterprise_fw'" class="enterprise-fw-container">
           <!-- 顶部两张大卡片 -->
           <div class="top-cards-row">
-            <!-- 企业画像与政策匹配 -->
+            <div style="display: grid;grid-template-columns: repeat(2, 1fr); gap: 20px;">
+              <!-- 企业画像与政策匹配 -->
             <div class="big-card blue-tint" @click="handleLink(enterpriseFwData['企业画像与政策匹配']?.url)" style="cursor: pointer;">
               <div class="card-title-row">
                 <div class="title-with-icon">
@@ -259,7 +260,8 @@ onMounted(() => {
                   </div>
                   <h2>{{ enterpriseFwData['营商环境监测']?.name || '营商环境监测' }}</h2>
                 </div>
-                <span class="view-more" @click="router.push({ path: '/news', query: { tab: '营商环境监测' } })" style="font-size: 13px; color: #0066ff; cursor: pointer;">查看更多 &rarr;</span>
+                <span class="view-more" @click="router.push({ path: '/news', query: { tab: '营商环境监测' } })" style="font-size: 13px; color: #0066ff; cursor: pointer;">更多
+                </span>
               </div>
               <p class="card-desc">{{ enterpriseFwData['营商环境监测']?.remark || '改革举措/成效数据/典型案例集中展示' }}</p>
               <ul class="article-list">
@@ -269,10 +271,10 @@ onMounted(() => {
                 </li>
               </ul>
             </div>
-          </div>
+            </div>
+            
 
-          <!-- 底部4列卡片 -->
-          <div class="bottom-cards-row">
+
             <!-- 企业信用查询 -->
             <div class="fw-card border-blue" @click="handleLink(enterpriseFwData['企业信用查询']?.url)" style="cursor: pointer;">
               <div class="card-title-row">
@@ -290,7 +292,10 @@ onMounted(() => {
                 <button class="outline-btn blue" @click.stop="handleLink(enterpriseFwData['企业信用查询']?.url)">立即跳转 &rarr;</button>
               </div>
             </div>
+          </div>
 
+    
+          <div class="bottom-cards-row">
             <!-- 招商引资服务 -->
             <div class="fw-card border-orange" @click="handleLink(enterpriseFwData['招商引资服务']?.url)" style="cursor: pointer;">
               <div class="card-title-row">
@@ -597,7 +602,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 240px;
+  height: 270px;
   transition: all 0.3s ease;
 }
 
@@ -668,8 +673,6 @@ onMounted(() => {
   background: #ffffff;
   border-radius: 6px;
   padding: 12px 20px;
-  display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-top: 16px;
 }
@@ -725,7 +728,7 @@ onMounted(() => {
 /* 底部4列卡片 */
 .bottom-cards-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
@@ -745,6 +748,8 @@ onMounted(() => {
 }
 
 .border-blue { 
+  height:270px;
+  padding:24px;
   border: 1px solid #e0f2fe; 
   background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
 }

@@ -166,7 +166,7 @@ onMounted(() => {
                 </div>
                 <div>
                   <h2>城市治理 · 随手拍</h2>
-                  <p class="subtitle">发现一分派一处置一反馈闭环</p>
+                  <!-- <p class="subtitle">发现一分派一处置一反馈闭环</p> -->
                 </div>
               </div>
             </div>
@@ -237,54 +237,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- 2. 劳道智工 · 短期工 -->
-          <div class="bm-card teal-tint">
-            <div class="card-header-flex">
-              <div class="header-title-box">
-                <div class="icon-square teal">
-                  <img v-if="laodaoInfo.bgImage && (laodaoInfo.bgImage.includes('/') || laodaoInfo.bgImage.includes('.'))" :src="laodaoInfo.bgImage.startsWith('http') ? laodaoInfo.bgImage : minioPrefix + laodaoInfo.bgImage" style="width: 36px; height: 36px; object-fit: contain; " />
-                  <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
-                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                  </svg>
-                </div>
-                <h2>{{ laodaoInfo.name ? laodaoInfo.name : '劳道智工' }} · <span>短期工</span></h2>
-              </div>
-              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
-            </div>
-
-            <div class="short-job-body">
-              <div class="job-tags-grid">
-                <span class="j-tag" v-for="(tag, idx) in laodaoTags" :key="idx">{{ tag.name }}</span>
-              </div>
-              <div class="hot-job-banner">
-                <span>热门职务 <strong>*{{ hotJobsCount }}</strong></span>
-                <a href="javascript:void(0)" class="view-link" @click.prevent="openModal(laodaoInfo)">查看 &rarr;</a>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. 中亚职通桥 · 长期工 -->
-          <div class="bm-card yellow-tint">
-            <div class="card-header-flex">
-              <div class="header-title-box">
-                <div class="icon-square orange">
-                  <img v-if="zhongyaInfo.bgImage && (zhongyaInfo.bgImage.includes('/') || zhongyaInfo.bgImage.includes('.'))" :src="zhongyaInfo.bgImage.startsWith('http') ? zhongyaInfo.bgImage : minioPrefix + zhongyaInfo.bgImage" style="width: 36px; height: 36px; object-fit: contain;" />
-                  <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
-                    <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
-                  </svg>
-                </div>
-                <h2>{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : '中亚职通桥' }} · <span>长期工</span></h2>
-              </div>
-              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
-            </div>
-
-            <div class="long-job-body">
-              <p class="desc-text">{{ zhongyaInfo.remark || '集成长期岗位，与劳道智工短期工形成短期+长期全覆盖就业服务体系。' }}</p>
-              <button class="yellow-action-btn" @click="openModal(zhongyaInfo)">
-                找人才/找工作 <span class="sub-link">职位列表 &rarr;</span>
-              </button>
-            </div>
-          </div>
+      
 
           <!-- 4. 社区便民 -->
           <div class="bm-card blue-tint-card">
@@ -323,6 +276,39 @@ onMounted(() => {
               </div>
             </div>
           </div>
+
+
+
+          <div  class="bm-card footer-small-card" @click.prevent="openModal(laodaoInfo)">
+              <div class="small-card-content">
+                <div class="card-icon-square" :class="['purple', 'cyan', 'yellow'][i % 3]">
+                <img v-if="laodaoInfo.bgImage && (laodaoInfo.bgImage.includes('/') || laodaoInfo.bgImage.includes('.'))" :src="laodaoInfo.bgImage.startsWith('http') ? laodaoInfo.bgImage : minioPrefix + laodaoInfo.bgImage" style="width: 40px; height: 40px; object-fit: contain;" />
+                <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
+                  <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                </svg>
+              </div>
+              <div class="text-info">
+                <h3>{{ laodaoInfo.name ? laodaoInfo.name : '劳道智工' }}  &rarr;</h3>
+                <p>短期工</p>
+              </div>
+            </div>
+          </div>
+
+          <div  class="bm-card footer-small-card" @click.prevent="openModal(zhongyaInfo)">
+              <div class="small-card-content">
+                <div class="card-icon-square" :class="['purple', 'cyan', 'yellow'][i % 3]">
+                <img v-if="zhongyaInfo.bgImage && (zhongyaInfo.bgImage.includes('/') || zhongyaInfo.bgImage.includes('.'))" :src="zhongyaInfo.bgImage.startsWith('http') ? zhongyaInfo.bgImage : minioPrefix + zhongyaInfo.bgImage" style="width: 40px; height: 40px; object-fit: contain;" />
+                <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
+                  <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                </svg>
+              </div>
+              <div class="text-info">
+                <h3>{{ zhongyaInfo.name ? zhongyaInfo.name : '中亚职通桥' }} &rarr;</h3>
+                <p>长期工</p>
+              </div>
+            </div>
+          </div>
+
 
           <!-- 底部三列横向入口卡片 -->
             <div v-for="(bc, i) in bottomCards" :key="i" class="bm-card footer-small-card" @click="handleNavigate(bc)">
@@ -472,7 +458,7 @@ onMounted(() => {
 .icon-square.orange { background: #f59e0b; }
 
 .shoot-body {
-  margin-top: 20px;
+  margin-top: 10px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -677,6 +663,7 @@ onMounted(() => {
   border: 1px solid #ccfbf1;
   display: flex;
   flex-direction: column;
+  height:140px;
 }
 
 .short-job-body {
@@ -731,6 +718,7 @@ onMounted(() => {
   border: 1px solid #fef3c7;
   display: flex;
   flex-direction: column;
+  height:140px
 }
 
 .long-job-body {
@@ -772,6 +760,7 @@ onMounted(() => {
   background: #f8fafc;
   border: 1px solid #ddd;
   grid-column: span 1;
+  height:400px;
 }
 
 /* 底部小卡片 */
@@ -825,7 +814,7 @@ onMounted(() => {
 /* 5列 Icon 布局 */
 .services-icon-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px 0px;
   margin-top: 10px;
 }

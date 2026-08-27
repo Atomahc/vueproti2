@@ -5,7 +5,7 @@ import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
 
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { http } from '@/api/request'
 
 import sq1 from '@/assets/other/Frame 59.png'
@@ -15,6 +15,15 @@ import sq4 from '@/assets/other/Frame 61.png'
 import sq5 from '@/assets/other/Frame 63-1.png'
 import sq6 from '@/assets/other/Frame 63-2.png'
 const appealsList = ref<any[]>([])
+const filteredAppealsList = computed(() => {
+  const list = appealsList.value.filter(c => c.name !== '诉求直通车')
+  const mayorIdx = list.findIndex(c => c.name === '市长信箱')
+  if (mayorIdx !== -1) {
+    const mayorCard = list.splice(mayorIdx, 1)[0]
+    list.splice(4, 0, mayorCard)
+  }
+  return list
+})
 
 const defaultIcons = [
   'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z',
@@ -114,56 +123,13 @@ onMounted(() => {
     <main class="main-content">
       <TheNavBar activeId="appeals" />
 
-      <div class="content-box">
+      <div class="content-box" style="display: flex; gap: 24px;">
         
-        <div class="appeals-grid">
-          <!-- 所有卡片 -->
-          <div v-for="card in appealsList" :key="card.name" class="appeal-card" :class="card.theme" @click="handleNavigate(card)">
-            <div class="card-bg" :style="{ backgroundImage: `url(${card.bg})` }"></div>
-            <div class="card-content">
-              <div class="header-row">
-                <div class="icon-sq" :class="'bg-' + card.theme">
-                  <img v-if="card.imgIcon" :src="card.imgIcon" style="object-fit: contain; width: 100%; height: 100%;" />
-                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                    <path :d="card.icon" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </div>
-                <div class="text-group">
-                  <h3>{{ card.name }}</h3>
-                  <p>{{ card.remark }}</p>
-                </div>
-              </div>
-              <button class="view-btn" :class="'btn-' + card.theme">
-                {{ card.name === '诉求直通车' ? '发起工单' : '立即查看' }} →
-              </button>
-            </div>
+        <!-- 左侧表单 -->
+        <div class="left-form-section" style="flex: 0 0 350px; border-right: 1px solid #e2e8f0; padding-right: 24px; overflow-y: auto;">
+          <div class="form-header" style="margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 18px; color: #0f172a;">创建诉求直通车工单</h3>
           </div>
-
-          <!-- 底部通栏 -->
-          <div class="bottom-banner">
-            <div class="banner-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </div>
-            <div class="banner-text">
-              <strong>诉求办理公示：</strong> 本月共受理诉求 <strong>1,256</strong> 件，办结率 <strong>98.6%</strong> ，平均响应时长 <strong>1.2小时</strong>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </main>
-
-    <!-- 弹窗 -->
-    <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>创建诉求直通车工单</h3>
-          <button class="close-btn" @click="showModal = false">×</button>
-        </div>
-        <div class="modal-body">
           <form @submit.prevent="submitForm" class="complaint-form">
             <div class="form-group">
               <label>诉求类型</label>
@@ -219,17 +185,54 @@ onMounted(() => {
             </div>
 
             <div class="form-actions">
-              <button type="button" class="btn-cancel" @click="showModal = false">取消</button>
-              <button type="submit" class="btn-submit" :disabled="submitting">
+              <button type="submit" class="btn-submit" :disabled="submitting" style="width: 100%;">
                 {{ submitting ? '提交中...' : '提交工单' }}
               </button>
             </div>
           </form>
         </div>
-      </div>
-    </div>
 
-    <TheFooter />
+        <div class="appeals-grid" style="flex: 1; overflow-y: auto;">
+          <!-- 所有卡片 -->
+          <div v-for="card in filteredAppealsList" :key="card.name" class="appeal-card" :class="[card.theme, card.name === '市长信箱' ? 'span-2' : '']" @click="handleNavigate(card)">
+            <div class="card-bg" :style="{ backgroundImage: `url(${card.bg})` }"></div>
+            <div class="card-content">
+              <div class="header-row">
+                <div class="icon-sq" :class="'bg-' + card.theme">
+                  <img v-if="card.imgIcon" :src="card.imgIcon" style="object-fit: contain; width: 100%; height: 100%;" />
+                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path :d="card.icon" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <div class="text-group">
+                  <h3>{{ card.name }}</h3>
+                  <p>{{ card.remark }}</p>
+                </div>
+              </div>
+              <button class="view-btn" :class="'btn-' + card.theme">
+                {{ card.name === '诉求直通车' ? '发起工单' : '立即查看' }} →
+              </button>
+            </div>
+          </div>
+
+          <!-- 底部通栏 -->
+          <div class="bottom-banner">
+            <div class="banner-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="banner-text">
+              <strong>诉求办理公示：</strong> 本月共受理诉求 <strong>1,256</strong> 件，办结率 <strong>98.6%</strong> ，平均响应时长 <strong>1.2小时</strong>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+        <TheFooter />
   </div>
 </template>
 
@@ -242,7 +245,7 @@ onMounted(() => {
 }
 
 .main-content {
-  height: 850px;
+  min-height: 850px;
   position: relative;
   z-index: 5;
   width: 1280px;
@@ -255,12 +258,12 @@ onMounted(() => {
   background: #ffffff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   padding: 24px;
-    height:600px
+  height: 600px;
 }
 
 .appeals-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 
@@ -302,6 +305,8 @@ onMounted(() => {
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
+  height:160px;
+  box-sizing: border-box;
 }
 
 .header-row {
@@ -383,14 +388,15 @@ onMounted(() => {
 
 /* 底部通栏 */
 .bottom-banner {
-  grid-column: span 3;
+  grid-column: span 2;
   background: #f1f5f9;
   border-radius: 4px;
   padding: 16px 24px;
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 10px;
+  height:55px;
+  box-sizing: border-box;
 }
 
 .banner-icon {

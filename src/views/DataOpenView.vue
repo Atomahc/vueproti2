@@ -80,36 +80,7 @@ onMounted(() => {
       <TheNavBar activeId="data" />
 
       <div class="data-open-body">
-        <!-- 统计数据查阅 -->
-        <section class="data-section">
-          <div class="section-header">
-            <div class="header-icon orange-icon">
-              <img v-if="statSection.icon" :src="statSection.icon.startsWith('http') ? statSection.icon : minioPrefix + '/' + statSection.icon.replace(/^\/+/, '')" style="object-fit: contain;" alt="" />
-              <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <path d="M7 7h10M7 11h10M7 15h6" />
-              </svg>
-            </div>
-            <div class="header-text">
-              <h2>{{ statSection.name || '统计数据查阅' }}</h2>
-              <p>{{ statSection.subtitle || '统计公报/年鉴/调查数据' }}</p>
-            </div>
-          </div>
-
-          <div class="cards-grid">
-            <div v-for="(card, i) in (statSection.children.length > 0 ? statSection.children : statCardsBackup)" :key="i" class="data-card orange-card clickable-card" @click="handleStatCardClick(card)">
-              <div class="card-info">
-                <h3>{{ card.name }}</h3>
-                <p>{{ card.remark }}</p>
-              </div>
-              <div class="card-img-placeholder">
-                 <img :src="card.bannerImage ? (card.bannerImage.startsWith('http') ? card.bannerImage : minioPrefix + '/' + card.bannerImage.replace(/^\/+/, '')) : card.bg" :alt="card.name" />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 数据可视化看板 -->
+                <!-- 数据可视化看板 -->
         <section class="data-section">
           <div class="section-header">
             <div class="header-icon green-icon">
@@ -140,6 +111,36 @@ onMounted(() => {
             </div>
           </div>
         </section>
+        <!-- 统计数据查阅 -->
+        <section class="data-section">
+          <div class="section-header">
+            <div class="header-icon orange-icon">
+              <img v-if="statSection.icon" :src="statSection.icon.startsWith('http') ? statSection.icon : minioPrefix + '/' + statSection.icon.replace(/^\/+/, '')" style="object-fit: contain;" alt="" />
+              <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M7 7h10M7 11h10M7 15h6" />
+              </svg>
+            </div>
+            <div class="header-text">
+              <h2>{{ statSection.name || '统计数据查阅' }}</h2>
+              <p>{{ statSection.subtitle || '统计公报/年鉴/调查数据' }}</p>
+            </div>
+          </div>
+
+          <div class="cards-grid">
+            <div v-for="(card, i) in (statSection.children.length > 0 ? statSection.children : statCardsBackup)" :key="i" class="data-card orange-card clickable-card" @click="handleStatCardClick(card)">
+              <div class="card-info">
+                <h3>{{ card.name }}</h3>
+                <p>{{ card.remark }}</p>
+              </div>
+              <div class="card-img-placeholder">
+                 <img :src="card.bannerImage ? (card.bannerImage.startsWith('http') ? card.bannerImage : minioPrefix + '/' + card.bannerImage.replace(/^\/+/, '')) : card.bg" :alt="card.name" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+
       </div>
     </main>
 
@@ -237,7 +238,7 @@ onMounted(() => {
   padding: 20px;
   position: relative;
   overflow: hidden;
-  height: 140px;
+  height: 60px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -294,7 +295,7 @@ onMounted(() => {
   background-size: cover;
   border: 1px solid #bbf7d0;
   padding: 14px;
-  height: 106px;
+  height: 220px;
   box-sizing: border-box;
 }
 
