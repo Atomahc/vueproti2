@@ -232,7 +232,7 @@ onMounted(() => {
                       <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>
-                  <h2>{{ enterpriseFwData['企业画像与政策匹配']?.name || '企业画像与政策匹配' }}</h2>
+                  <h2>{{ enterpriseFwData['企业画像与政策匹配']?.name || '政策匹配推荐' }}</h2>
                 </div>
                 <span class="arrow-right">
                   <svg data-v-dac29979="" t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path data-v-dac29979="" d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg>
@@ -306,14 +306,14 @@ onMounted(() => {
               </div>
               <div class="attract-tags">
                 <template v-if="enterpriseFwData['招商引资服务']?.children?.length">
-                  <span 
+                  <div 
                     class="tag-item" 
                     v-for="tag in enterpriseFwData['招商引资服务'].children" 
                     :key="tag.id"
                     @click.stop="handleTagClick(tag)"
                   >
                     {{ tag.name }}
-                  </span>
+                  </div>
                 </template>
               </div>
             </div>
@@ -408,9 +408,7 @@ onMounted(() => {
   background: rgba(30, 64, 120, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 4px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  margin-top: 10px;
   overflow: hidden;
 }
 
@@ -599,7 +597,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 140px;
+  height: 240px;
   transition: all 0.3s ease;
 }
 
@@ -698,19 +696,26 @@ onMounted(() => {
 }
 
 .attract-tags {
-  display: flex;
+
   background: #ffffff;
   border-radius: 6px;
   padding: 12px 20px;
-  justify-content: space-around;
   margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0px 10px;
 }
 
 .tag-item {
+  width:42%;
   font-size: 14px;
   color: #334155;
   font-weight: 500;
   cursor: pointer;
+  text-align: center;
+  margin-bottom: 10px;
+  background: #f9f9f9;
+  padding: 5px;
 }
 
 .tag-item:hover {
@@ -729,7 +734,7 @@ onMounted(() => {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  min-height: 220px;
+  height: 150px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   transition: all 0.3s ease;
 }
