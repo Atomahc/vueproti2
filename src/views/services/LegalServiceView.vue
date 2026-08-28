@@ -57,7 +57,7 @@ const fetchCloudLegal = async () => {
     if (res.code === 0 && res.data && res.data.cloud_legal) {
       const list = res.data.cloud_legal
 
-      const yilu = list.find((item: any) => item.name === '驿路法务通')
+      const yilu = list.find((item: any) => item.name === '霍尔果斯驿路国际法务区')
       if (yilu) {
         yiluHeader.value = yilu
         if (yilu.children && yilu.children.length > 0) {

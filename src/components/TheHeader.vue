@@ -110,10 +110,12 @@ const handleLogout = () => {
   showDropdown.value = false
   window.location.reload()
 }
+import TheHeaderMobile from './TheHeaderMobile.vue'
 </script>
 
 <template>
-  <header class="header-wrapper">
+  <TheHeaderMobile class="mobile-only-comp" v-bind="$attrs" />
+  <header class="header-wrapper desktop-only-comp">
     <!-- Top Utility Bar -->
     <div class="top-bar">
       <div class="top-bar-inner">

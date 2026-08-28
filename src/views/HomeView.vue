@@ -616,4 +616,54 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
   font-size: 12px;
   color: #64748b;
 }
+@media screen and (max-width: 768px) {
+  .hero-section {
+    flex-wrap: wrap !important;
+  }
+  .hero-box {
+    height: auto !important;
+    padding: 12px !important;
+  }
+  .banner-card {
+    width: 100% !important;
+    height: 200px !important;
+    min-height: 200px !important;
+  }
+  .banner-swiper {
+    height: 200px !important;
+  }
+  .news-card {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .quick-services-section {
+    flex-wrap: wrap !important;
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  .quick-banner-title {
+    width: 100% !important;
+    flex-direction: row !important;
+    padding: 10px 0 !important;
+  }
+  .quick-banner-title span {
+    margin: 0 4px;
+  }
+  .quick-grid {
+    width: 100% !important;
+    grid-template-columns: repeat(1, 1fr) !important;
+    height: auto !important;
+  }
+  .vr-card{
+    padding: 8px !important;
+  }
+  .vr-icon-box{
+    margin-bottom: 0px;
+  }
+  .vr-text h3{
+    margin:0px;
+    font-size: 14px !important;
+  }
+}
+
 </style>

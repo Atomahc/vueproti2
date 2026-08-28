@@ -1,5 +1,10 @@
+<script setup>
+import TheFooterMobile from './TheFooterMobile.vue'
+</script>
+
 <template>
-  <footer class="footer-wrapper">
+  <TheFooterMobile class="mobile-only-comp" />
+  <footer class="footer-wrapper desktop-only-comp">
     <div class="banner-inner">
       <span class="banner-text">主办：霍尔果斯市人民政府办公室     关于我们  |  版权保护  |  隐私声明  |  联系我们</span>
       <span class="banner-text">数字霍尔果斯 · 全域统一综合服务门户</span>

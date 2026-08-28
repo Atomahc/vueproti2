@@ -45,16 +45,15 @@ const handleNavClick = (item: any) => {
 </script>
 
 <template>
-  <!-- 蓝色半透明主导航栏 -->
-  <nav class="nav-bar desktop-only-comp">
-    <ul class="nav-list">
+  <nav class="mobile-bottom-nav">
+    <ul class="mobile-nav-list">
       <li
         v-for="item in navTabs"
         :key="item.id"
-        :class="['nav-item', { active: currentActiveId === item.id }]"
+        :class="['mobile-nav-item', { active: currentActiveId === item.id }]"
         @click="handleNavClick(item)"
       >
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path :d="item.icon" />
         </svg>
         <span>{{ item.name }}</span>
@@ -64,49 +63,48 @@ const handleNavClick = (item: any) => {
 </template>
 
 <style scoped>
-.nav-bar {
-  background: rgba(30, 64, 120, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
-  flex-shrink: 0;
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: #ffffff;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  z-index: 9999;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-.nav-list {
+.mobile-nav-list {
   display: flex;
-  list-style: none;
+  justify-content: space-around;
+  align-items: center;
+  height: 60px;
   margin: 0;
   padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.nav-item {
-  flex: 1;
+.mobile-nav-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 16px 12px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 16px;
-  font-weight: 500;
+  color: #64748b;
+  font-size: 10px;
+  flex: 0 0 auto;
+  padding: 0 10px;
   cursor: pointer;
-  transition: all 0.3s;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.nav-item:last-child {
-  border-right: none;
+.mobile-nav-item.active {
+  color: #3b82f6;
 }
 
-.nav-item.active, .nav-item:hover {
-  background: #0066ff;
-  color: #ffffff;
-  font-weight: 600;
-}
-
-.nav-icon {
-  width: 18px;
-  height: 18px;
+.mobile-nav-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
 }
 </style>
