@@ -3,6 +3,7 @@ const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { http } from '@/api/request'
+import { getSupplyDemandList } from '@/api/supplyDemand'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
@@ -101,7 +102,34 @@ const fetchEnterpriseArticles = async () => {
   }
 }
 
+const policyMatchArticles = ref<any[]>([])
+
+const fetchPolicyMatchArticles = async () => {
+  try {
+    const res: any = await http.get('/api-cas/api/get-articles', {
+      owner: 'hgsso',
+      categoryIds: '政策推送',
+      recommend: true
+    })
+    if (res.status === 'ok' && res.data) {
+      policyMatchArticles.value = res.data.slice(0, 3).map((item: any) => ({
+        id: item.name,
+        title: item.displayName || item.title,
+        date: item.publishTime ? item.publishTime.substring(5, 10).replace('-', '/') : '07/03',
+        originalData: item
+      }))
+    }
+  } catch (error) {
+    console.error('Fetch policy match articles failed', error)
+  }
+}
+
 const enterpriseFwData = ref<Record<string, any>>({})
+
+const creditSearchKeyword = ref('')
+const handleCreditSearch = () => {
+  window.open(`https://www.creditxj.gov.cn/qycx/interfaceqycx.do?qymc=${encodeURIComponent(creditSearchKeyword.value)}`, '_blank')
+}
 
 const qrModalVisible = ref(false)
 const qrModalTitle = ref('')
@@ -133,9 +161,24 @@ const goToArticleDetail = (item: any) => {
   router.push('/article/' + item.id)
 }
 
+const supplyDemandList = ref<any[]>([])
+
+const fetchSupplyDemand = async () => {
+  try {
+    const res: any = await getSupplyDemandList({ page: 1, limit: 3 })
+    if (res.code === 0 && res.data) {
+      supplyDemandList.value = res.data.list || []
+    }
+  } catch (error) {
+    console.error('Fetch supply demand failed', error)
+  }
+}
+
 onMounted(() => {
   fetchGovServices()
   fetchEnterpriseArticles()
+  fetchPolicyMatchArticles()
+  fetchSupplyDemand()
 })
 </script>
 
@@ -223,9 +266,8 @@ onMounted(() => {
         <div v-else-if="activeSubTab === 'enterprise_fw'" class="enterprise-fw-container">
           <!-- 顶部两张大卡片 -->
           <div class="top-cards-row">
-            <div style="display: grid;grid-template-columns: repeat(2, 1fr); gap: 20px;">
-              <!-- 企业画像与政策匹配 -->
-            <div class="big-card blue-tint" @click="handleLink(enterpriseFwData['企业画像与政策匹配']?.url)" style="cursor: pointer;">
+              <!-- 政策匹配推荐 -->
+            <div class="big-card blue-tint" @click="router.push({ path: '/news', query: { tab: '政策推送' } })" style="cursor: pointer;">
               <div class="card-title-row">
                 <div class="title-with-icon">
                   <div class="card-icon-square blue">
@@ -233,13 +275,21 @@ onMounted(() => {
                       <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>
-                  <h2>{{ enterpriseFwData['企业画像与政策匹配']?.name || '政策匹配推荐' }}</h2>
+                  <h2>{{ enterpriseFwData['政策匹配推荐']?.name || '政策匹配推荐' }}</h2>
                 </div>
-                <span class="arrow-right">
-                  <svg data-v-dac29979="" t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path data-v-dac29979="" d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg>
-                </span>
+                <span class="view-more" @click.stop="router.push({ path: '/news', query: { tab: '政策推送' } })" style="font-size: 13px; color: #0066ff; cursor: pointer;">更多</span>
               </div>
-              <div class="match-banner">
+              
+
+
+              <ul class="article-list" style="margin-top: 16px; flex: 1;">
+                <li v-for="(item, i) in policyMatchArticles" :key="i" @click.stop="goToArticleDetail(item)" style="cursor: pointer;">
+                  <span class="art-title">{{ item.title }}</span>
+                  <span class="art-date">{{ item.date }}</span>
+                </li>
+              </ul>
+
+              <div class="match-banner" style="margin-top: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; padding: 10px 16px;">
                 <div class="match-info">
                   <span>行业 <strong>跨境电商</strong></span>
                   <span class="gap">|</span>
@@ -271,12 +321,43 @@ onMounted(() => {
                 </li>
               </ul>
             </div>
-            </div>
+          
             
+          <!-- 企业供需对接 -->
+            <div class="fw-card border-teal" style="cursor: pointer;" @click="router.push('/supply-demand')">
+              <div class="card-title-row">
+                <div class="title-with-icon">
+                  <div class="card-icon-square teal">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
+                      <path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                  </div>
+                  <h3>{{ enterpriseFwData['企业供需对接']?.name || '企业供需对接' }}</h3>
+                </div>
+                <span class="view-more" @click.stop="router.push('/supply-demand')" style="font-size: 13px; color: #0d9488; cursor: pointer;">更多</span>
+              </div>
+              <p class="card-desc" style="margin-bottom: 12px;">{{ enterpriseFwData['企业供需对接']?.remark || '供需发布平台，产业链上下游资源互补与协作' }}</p>
+              
+              <ul class="supply-demand-list" style="list-style: none; padding: 0; margin: 0; flex: 1;">
+                <li v-for="(item, i) in supplyDemandList" :key="i" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: #334155; border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px;">
+                  <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <span :style="{ color: item.type === 'supply' ? '#10b981' : '#f59e0b', marginRight: '4px', fontWeight: 'bold' }">
+                      [{{ item.type === 'supply' ? '供应' : '需求' }}]
+                    </span>
+                    {{ item.title }}
+                  </span>
+                  <span style="color: #94a3b8; font-size: 12px; margin-left: 10px;">{{ item.createTime ? item.createTime.substring(5, 10).replace('-', '/') : '' }}</span>
+                </li>
+              </ul>
+            </div>
 
+          
+          </div>
 
-            <!-- 企业信用查询 -->
-            <div class="fw-card border-blue" @click="handleLink(enterpriseFwData['企业信用查询']?.url)" style="cursor: pointer;">
+    
+          <div class="bottom-cards-row">
+    <!-- 企业信用查询 -->
+            <div class="fw-card border-blue" @click="handleCreditSearch" style="cursor: pointer;">
               <div class="card-title-row">
                 <div class="title-with-icon">
                   <div class="card-icon-square blue">
@@ -288,14 +369,11 @@ onMounted(() => {
                 </div>
               </div>
               <p class="card-desc">{{ enterpriseFwData['企业信用查询']?.remark || '接入信用中国（霍尔果斯），企业信用信息一站式查询' }}</p>
-              <div class="action-btn-row">
-                <button class="outline-btn blue" @click.stop="handleLink(enterpriseFwData['企业信用查询']?.url)">立即跳转 &rarr;</button>
+              <div class="credit-search-group" @click.stop>
+                <input v-model="creditSearchKeyword" type="text" placeholder="请输入 法人/企业名称/营业执照" class="credit-search-input-integrated" @keyup.enter="handleCreditSearch" />
+                <button class="credit-search-btn" @click.stop="handleCreditSearch">立即搜索</button>
               </div>
             </div>
-          </div>
-
-    
-          <div class="bottom-cards-row">
             <!-- 招商引资服务 -->
             <div class="fw-card border-orange" @click="handleLink(enterpriseFwData['招商引资服务']?.url)" style="cursor: pointer;">
               <div class="card-title-row">
@@ -323,23 +401,7 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- 企业供需对接 -->
-            <div class="fw-card border-teal" @click="router.push('/supply-demand')" style="cursor: pointer;">
-              <div class="card-title-row">
-                <div class="title-with-icon">
-                  <div class="card-icon-square teal">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
-                      <path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
-                  </div>
-                  <h3>{{ enterpriseFwData['企业供需对接']?.name || '企业供需对接' }}</h3>
-                </div>
-              </div>
-              <p class="card-desc">{{ enterpriseFwData['企业供需对接']?.remark || '供需发布平台，产业链上下游资源互补与协作' }}</p>
-              <div class="action-btn-row">
-                <button class="outline-btn teal" @click.stop="router.push('/supply-demand')">立即跳转 &rarr;</button>
-              </div>
-            </div>
+            
 
             <!-- 乐享霍尔果斯 -->
             <div class="fw-card border-orange" @click="handleLink(enterpriseFwData['乐享霍尔果斯']?.url)" style="cursor: pointer;">
@@ -478,6 +540,46 @@ onMounted(() => {
   gap: 4px;
 }
 
+/* 信用查询搜索框样式 */
+.credit-search-group {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  width: 100%;
+}
+
+.credit-search-input-integrated {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #0066ff;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  font-size: 13px;
+  outline: none;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.credit-search-input-integrated:focus {
+  background: #f4f9ff;
+}
+
+.credit-search-btn {
+  background: #0066ff;
+  color: #fff;
+  border: 1px solid #0066ff;
+  padding: 10px 16px;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.credit-search-btn:hover {
+  background: #005ce6;
+}
+
 .sub-tab-btn {
   padding: 10px 32px;
   font-size: 16px;
@@ -592,7 +694,7 @@ onMounted(() => {
 
 .top-cards-row {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
@@ -748,12 +850,12 @@ onMounted(() => {
 }
 
 .border-blue { 
-  height:270px;
-  padding:24px;
   border: 1px solid #e0f2fe; 
   background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
 }
 .border-teal { 
+  height:270px;
+  padding:24px;
   border: 1px solid #ccfbf1; 
   background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%);
 }

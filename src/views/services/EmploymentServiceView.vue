@@ -128,7 +128,7 @@ onMounted(() => {
         <!-- 左侧表单 -->
         <div class="left-form-section" style="flex: 0 0 350px; border-right: 1px solid #e2e8f0; padding-right: 24px; overflow-y: auto;">
           <div class="form-header" style="margin-bottom: 20px;">
-            <h3 style="margin: 0; font-size: 18px; color: #0f172a;">创建诉求直通车工单</h3>
+            <h3 style="margin: 0; font-size: 18px; color: #0f172a;">诉求直通车</h3>
           </div>
           <form @submit.prevent="submitForm" class="complaint-form">
             <div class="form-group">
