@@ -1017,5 +1017,50 @@ onMounted(() => {
   background: #f8fafc;
   border-radius: 4px;
 }
+@media screen and (max-width: 768px) {
+  .top-cards-row,
+  .bottom-cards-row {
+    grid-template-columns: 1fr !important;
+  }
+  .grid-container {
+    grid-template-columns: 1fr !important;
+  }
+  .big-card {
+    height: auto !important;
+    min-height: 200px;
+    box-sizing: border-box;
+  }
+  .fw-card{
+    box-sizing: border-box;
+    height:auto !important;
+  }
+  .sub-tab-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .sub-tabs {
+    flex-wrap: wrap;
+  }
+  .credit-search-group {
+    width: 100% !important;
+  }
+  .match-banner {
+    flex-direction: column;
+    text-align: left !important;
+    height: auto !important;
+    padding: 16px !important;
+    align-items: flex-start !important;
+  }
+  .match-left, .match-center, .match-right {
+    width: 100% !important;
+    justify-content: left !important;
+    margin: 8px 0 !important;
+  }
+  .sub-tab-btn{
+    padding: 8px 26px !important;
+    font-size: 14px !important;
+  }
+}
+
 </style>
 
