@@ -568,4 +568,52 @@ onMounted(() => {
   opacity: 0.6;
   cursor: not-allowed;
 }
+@media screen and (max-width: 768px) {
+  .content-box {
+    flex-direction: column !important;
+  }
+  .left-form-section {
+    flex: auto !important;
+    width: 100% !important;
+    border-right: none !important;
+    padding-right: 0 !important;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 24px;
+    margin-bottom: 12px;
+  }
+  .appeals-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: auto !important;
+    width: 100% !important;
+  }
+  .appeals-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: 1fr !important;
+  }
+  .appeal-card.span-2 {
+    grid-column: span 1 !important;
+  }
+  .appeal-card {
+    height: auto !important;
+    min-height: 120px !important;
+  }
+  .content-box {
+    height: auto !important;
+    padding: 12px !important;
+  }
+  .row-group {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .header-row {
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  .card-bg {
+    opacity: 0.2 !important;
+  }
+}
+
 </style>

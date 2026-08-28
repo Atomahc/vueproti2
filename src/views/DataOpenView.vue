@@ -6,6 +6,7 @@ import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
 import TheNavBar from '../components/TheNavBar.vue'
+import DataBoard from '../components/DataBoard.vue'
 
 import gg1 from '@/assets/other/gg1.png'
 import gg2 from '@/assets/other/gg2.png'
@@ -13,6 +14,7 @@ import gg3 from '@/assets/other/gg3.png'
 import gg4 from '@/assets/other/gg4.png'
 
 const router = useRouter()
+
 
 const statSection = ref<any>({ children: [] })
 const visSection = ref<any>({ children: [] })
@@ -167,7 +169,11 @@ onMounted(() => {
       <TheNavBar activeId="data" />
 
       <div class="data-open-body">
-                <!-- 数据可视化看板 -->
+        
+        <!-- 口岸贸易与城市治理数据看板 -->
+        <DataBoard />
+
+        <!-- 数据可视化看板 (Excel 数据) -->
         <section class="data-section">
           <div class="section-header">
             <div class="header-icon green-icon">

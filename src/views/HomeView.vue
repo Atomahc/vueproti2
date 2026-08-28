@@ -14,6 +14,13 @@ import { Pagination, Autoplay } from 'swiper/modules'
 const router = useRouter()
 
 // 新闻选项卡
+const searchKeyword = ref("")
+const handleSearch = () => {
+  if (searchKeyword.value.trim()) {
+    router.push({ path: "/search", query: { keyword: searchKeyword.value } })
+  }
+}
+
 const newsTab = ref('城市形象')
 const newsTabs = ['城市形象', '重大活动', '图文宣传']
 
@@ -182,6 +189,19 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
               </div>
             </div>
 
+          </div>
+        </div>
+
+        <!-- 移动端专属搜索框 -->
+        <div class="mobile-only-comp" style="width: 100%; box-sizing: border-box; background: transparent;">
+          <div style="display: flex; align-items: center; background: #ffffff; border-radius: 20px; padding: 6px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+            <input type="text" placeholder="全域搜索..." v-model="searchKeyword" @keyup.enter="handleSearch" style="border: none; outline: none; flex: 1; font-size: 14px; color: #334155; background: transparent;" />
+            <button @click="handleSearch" style="background: none; border: none; color: #3b82f6; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -663,6 +683,9 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
   .vr-text h3{
     margin:0px;
     font-size: 14px !important;
+  }
+  .quick-banner-title{
+    font-size: 16px;
   }
 }
 

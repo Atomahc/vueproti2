@@ -214,14 +214,14 @@ onMounted(() => {
         </div>
         <!-- 上方板块：驿路法务通 -->
         <div class="legal-block">
-          <div class="block-header">
-
+          <div class="block-header" style="justify-content: space-between;">
             <div class="header-text">
               <h2>{{ yiluHeader.name || '云上法务 让每一次法律求助都有清晰路径' }}</h2>
               <p>{{ yiluHeader.remark || '基础法律服务 · 普惠便民' }}</p>
             </div>
+            <a href="http://sz.xjhegs.gov.cn:3003/fawu" target="_blank" style="color: #fff; font-size: 14px; text-decoration: none; cursor: pointer;">查看更多 &gt;</a>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: stretch; gap: 24px;">
+          <div class="middle-flex-row" style="display: flex; justify-content: space-between; align-items: stretch; gap: 24px;">
             <div class="intl-grid">
               <div v-for="(card, i) in intlCards" :key="i" class="intl-card" @click="handleNavigate(card.url)">
                 <div class="intl-title-wrap">
@@ -245,7 +245,7 @@ onMounted(() => {
                 </h3>
               </div>
 
-              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1;">
+              <div class="form-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1;">
                 <input v-model="appointmentForm.userName" type="text" placeholder="姓名" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9); border-radius: 6px; font-size: 13px; outline: none; box-sizing: border-box;" />
                 <input v-model="appointmentForm.contact" type="text" placeholder="手机号" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9); border-radius: 6px; font-size: 13px; outline: none; box-sizing: border-box;" />
                 
@@ -358,6 +358,8 @@ onMounted(() => {
   padding: 24px;
   min-height: 600px;
   position: relative;
+  background-position: 0px 0px;
+  background-size: 100% 100%;
 }
 
 .legal-block {
@@ -374,7 +376,7 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   padding-bottom: 16px;
-  border-bottom: 1px dashed #cbd5e1;
+
 }
 
 .icon-square {
@@ -569,4 +571,40 @@ onMounted(() => {
   object-fit: contain;
   z-index: 1;
 }
+@media screen and (max-width: 768px) {
+  .yilu-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .intl-grid {
+    width: 100% !important;
+    grid-template-columns: 1fr !important;
+  }
+  .middle-flex-row {
+    flex-direction: column !important;
+  }
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .appointment-form-card {
+    height: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .content-box {
+    height: auto !important;
+    padding: 12px !important;
+  }
+  .block-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+  }
+  .yilu-col-card{
+    box-sizing: border-box;
+  }
+  .header-text h2{
+    font-size: 16px;
+  }
+}
+
 </style>

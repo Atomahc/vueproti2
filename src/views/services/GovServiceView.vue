@@ -557,6 +557,7 @@ onMounted(() => {
   font-size: 13px;
   outline: none;
   color: #333;
+  width:150px;
   transition: all 0.2s;
 }
 
@@ -839,7 +840,8 @@ onMounted(() => {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  height: 150px;
+  min-height: 150px;
+  height: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   transition: all 0.3s ease;
 }

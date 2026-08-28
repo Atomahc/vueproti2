@@ -287,12 +287,22 @@ watch(() => route.params.id, () => {
 @media (max-width: 768px) {
   .article-container {
     padding: 30px 20px;
+    height:100%;
+    box-sizing: border-box;
   }
-  
+  .article-page{
+    display: block;
+    height: 100vh;
+  }
   .article-header .title {
     font-size: 24px;
   }
-  
+  .article-main{
+    padding-top: 0px;
+    height:calc(100vh - 70px);
+    padding-bottom:0px;
+    background-color: #ffffff;
+  }
   .meta-info {
     flex-direction: column;
     gap: 10px;

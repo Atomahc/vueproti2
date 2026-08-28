@@ -409,4 +409,29 @@ h3 {
   background-color: #004ecc;
 }
 
+@media screen and (max-width: 768px) {
+  .image-cards-grid{
+    font-size: 12px !important;
+    gap: 12px !important;
+  }
+  .arrow-btn{
+    padding: 5px !important;
+    font-size: 8px !important;
+    display: none;
+  }
+  h3{
+    font-size: 16px;
+  }
+  .subtitle{
+    font-size: 12px;
+  }
+  .action-btn{
+    font-size: 12px;
+    padding:6px 0px;
+  }
+  .cross-card{
+    padding:10px;
+  }
+}
+
 </style>

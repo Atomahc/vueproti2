@@ -521,6 +521,7 @@ onMounted(() => {
   resize: none;
   background: transparent;
   margin-bottom: 0;
+  width: 100px;
 }
 
 .shoot-textarea:focus,
@@ -984,4 +985,42 @@ onMounted(() => {
   height: 140px;
   object-fit: contain;
 }
+@media screen and (max-width: 768px) {
+  .bm-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .content-box {
+    height: auto !important;
+    padding: 12px !important;
+  }
+  .teal-tint, .yellow-tint, .blue-tint-card, .footer-small-card, .bm-card {
+    height: auto !important;
+    min-height: 80px !important;
+  }
+  .row-group {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .row-group .col {
+    margin-right: 0 !important;
+  }
+  .modal-content {
+    width: 90vw !important;
+    padding: 20px !important;
+  }
+  .hot-job-banner {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+  }
+  .upload-container {
+    justify-content: flex-start;
+  }
+  .services-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
 </style>
