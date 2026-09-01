@@ -6,7 +6,6 @@ import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
-
 import ss1 from '@/assets/other/ss1.png'
 import ss2 from '@/assets/other/ss2.png'
 import ss3 from '@/assets/other/ss3.png'
@@ -14,7 +13,6 @@ import ss4 from '@/assets/other/ss4.png'
 import ss5 from '@/assets/other/ss5.png'
 import ss6 from '@/assets/other/ss6.png'
 const ssBgs = [ss1, ss2, ss3, ss4, ss5, ss6]
-
 // 随手拍表单
 const snapshotSubmitting = ref(false)
 const uploadedImages = ref<string[]>([])
@@ -34,11 +32,6 @@ const router = useRouter()
 const handleNavigate = (item: any) => {
   if (item.name === '文旅服务') {
     router.push('/service/culture')
-    return
-  }
- 
-  if (item.name === '青少年活动中心') {
-    router.push('/service/youth-activity')
     return
   }
   if (item.name === '志愿者服务(霍尔果斯云)' || item.linkType === 'qrcode') {
@@ -122,33 +115,33 @@ const fetchConvenience = async () => {
     })
     if (res.code === 0 && res.data && res.data.convenience) {
       const list = res.data.convenience
-
+      
       const ld = list.find((item: any) => item.name === '劳道智工')
       if (ld) {
         laodaoInfo.value = ld
         laodaoTags.value = ld.children || []
       }
-
+      
       const zy = list.find((item: any) => item.name?.includes('中亚职通桥'))
       if (zy) {
         zhongyaInfo.value = zy
       }
-
+      
       const sq = list.find((item: any) => item.name === '社区便民')
       if (sq) {
         communityServices.value = sq.children || []
       }
-
+      
       const sh = list.find((item: any) => item.name === '生活服务')
       if (sh) {
         lifeServices.value = sh.children || []
       }
 
-      bottomCards.value = list.filter((item: any) =>
+      bottomCards.value = list.filter((item: any) => 
         ['青少年活动中心', '文旅服务', '志愿者服务(霍尔果斯云)'].includes(item.name)
       )
     }
-  } catch (e) {
+  } catch(e) {
     console.error('Failed to fetch convenience services', e)
   }
 }
@@ -168,19 +161,18 @@ onMounted(() => {
       <div class="content-box">
         <div class="bm-grid">
           <!-- 1. 城市治理 · 随手拍 -->
-          <div class="bm-card shoot-card">
+          <div class="bm-card shoot-card" >
             <div class="card-header green-theme">
               <div class="header-title-box">
                 <div class="icon-square green">
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
-                    <path
-                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <circle cx="12" cy="13" r="3" />
                   </svg>
                 </div>
                 <div>
                   <h2>城市治理 · 随手拍</h2>
-                  <!-- <p class="subtitle">发现一分派一处置一反馈闭环</p> -->
+                  <p class="subtitle">发现一分派一处置一反馈闭环</p>
                 </div>
               </div>
             </div>
@@ -190,12 +182,12 @@ onMounted(() => {
                 <div class="col" style="margin-right: 10px;">
                   <label class="form-label">上报类型</label>
                   <select class="shoot-input" v-model="snapshotForm.reportType">
-                    <option value="occupying_business">占道经营</option>
-                    <option value="illegal_parking">违章停车</option>
-                    <option value="streetlight_fault">路灯故障</option>
-                    <option value="manhole_missing">井盖缺失</option>
-                    <option value="road_dirty">道路不洁</option>
-                    <option value="uncivilized_behavior">不文明行为</option>
+                      <option value="occupying_business">占道经营</option>
+                      <option value="illegal_parking">违章停车</option>
+                      <option value="streetlight_fault">路灯故障</option>
+                      <option value="manhole_missing">井盖缺失</option>
+                      <option value="road_dirty">道路不洁</option>
+                      <option value="uncivilized_behavior">不文明行为</option>
                   </select>
                 </div>
                 <div class="col">
@@ -224,8 +216,11 @@ onMounted(() => {
                     <input type="file" accept="image/*" @change="handleImageUpload" />
                   </div>
                 </div>
-                <textarea v-model="snapshotForm.content" placeholder="请输入问题描述..."
-                  class="shoot-textarea-inner"></textarea>
+                <textarea
+                  v-model="snapshotForm.content"
+                  placeholder="请输入问题描述..."
+                  class="shoot-textarea-inner"
+                ></textarea>
               </div>
 
               <div class="row-group" style="margin-top: 10px;">
@@ -238,10 +233,9 @@ onMounted(() => {
                   <input type="text" class="shoot-input" v-model="snapshotForm.contactPhone" placeholder="电话" />
                 </div>
               </div>
-
+              
               <label class="form-label" style="margin-top: 10px;">地址</label>
-              <input type="text" class="shoot-input" v-model="snapshotForm.address" placeholder="请输入地址"
-                style="margin-bottom: 16px;" />
+              <input type="text" class="shoot-input" v-model="snapshotForm.address" placeholder="请输入地址" style="margin-bottom: 16px;" />
 
               <button class="submit-btn green" @click="submitSnapshotForm" :disabled="snapshotSubmitting">
                 {{ snapshotSubmitting ? '提交中...' : '立即上传' }}
@@ -249,126 +243,108 @@ onMounted(() => {
             </div>
           </div>
 
-          <div class="gdright" >
-            <!-- 4. 社区便民 -->
-            <div class="bm-card blue-tint-card">
-              <div class="card-header-flex">
-                <h2>社区便民</h2>
-                <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                    xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200">
-                    <path
-                      d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063"
-                      fill="#333333" p-id="6570"></path>
-                  </svg></span>
-              </div>
-              <div class="services-icon-grid">
-                <div v-for="(s, i) in communityServices" :key="i" class="icon-item-box" @click="handleNavigate(s)">
-                  <div class="svg-icon-blue">
-                    <img v-if="s.bgImage && (s.bgImage.includes('/') || s.bgImage.includes('.'))"
-                      :src="s.bgImage.startsWith('http') ? s.bgImage : minioPrefix + s.bgImage"
-                      style="width: 36px; height: 36px; object-fit: contain; filter: none;" />
-                    <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round">
-                      <path :d="s.icon" />
-                    </svg>
-                  </div>
-                  <span>{{ s.name }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- 5. 生活服务 -->
-            <div class="bm-card pur-tint-card">
-              <div class="card-header-flex">
-                <h2>生活服务</h2>
-                <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                    xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200">
-                    <path
-                      d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063"
-                      fill="#333333" p-id="6570"></path>
-                  </svg></span>
-              </div>
-              <div class="services-icon-grid">
-                <div v-for="(s, i) in lifeServices" :key="i" class="icon-item-box" @click="handleNavigate(s)">
-                  <div class="svg-icon-blue">
-                    <img v-if="s.bgImage && (s.bgImage.includes('/') || s.bgImage.includes('.'))"
-                      :src="s.bgImage.startsWith('http') ? s.bgImage : minioPrefix + s.bgImage"
-                      style="width: 36px; height: 36px; object-fit: contain; filter: none;" />
-                    <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round">
-                      <path :d="s.icon" />
-                    </svg>
-                  </div>
-                  <span>{{ s.name }}</span>
-                </div>
-              </div>
-            </div>
-            <div class="bm-card footer-small-card"
-            :style="{ backgroundImage: `url(${ssBgs[5]})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', border: 'none' }"
-            @click.prevent="openModal(laodaoInfo)">
-              <div class="small-card-content">
-                <div class="card-icon-square" :class="['purple', 'cyan', 'yellow'][i % 3]">
-                  <img
-                    v-if="laodaoInfo.bgImage && (laodaoInfo.bgImage.includes('/') || laodaoInfo.bgImage.includes('.'))"
-                    :src="laodaoInfo.bgImage.startsWith('http') ? laodaoInfo.bgImage : minioPrefix + laodaoInfo.bgImage"
-                    style="width: 40px; height: 40px; object-fit: contain;" />
-                  <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
+          <!-- 2. 劳道智工 · 短期工 -->
+          <div class="bm-card teal-tint">
+            <div class="card-header-flex">
+              <div class="header-title-box">
+                <div class="icon-square teal">
+                  <img v-if="laodaoInfo.bgImage && (laodaoInfo.bgImage.includes('/') || laodaoInfo.bgImage.includes('.'))" :src="laodaoInfo.bgImage.startsWith('http') ? laodaoInfo.bgImage : minioPrefix + laodaoInfo.bgImage" style="width: 36px; height: 36px; object-fit: contain; " />
+                  <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
                     <path d="M12 14l9-5-9-5-9 5 9 5z" />
                   </svg>
                 </div>
-                <div class="text-info">
-                  <h3>{{ laodaoInfo.name ? laodaoInfo.name : '劳道智工' }} &rarr;</h3>
-                  <p>短期工</p>
-                </div>
+                <h2>{{ laodaoInfo.name ? laodaoInfo.name : '劳道智工' }} · <span>短期工</span></h2>
               </div>
+              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
 
-            <div class="bm-card footer-small-card"
-            :style="{ backgroundImage: `url(${ssBgs[4]})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', border: 'none' }"
-             @click.prevent="openModal(zhongyaInfo)">
-              <div class="small-card-content">
-                <div class="card-icon-square" :class="['purple', 'cyan', 'yellow'][i % 3]">
-                  <img
-                    v-if="zhongyaInfo.bgImage && (zhongyaInfo.bgImage.includes('/') || zhongyaInfo.bgImage.includes('.'))"
-                    :src="zhongyaInfo.bgImage.startsWith('http') ? zhongyaInfo.bgImage : minioPrefix + zhongyaInfo.bgImage"
-                    style="width: 40px; height: 40px; object-fit: contain;" />
-                  <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
-                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                  </svg>
-                </div>
-                <div class="text-info">
-                  <h3>{{ zhongyaInfo.name ? zhongyaInfo.name : '中亚职通桥' }} &rarr;</h3>
-                  <p>长期工</p>
-                </div>
+            <div class="short-job-body">
+              <div class="job-tags-grid">
+                <span class="j-tag" v-for="(tag, idx) in laodaoTags" :key="idx">{{ tag.name }}</span>
               </div>
-            </div>
-
-
-            <!-- 底部三列横向入口卡片 -->
-            <div v-for="(bc, i) in bottomCards" :key="i"  class="bm-card footer-small-card" @click="handleNavigate(bc)"
-                 :style="{ backgroundImage: `url(${ssBgs[i % 6]})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', border: 'none' }">
-              <div class="small-card-content">
-                <div class="card-icon-square" :class="['purple', 'cyan', 'yellow'][i % 3]">
-                  <img v-if="bc.bgImage && (bc.bgImage.includes('/') || bc.bgImage.includes('.'))"
-                    :src="bc.bgImage.startsWith('http') ? bc.bgImage : minioPrefix + bc.bgImage"
-                    style="width: 40px; height: 40px; object-fit: contain;" />
-                  <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
-                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                  </svg>
-                </div>
-                <div class="text-info">
-                  <h3>{{ bc.name.replace('(霍尔果斯云)', '') }} <span class="sub"
-                      v-if="bc.name.includes('(霍尔果斯云)')">(霍尔果斯云)</span> &rarr;</h3>
-                  <p>{{ bc.remark || '暂无描述' }}</p>
-                </div>
+              <div class="hot-job-banner">
+                <span>热门职务 <strong>*{{ hotJobsCount }}</strong></span>
+                <a href="javascript:void(0)" class="view-link" @click.prevent="openModal(laodaoInfo)">查看 &rarr;</a>
               </div>
             </div>
           </div>
 
+          <!-- 3. 中亚职通桥 · 长期工 -->
+          <div class="bm-card yellow-tint">
+            <div class="card-header-flex">
+              <div class="header-title-box">
+                <div class="icon-square orange">
+                  <img v-if="zhongyaInfo.bgImage && (zhongyaInfo.bgImage.includes('/') || zhongyaInfo.bgImage.includes('.'))" :src="zhongyaInfo.bgImage.startsWith('http') ? zhongyaInfo.bgImage : minioPrefix + zhongyaInfo.bgImage" style="width: 36px; height: 36px; object-fit: contain;" />
+                  <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
+                    <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
+                  </svg>
+                </div>
+                <h2>{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : '中亚职通桥' }} · <span>长期工</span></h2>
+              </div>
+              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
+            </div>
 
+            <div class="long-job-body">
+              <p class="desc-text">{{ zhongyaInfo.remark || '集成长期岗位，与劳道智工短期工形成短期+长期全覆盖就业服务体系。' }}</p>
+              <button class="yellow-action-btn" @click="openModal(zhongyaInfo)">
+                找人才/找工作 <span class="sub-link">职位列表 &rarr;</span>
+              </button>
+            </div>
+          </div>
 
+          <!-- 4. 社区便民 -->
+          <div class="bm-card blue-tint-card">
+            <div class="card-header-flex">
+              <h2>社区便民</h2>
+              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
+            </div>
+            <div class="services-icon-grid">
+              <div v-for="(s, i) in communityServices" :key="i" class="icon-item-box" @click="handleNavigate(s)">
+                <div class="svg-icon-blue">
+                  <img v-if="s.bgImage && (s.bgImage.includes('/') || s.bgImage.includes('.'))" :src="s.bgImage.startsWith('http') ? s.bgImage : minioPrefix + s.bgImage " style="width: 36px; height: 36px; object-fit: contain; filter: none;" />
+                  <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path :d="s.icon" />
+                  </svg>
+                </div>
+                <span>{{ s.name }}</span>
+              </div>
+            </div>
+          </div>
 
+          <!-- 5. 生活服务 -->
+          <div class="bm-card pur-tint-card">
+            <div class="card-header-flex">
+              <h2>生活服务</h2>
+              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
+            </div>
+            <div class="services-icon-grid">
+              <div v-for="(s, i) in lifeServices" :key="i" class="icon-item-box" @click="handleNavigate(s)">
+                <div class="svg-icon-blue">
+                  <img v-if="s.bgImage && (s.bgImage.includes('/') || s.bgImage.includes('.'))" :src="s.bgImage.startsWith('http') ? s.bgImage : minioPrefix + s.bgImage " style="width: 36px; height: 36px; object-fit: contain; filter: none;" />
+                  <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path :d="s.icon" />
+                  </svg>
+                </div>
+                <span>{{ s.name }}</span>
+              </div>
+            </div>
+          </div>
 
+          <!-- 底部三列横向入口卡片 -->
+            <div v-for="(bc, i) in bottomCards" :style="{ backgroundImage: `url(${ssBgs[i]})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', border: 'none' }" :key="i" class="bm-card footer-small-card" @click="handleNavigate(bc)">
+              <div class="small-card-content">
+                <div class="card-icon-square" :class="['purple', 'cyan', 'yellow'][i % 3]">
+                <img v-if="bc.bgImage && (bc.bgImage.includes('/') || bc.bgImage.includes('.'))" :src="bc.bgImage.startsWith('http') ? bc.bgImage : minioPrefix + bc.bgImage" style="width: 40px; height: 40px; object-fit: contain;" />
+                <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
+                  <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                </svg>
+              </div>
+              <div class="text-info">
+                <h3>{{ bc.name.replace('(霍尔果斯云)', '') }} <span class="sub" v-if="bc.name.includes('(霍尔果斯云)')">(霍尔果斯云)</span> &rarr;</h3>
+                <p>{{ bc.remark || '暂无描述' }}</p>
+              </div>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -378,18 +354,14 @@ onMounted(() => {
     <div class="modal-overlay" v-if="activeModal" @click.self="closeModal">
       <div class="modal-content">
         <button class="modal-close-btn" @click="closeModal">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
         <div class="modal-header">
-          <div class="modal-icon-box"
-            :class="{ 'green': activeModal.name?.includes('劳道'), 'yellow': activeModal.name?.includes('中亚') }">
-            <img v-if="activeModal.bgImage && (activeModal.bgImage.includes('/') || activeModal.bgImage.includes('.'))"
-              :src="activeModal.bgImage.startsWith('http') ? activeModal.bgImage : minioPrefix + activeModal.bgImage"
-              style="" />
+          <div class="modal-icon-box" :class="{ 'green': activeModal.name?.includes('劳道'), 'yellow': activeModal.name?.includes('中亚') }">
+            <img v-if="activeModal.bgImage && (activeModal.bgImage.includes('/') || activeModal.bgImage.includes('.'))" :src="activeModal.bgImage.startsWith('http') ? activeModal.bgImage : minioPrefix + activeModal.bgImage" style="" />
             <svg v-else viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2">
               <path d="M12 14l9-5-9-5-9 5 9 5z" />
             </svg>
@@ -397,13 +369,10 @@ onMounted(() => {
           <h2 class="modal-title">{{ activeModal.name ? activeModal.name.split('·')[0] : '' }}简介</h2>
         </div>
         <p class="modal-desc">{{ activeModal.linkDesc || '暂无简介' }}</p>
-        <div class="modal-qrcode-section"
-          :class="{ 'green-bg': activeModal.name?.includes('劳道'), 'yellow-bg': activeModal.name?.includes('中亚') }">
+        <div class="modal-qrcode-section" :class="{ 'green-bg': activeModal.name?.includes('劳道'), 'yellow-bg': activeModal.name?.includes('中亚') }">
           <div class="qrcode-title">请扫描下方二维码进入小程序</div>
           <div class="qrcode-wrapper">
-            <img v-if="activeModal.qrcode"
-              :src="activeModal.qrcode.startsWith('http') ? activeModal.qrcode : minioPrefix + activeModal.qrcode"
-              alt="QR Code" class="qrcode-img" />
+            <img v-if="activeModal.qrcode" :src="activeModal.qrcode.startsWith('http') ? activeModal.qrcode : minioPrefix + activeModal.qrcode" alt="QR Code" class="qrcode-img" />
             <!-- Fallback QR code images if no dynamic one -->
           </div>
         </div>
@@ -415,12 +384,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.gdright{
-  flex:1;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
 .public-page-container {
   width: 100vw;
   min-height: 100vh;
@@ -447,36 +410,32 @@ onMounted(() => {
   background: #ffffff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   padding: 24px;
-  height: 600px
+    height:600px
 }
 
 .bm-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 340px 1fr 1fr;
   gap: 20px;
 }
 
 .bm-card {
   background: #ffffff;
-  border-radius: 6px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-  padding: 20px;
+  padding: 10px 20px;
   box-sizing: border-box;
 }
-
 .footer-small-card:hover {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
   transform: scale(1.05);
-  transition: all 0.2s;
+  transition: all 0.2s; 
   cursor: pointer;
 }
-
-.footer-small-card {
-  border: 1px solid #eee
+.footer-small-card{
+  border:1px solid #eee
 }
-
 .shoot-card {
-  width: 380px;
+  grid-row: span 2;
   background: #e6f9f0;
   border: 1px solid #a7f3d0;
   display: flex;
@@ -505,28 +464,19 @@ onMounted(() => {
 .icon-square {
   width: 36px;
   height: 36px;
-  border-radius: 6px;
-  overflow: hidden;
+  overflow:hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.icon-square.green {
-  background: #10b981;
-}
-
-.icon-square.teal {
-  background: #0d9488;
-}
-
-.icon-square.orange {
-  background: #f59e0b;
-}
+.icon-square.green { background: #10b981; }
+.icon-square.teal { background: #0d9488; }
+.icon-square.orange { background: #f59e0b; }
 
 .shoot-body {
-  margin-top: 10px;
+  margin-top: 20px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -550,7 +500,6 @@ onMounted(() => {
   padding: 8px 0;
   background: #ffffff;
   border: 1px solid #cbd5e1;
-  border-radius: 4px;
   font-size: 12px;
   color: #334155;
   cursor: pointer;
@@ -570,12 +519,10 @@ onMounted(() => {
   gap: 12px;
   align-items: stretch;
   border: 1px solid #cbd5e1;
-  border-radius: 4px;
   background: #ffffff;
   padding: 8px;
   transition: border-color 0.2s;
 }
-
 .textarea-with-upload:focus-within {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
@@ -583,14 +530,13 @@ onMounted(() => {
 
 .shoot-textarea-inner {
   flex: 1;
-  min-height: 120px;
+  min-height: 60px;
   border: none;
   font-size: 13px;
   outline: none;
   resize: none;
   background: transparent;
   margin-bottom: 0;
-  width: 100px;
 }
 
 .shoot-textarea:focus,
@@ -602,7 +548,6 @@ onMounted(() => {
 .shoot-input {
   width: 100%;
   border: 1px solid #cbd5e1;
-  border-radius: 4px;
   padding: 8px 12px;
   box-sizing: border-box;
   font-size: 13px;
@@ -614,7 +559,6 @@ onMounted(() => {
 .row-group {
   display: flex;
 }
-
 .row-group .col {
   flex: 1;
 }
@@ -627,22 +571,18 @@ onMounted(() => {
   max-width: 130px;
   align-content: flex-start;
 }
-
 .upload-item {
   position: relative;
   width: 60px;
   height: 60px;
-  border-radius: 4px;
   border: 1px solid #cbd5e1;
   overflow: hidden;
 }
-
 .upload-preview {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
 .btn-remove-img {
   position: absolute;
   top: 2px;
@@ -660,12 +600,10 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
 }
-
 .upload-btn {
   position: relative;
   width: 60px;
   height: 60px;
-  border-radius: 4px;
   border: 1px dashed #cbd5e1;
   display: flex;
   align-items: center;
@@ -678,12 +616,10 @@ onMounted(() => {
   text-align: center;
   padding: 0 4px;
 }
-
 .upload-btn:hover {
   border-color: #3b82f6;
   color: #3b82f6;
 }
-
 .upload-btn input[type="file"] {
   position: absolute;
   top: 0;
@@ -699,7 +635,6 @@ onMounted(() => {
   color: #ffffff;
   border: none;
   padding: 12px 0;
-  border-radius: 4px;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
@@ -712,6 +647,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  margin-top:10px;
 }
 
 .card-header-flex h2 {
@@ -729,20 +665,17 @@ onMounted(() => {
   color: #94a3b8;
   font-size: 16px;
 }
-
 .arrow svg {
   width: 16px;
   height: 16px;
   stroke: #94a3b8;
 }
-
 /* 劳道智工 (Teal) */
 .teal-tint {
   background: #f0fdfa;
   border: 1px solid #ccfbf1;
   display: flex;
   flex-direction: column;
-  height: 140px;
 }
 
 .short-job-body {
@@ -755,7 +688,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  margin-bottom: 16px;
+
 }
 
 .j-tag {
@@ -763,14 +696,12 @@ onMounted(() => {
   border: 1px solid #99f6e4;
   color: #0d9488;
   padding: 6px 0;
-  border-radius: 4px;
   font-size: 12px;
   text-align: center;
 }
 
 .hot-job-banner {
   background: #ccfbf1;
-  border-radius: 4px;
   padding: 10px 12px;
   display: flex;
   justify-content: space-between;
@@ -797,7 +728,6 @@ onMounted(() => {
   border: 1px solid #fef3c7;
   display: flex;
   flex-direction: column;
-  height: 140px
 }
 
 .long-job-body {
@@ -818,7 +748,6 @@ onMounted(() => {
   color: #ffffff;
   border: none;
   padding: 12px;
-  border-radius: 4px;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
@@ -836,18 +765,14 @@ onMounted(() => {
 
 /* 社区便民 & 生活服务 (Blue) */
 .blue-tint-card {
-  background: #f8fafc;
-  border: 1px solid #ddd;
-  grid-column: span 1;
-  height: 300px;
   background: linear-gradient( 180deg, rgba(0,140,245,0.1) 0%, rgba(241,242,243,0) 100%), #FFFFFF;
-}
-.pur-tint-card{
-  background: #f8fafc;
   border: 1px solid #ddd;
   grid-column: span 1;
-  height: 300px;
+}
+.pur-tint-card {
   background: linear-gradient( 180deg, rgba(68,106,245,0.1) 0%, rgba(243,243,243,0) 100%), #FFFFFF;
+  border: 1px solid #ddd;
+  grid-column: span 1;
 }
 
 /* 底部小卡片 */
@@ -867,7 +792,6 @@ onMounted(() => {
 .card-icon-square {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -875,17 +799,9 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.card-icon-square.purple {
-  background: #8b5cf6;
-}
-
-.card-icon-square.cyan {
-  background: #06b6d4;
-}
-
-.card-icon-square.yellow {
-  background: #f59e0b;
-}
+.card-icon-square.purple { background: #8b5cf6; }
+.card-icon-square.cyan { background: #06b6d4; }
+.card-icon-square.yellow { background: #f59e0b; }
 
 .text-info h3 {
   font-size: 15px;
@@ -906,11 +822,10 @@ onMounted(() => {
   color: #94a3b8;
   margin-left: 4px;
 }
-
 /* 5列 Icon 布局 */
 .services-icon-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px 0px;
   margin-top: 10px;
 }
@@ -1014,23 +929,16 @@ onMounted(() => {
 .modal-icon-box {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .modal-icon-box img {
-  width: 100%
+  width:100%
 }
 
-.modal-icon-box.green {
-  background: #10b981;
-}
-
-.modal-icon-box.yellow {
-  background: #f59e0b;
-}
+.modal-icon-box.green { background: #10b981; }
+.modal-icon-box.yellow { background: #f59e0b; }
 
 .modal-title {
   font-size: 20px;
@@ -1048,7 +956,6 @@ onMounted(() => {
 }
 
 .modal-qrcode-section {
-  border-radius: 8px;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -1070,14 +977,12 @@ onMounted(() => {
   color: #334155;
   background: #ffffff;
   padding: 6px 16px;
-  border-radius: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .qrcode-wrapper {
   background: #ffffff;
   padding: 12px;
-  border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -1085,55 +990,5 @@ onMounted(() => {
   width: 140px;
   height: 140px;
   object-fit: contain;
-}
-
-@media screen and (max-width: 768px) {
-  .bm-grid {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-  }
-
-  .content-box {
-    height: auto !important;
-    padding: 12px !important;
-  }
-
-  .teal-tint,
-  .yellow-tint,
-  .blue-tint-card,
-  .footer-small-card,
-  .bm-card {
-    height: auto !important;
-    min-height: 80px !important;
-  }
-
-  .row-group {
-    flex-direction: column !important;
-    gap: 10px !important;
-  }
-
-  .row-group .col {
-    margin-right: 0 !important;
-  }
-
-  .modal-content {
-    width: 90vw !important;
-    padding: 20px !important;
-  }
-
-  .hot-job-banner {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 8px;
-  }
-
-  .upload-container {
-    justify-content: flex-start;
-  }
-
-  .services-icon-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
 }
 </style>
