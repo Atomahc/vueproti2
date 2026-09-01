@@ -126,70 +126,70 @@ onMounted(() => {
       <div class="content-box" style="display: flex; gap: 24px;">
         
         <!-- 左侧表单 -->
-        <div class="left-form-section" style="flex: 0 0 350px; border-right: 1px solid #e2e8f0; padding-right: 24px; overflow-y: auto;">
-          <div class="form-header" style="margin-bottom: 20px;">
-            <h3 style="margin: 0; font-size: 18px; color: #0f172a;">诉求直通车</h3>
-          </div>
-          <form @submit.prevent="submitForm" class="complaint-form">
-            <div class="form-group">
-              <label>诉求类型</label>
-              <select v-model.number="formData.type" required>
-                <option value="1">企业诉求</option>
-                <option value="2">群众建议</option>
-                <option value="3">问题反映</option>
-              </select>
+        <div class="left-form-section" style="flex: 0 0 350px;">
+          <div style=" border-radius: 4px; overflow: hidden;padding:20px 20px 0px; height: 100%;">
+            <div class="form-header" style=" padding: 5px 10px; background:linear-gradient(90deg, rgba(0, 180, 120, 0.5) 0%, rgba(255, 255, 255, 0) 100%), rgba(255, 255, 255, 0);">
+              <h3 style="margin: 0; font-size: 16px; color: #047857; font-weight: 600;">创建诉求直通车工单</h3>
             </div>
-            
-            <div class="form-group">
-              <label>标题</label>
-              <input type="text" v-model="formData.title" placeholder="请输入标题" required />
-            </div>
-
-            <div class="form-group">
-              <label>诉求内容</label>
-              <textarea v-model="formData.content" rows="4" placeholder="请输入详细内容" required></textarea>
-            </div>
-
-            <div class="form-group row-group">
-              <div class="col">
-                <label>联系人姓名</label>
-                <input type="text" v-model="formData.contactName" placeholder="姓名" required />
+            <form @submit.prevent="submitForm" class="complaint-form" style="padding: 20px 0px 0px;">
+              
+              <div class="row-group" style="display: flex; gap: 10px; margin-bottom: 12px;">
+                <div style="flex: 1; display: flex; align-items: center; background: white; padding: 0 10px; border-radius: 4px;">
+                  <span style="color: #64748b; font-size: 13px; white-space: nowrap;">诉求类型：</span>
+                  <select v-model.number="formData.type" required style="border: none; outline: none; flex: 1; padding: 10px 0; background: transparent; font-size: 13px; color: #334155; appearance: none;">
+                    <option value="1">企业诉求</option>
+                    <option value="2">群众建议</option>
+                    <option value="3">问题反映</option>
+                  </select>
+                  <span style="color: #cbd5e1; font-size: 12px; pointer-events: none;">▼</span>
+                </div>
+                
+                <div style="flex: 1; display: flex; align-items: center; background: white; padding: 0 10px; border-radius: 4px;">
+                  <span style="color: #64748b; font-size: 13px; white-space: nowrap;">紧急程度：</span>
+                  <select v-model.number="formData.urgency" style="border: none; outline: none; flex: 1; padding: 10px 0; background: transparent; font-size: 13px; color: #334155; appearance: none;">
+                    <option value="1">普通</option>
+                    <option value="2">紧急</option>
+                    <option value="3">特急</option>
+                  </select>
+                  <span style="color: #cbd5e1; font-size: 12px; pointer-events: none;">▼</span>
+                </div>
               </div>
-              <div class="col">
-                <label>联系电话</label>
-                <input type="text" v-model="formData.contactPhone" placeholder="电话" required />
+              
+              <div style="display: flex; align-items: center; background: white; padding: 0 10px; border-radius: 4px; margin-bottom: 12px;">
+                <span style="color: #64748b; font-size: 13px; white-space: nowrap;">标题：</span>
+                <input type="text" v-model="formData.title" placeholder="请输入标题" required style="border: none; outline: none; flex: 1; padding: 10px 0; background: transparent; font-size: 13px; color: #334155;" />
               </div>
-            </div>
 
-            <div class="form-group row-group">
-              <div class="col">
-                <label>所属社区</label>
-                <select v-model="formData.community">
-                  <option value="none">无社区</option>
-                  <option value="cooperation_zone">合作区</option>
-                  <option value="kalasu">卡拉苏社区</option>
-                  <option value="silu">丝路社区</option>
-                  <option value="suolun">索伦社区</option>
-                  <option value="yingtarr">英塔尔社区</option>
-                  <option value="hongqiao">红桥社区</option>
-                </select>
+              <div style="margin-bottom: 12px;">
+                <textarea v-model="formData.content" rows="6" placeholder="请输入诉求详情内容..." required style="width: 100%; height:280px; border: none; outline: none; padding: 12px; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box; resize: none;"></textarea>
               </div>
-              <div class="col">
-                <label>紧急程度</label>
-                <select v-model.number="formData.urgency">
-                  <option value="1">普通</option>
-                  <option value="2">紧急</option>
-                  <option value="3">特急</option>
-                </select>
-              </div>
-            </div>
 
-            <div class="form-actions">
-              <button type="submit" class="btn-submit" :disabled="submitting" style="width: 100%;">
-                {{ submitting ? '提交中...' : '提交工单' }}
+              <div class="row-group" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                  <input type="text" v-model="formData.contactName" placeholder="姓名" required style="width: 100%; border: none; outline: none; padding: 10px 12px; background: #e2e8f0; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box;" />
+                </div>
+                <div style="flex: 1.5;">
+                  <input type="text" v-model="formData.contactPhone" placeholder="联系电话" required style="width: 100%; border: none; outline: none; padding: 10px 12px; background: #e2e8f0; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box;" />
+                </div>
+                <div style="flex: 1.5; display: flex; align-items: center; background: #e2e8f0; padding: 0 10px; border-radius: 4px;">
+                  <select v-model="formData.community" style="border: none; outline: none; flex: 1; padding: 10px 0; background: transparent; font-size: 13px; color: #334155; appearance: none;">
+                    <option value="none">所属社区</option>
+                    <option value="cooperation_zone">合作区</option>
+                    <option value="kalasu">卡拉苏</option>
+                    <option value="silu">丝路</option>
+                    <option value="suolun">索伦</option>
+                    <option value="yingtarr">英塔尔</option>
+                    <option value="hongqiao">红桥</option>
+                  </select>
+                  <span style="color: #94a3b8; font-size: 12px; pointer-events: none;">▼</span>
+                </div>
+              </div>
+
+              <button type="submit" :disabled="submitting" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.2s;">
+                {{ submitting ? '提交中...' : '立即提交' }}
               </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
 
         <div class="appeals-grid" style="flex: 1; overflow-y: auto;">
@@ -567,6 +567,9 @@ onMounted(() => {
 .btn-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+.left-form-section {
+  background: linear-gradient( 180deg, rgba(0,189,125,0.24) 0%, rgba(0,189,125,0.06) 100%), #FFFFFF;
 }
 @media screen and (max-width: 768px) {
   .content-box {

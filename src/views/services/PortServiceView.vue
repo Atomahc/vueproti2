@@ -325,7 +325,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 606px;
+  width: 600px;
 }
 .blue-tint-card {
   background: linear-gradient( 180deg, rgba(0,89,255,0.2) 0%, rgba(0,89,255,0.02) 100%), #FFFFFF;
@@ -342,7 +342,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 606px;
+  width: 600px;
 }
 
 .purple-tint-card {
@@ -351,7 +351,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 672px;
+  width: 660px;
 }
 
 .port-page-container {
@@ -392,13 +392,18 @@ h3 {
   padding: 24px;
   height: 600px;
   overflow: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.content-box::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 /* 2x2 网格卡片布局 */
 .cross-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 16px;
 }
 
 .block-grid {

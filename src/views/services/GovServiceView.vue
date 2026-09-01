@@ -135,6 +135,8 @@ const qrModalVisible = ref(false)
 const qrModalTitle = ref('')
 const currentQrImage = ref('')
 
+const introModalVisible = ref(false)
+
 const handleTagClick = (tag: any) => {
   if (tag.linkType === 'qrcode' && tag.qrcode) {
     qrModalTitle.value = tag.name
@@ -414,18 +416,40 @@ onMounted(() => {
                   </div>
                   <h3>{{ enterpriseFwData['乐享霍尔果斯']?.name || '乐享霍尔果斯' }}</h3>
                 </div>
+                <span class="view-more" @click.stop="introModalVisible = true" style="font-size: 13px; color: #ea580c; cursor: pointer; padding: 4px 10px; border: 1px solid #fdba74; border-radius: 20px; background-color: #fff7ed;">平台介绍</span>
               </div>
               <p class="card-desc">{{ enterpriseFwData['乐享霍尔果斯']?.remark || '商户收款流水/到账语音提醒/资金无感结算' }}</p>
-              <div class="placeholder-box">
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; background: #f8fafc; color: #94a3b8; font-size: 13px; border-radius: 4px; border: 1px dashed #cbd5e1;">
-                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 6px;">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
-                  <span>即将上线 敬请期待</span>
+              <div class="placeholder-box" style=" display: flex; flex-direction: column; justify-content: center; gap: 8px;">
+                <div style="font-size: 13px; color: #9a3412; display: flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                  平台服务热线: 0999-8799992
+                </div>
+                <div style="font-size: 13px; color: #9a3412; display: flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  地址: 霍尔果斯北京路人才大厦13层
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 平台介绍弹窗 -->
+      <div v-if="introModalVisible" class="qr-modal-overlay" @click="introModalVisible = false">
+        <div class="qr-modal-content" @click.stop style="max-width: 500px; padding: 24px;">
+          <div class="qr-modal-header" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 18px; color: #0f172a;">乐享霍尔果斯平台介绍</h3>
+            <button class="close-btn" @click="introModalVisible = false" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+          </div>
+          <div class="qr-modal-body" style="font-size: 14px; color: #334155; line-height: 1.6;">
+            <p>“乐享霍尔果斯”平台是一个专为本地商户和企业提供的高效资金与数字化管理平台。</p>
+            <p>主要功能包含：</p>
+            <ul style="padding-left: 20px; margin-top: 8px;">
+              <li><strong>商户收款流水：</strong>实时查看并导出交易流水，账单清晰明了。</li>
+              <li><strong>到账语音提醒：</strong>支持多端同步的语音播报，防漏单、防错单。</li>
+              <li><strong>资金无感结算：</strong>安全便捷的资金结算体系，加速资金周转。</li>
+            </ul>
+            <p style="margin-top: 12px; font-weight: 500; color: #ea580c;">更多精彩功能，敬请期待！</p>
           </div>
         </div>
       </div>
@@ -954,7 +978,6 @@ onMounted(() => {
 .placeholder-box {
   width: 100%;
   height: 80px;
-  background: #f8fafc;
   border-radius: 4px;
   margin-top: auto;
 }
