@@ -17,9 +17,9 @@ const initTradeChart = () => {
   if (!tradeChart) tradeChart = echarts.init(tradeChartRef.value)
   const option = {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    legend: { data: ['放行数量', '预约数量'], right: 0 },
-    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: { type: 'category', data: ['重车', '商品车'] },
+    legend: { show: false },
+    grid: { left: '3%', right: '4%', bottom: '3%', top:'6%'},
+    xAxis: { type: 'category',  },
     yAxis: { type: 'value' },
     series: [
       { name: '放行数量', type: 'bar', barWidth: 30, data: [38928, 22731], itemStyle: { color: '#2563eb' } },
@@ -36,7 +36,7 @@ const initGovCharts = () => {
   
   const barOption = {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    grid: { left: '3%', right: '10%', bottom: '3%', containLabel: true },
+    grid: { left: '3%', right: '10%', bottom: '3%',  top:'3%', containLabel: true },
     xAxis: { type: 'value' },
     yAxis: { type: 'category', data: ['市容环境', '地下管网', '交通设施', '公共设施', '园林绿化'] },
     series: [
@@ -151,9 +151,9 @@ onMounted(() => {
           </div>
         </div>
         
-        <div class="chart-container" style="margin-top: 20px;">
+        <div class="chart-container" style="margin-top: 10px;">
            <div class="chart-title">车辆放行与预约数量对比</div>
-           <div ref="tradeChartRef" style="height: 300px; width: 100%;"></div>
+           <div ref="tradeChartRef" style="height: 150px; width: 100%;"></div>
         </div>
       </div>
       
@@ -177,11 +177,11 @@ onMounted(() => {
         <div class="gov-charts-grid" style="margin-top: 20px; display: flex; gap: 20px;">
            <div class="chart-container" style="flex: 1;">
               <div class="chart-title">城市资产部件分布</div>
-              <div ref="govBarChartRef" style="height: 300px; width: 100%;"></div>
+              <div ref="govBarChartRef" style="height: 232px; width: 100%;"></div>
            </div>
            <div class="chart-container" style="flex: 1;">
               <div class="chart-title">资产类别占比</div>
-              <div ref="govPieChartRef" style="height: 300px; width: 100%;"></div>
+              <div ref="govPieChartRef" style="height: 232px; width: 100%;"></div>
            </div>
         </div>
       </div>
@@ -194,7 +194,8 @@ onMounted(() => {
   border-radius: 8px;
   background: #fff;
   padding: 20px;
-  margin-bottom: 24px;
+  padding-top:0px;
+  padding-bottom:10px;
 }
 .board-header {
   border-bottom: 1px solid #e2e8f0;
@@ -240,13 +241,13 @@ onMounted(() => {
 .data-card {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 20px;
+  padding:10px 20px;
   text-align: center;
 }
 .card-label {
   color: #64748b;
   font-size: 14px;
-  margin-bottom: 10px;
+
 }
 .card-value {
   color: #94a3b8;

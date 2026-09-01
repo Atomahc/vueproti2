@@ -10,6 +10,8 @@ const foreignServices = ref<any>({ children: [] })
 const portCloudItems = ref<any>({ children: [] })
 const passServices = ref<any>({ children: [] })
 const coopServices = ref<any>({ children: [] })
+const cultureBase = ref<any>({ children: [] })
+const activeIndex = ref<number>(0)
 
 const fetchCrossBorder = async () => {
   try {
@@ -24,6 +26,7 @@ const fetchCrossBorder = async () => {
       portCloudItems.value = list.find((item: any) => item.name === '口岸云集') || { children: [] }
       passServices.value = list.find((item: any) => item.name === '霍数通·通关服务') || { children: [] }
       coopServices.value = list.find((item: any) => item.name === '中哈合作中心智慧服务') || { children: [] }
+      cultureBase.value = list.find((item: any) => item.name === '国家对外文化贸易基地(伊犁)') || { children: [] }
     }
   } catch (e) {
     console.error('Failed to fetch cross border data:', e)
@@ -113,7 +116,36 @@ onMounted(() => {
               </div>
             </div>
           </div>
+           <!-- 5. 国家对外文化贸易基地 (底部，全宽) -->
+          <div class="cross-card red-tint-card" v-if="cultureBase.id" style="width: 100%; ">
+            <div class="card-title-header">
+              <div class="title-with-square red">
+                <img :src="cultureBase.icon ? (cultureBase.icon.startsWith('http') ? cultureBase.icon : minioPrefix + cultureBase.icon) : ''" alt="">
+              </div>
+              <div>
+                <h3>{{ cultureBase.name }}</h3>
+                <p class="subtitle">{{ cultureBase.remark }}</p>
+              </div>
+            </div>
+            
+            <div class="accordion-container" @mouseleave="activeIndex = 0">
+              <div v-for="(item, i) in cultureBase.children" :key="i" 
+                   class="accordion-item" 
+                   :class="{ active: activeIndex === i }"
+                   @mouseenter="activeIndex = i"
+                   @click="handleNavigate(item.url)">
+                <img class="acc-bg" :class="{ 'has-banner': !!item.bannerImage }" :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
+                <img class="acc-banner" v-if="item.bannerImage" :src="item.bannerImage ? (item.bannerImage.startsWith('http') ? item.bannerImage : minioPrefix + item.bannerImage) : ''" :alt="item.name" />
+                <div class="acc-content">
+                  <span class="acc-title">{{ item.name }}</span>
+                  <p class="acc-desc">{{ item.linkDesc }}</p>
 
+                  <button class="arrow-btn orange" >&rarr;</button>
+
+                </div>
+              </div>
+            </div>
+          </div>
           <!-- 2. 口岸云集 (左下) -->
           <div class="cross-card blue-tint-card" v-if="portCloudItems.id">
             <div class="card-title-header" style="justify-content: space-between;">
@@ -166,6 +198,9 @@ onMounted(() => {
           </div>
 
         </div>
+          
+         
+
       </div>
     </main>
 
@@ -209,6 +244,7 @@ onMounted(() => {
 
 .blue-tint-card .img-wrapper .arrow-btn{
   top: 40px;
+  font-size:10px;
 }
 .image-item-box{
   position: relative;
@@ -252,6 +288,11 @@ onMounted(() => {
 }
 .purplenext{
   background-color: #5835F4;
+}
+.orange{
+   background-color: #fb7f21;
+   color:#fff;
+   border:none
 }
 .image-cards-grid{
   display:flex;
@@ -325,7 +366,7 @@ h3 {
 }
 
 .main-content {
-  height: 850px;
+  min-height: 850px;
   position: relative;
   z-index: 5;
   width: 1280px;
@@ -349,8 +390,8 @@ h3 {
   background: #ffffff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   padding: 24px;
-    height:600px
-
+  height: 600px;
+  overflow: scroll;
 }
 
 /* 2x2 网格卡片布局 */
@@ -432,6 +473,88 @@ h3 {
   .cross-card{
     padding:10px;
   }
+}
+
+.red-tint-card {
+  background: linear-gradient(180deg, rgba(220,38,38,0.2) 0%, rgba(220,38,38,0.02) 100%), #FFFFFF;
+  border-radius: 0;
+  border: 1px solid #DDDDDD;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.accordion-container {
+  display: flex;
+  width: 100%;
+  height: 160px;
+  gap: 10px;
+}
+.accordion-item {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0px;
+  cursor: pointer;
+  transition: flex 0.5s ease;
+}
+.accordion-item.active {
+  flex: 4;
+}
+.acc-bg, .acc-banner {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  transition: opacity 0.5s ease;
+}
+.acc-banner {
+  opacity: 0;
+}
+.accordion-item.active .acc-bg.has-banner {
+  opacity: 0;
+}
+.accordion-item.active .acc-banner {
+  opacity: 1;
+}
+.acc-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height:100%;
+  padding: 10px 15px;
+  background: linear-gradient(transparent, rgba(207, 134, 112, 0.15));
+  color: white;
+  z-index: 2;
+  box-sizing: border-box;
+}
+.acc-title {
+  font-size: 16px;
+  font-weight: bold;
+  display: block;
+  color:#321600
+}
+.active .acc-title{
+  color:#fff;
+}
+.acc-desc {
+  font-size: 14px;
+  opacity: 0;
+  max-height: 0;
+  margin-top: 0;
+  transition: opacity 0.5s ease, max-height 0.5s ease, margin-top 0.5s ease;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.accordion-item.active .acc-desc {
+  opacity: 1;
+  max-height: 100px;
+  margin-top: 4px;
 }
 
 </style>

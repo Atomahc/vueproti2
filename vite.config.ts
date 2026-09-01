@@ -52,6 +52,23 @@ export default defineConfig(({ mode }) => {
               }
             })
           }
+        },
+        '/api-dayu': {
+          target: env.VITE_API_DAYU_PREFIX,
+          changeOrigin: true,
+          secure: false,
+          autoRewrite: true,
+          rewrite: (path) => path.replace(/^\/api-dayu/, ''),
+          configure: (proxy, options) => {
+            proxy.on('proxyReq', (proxyReq) => {
+              if (options.target && typeof options.target === 'string') {
+                const targetUrl = new URL(options.target)
+                proxyReq.setHeader('Origin', targetUrl.origin)
+                proxyReq.setHeader('Referer', targetUrl.origin + '/')
+                proxyReq.setHeader('Host', targetUrl.host)
+              }
+            })
+          }
         }
       }
     }

@@ -15,7 +15,7 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
-    "echarts": "^6.0.0",
+    "echarts": "^6.1.0",
     "pinia": "^3.0.4",
     "swiper": "^12.2.0",
     "vue": "^3.5.32",

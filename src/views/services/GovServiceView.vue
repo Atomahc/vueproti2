@@ -375,7 +375,7 @@ onMounted(() => {
               </div>
             </div>
             <!-- 招商引资服务 -->
-            <div class="fw-card border-orange" @click="handleLink(enterpriseFwData['招商引资服务']?.url)" style="cursor: pointer;">
+            <div class="fw-card border-orange2" @click="handleLink(enterpriseFwData['招商引资服务']?.url)" style="cursor: pointer;">
               <div class="card-title-row">
                 <div class="title-with-icon">
                   <div class="card-icon-square yellow">
@@ -803,7 +803,7 @@ onMounted(() => {
 
 .attract-tags {
 
-  background: #ffffff;
+  background: #ffffff89;
   border-radius: 6px;
   padding: 12px 20px;
   margin-top: 16px;
@@ -813,7 +813,7 @@ onMounted(() => {
 }
 
 .tag-item {
-  width:42%;
+  width:45%;
   font-size: 14px;
   color: #334155;
   font-weight: 500;
@@ -853,7 +853,8 @@ onMounted(() => {
 
 .border-blue { 
   border: 1px solid #e0f2fe; 
-  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
+  background:url('@/assets/other/qyxy.jpg') no-repeat;
+  background-size: 100%;
 }
 .border-teal { 
   height:270px;
@@ -863,9 +864,16 @@ onMounted(() => {
 }
 .border-orange { 
   border: 1px solid #ffedd5; 
-  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+  background:url('@/assets/other/ggs.jpg') no-repeat;
+  background-size: 100%;
+  /* background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%); */
 }
-
+.border-orange2 { 
+  border: 1px solid #ffedd5; 
+  background:url('@/assets/other/zsyz.jpg') no-repeat;
+  background-size: 100%;
+  /* background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%); */
+}
 .card-desc {
   font-size: 13px;
   color: #64748b;

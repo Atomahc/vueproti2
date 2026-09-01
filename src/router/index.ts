@@ -78,9 +78,19 @@ const router = createRouter({
       component: () => import('../views/services/ForeignServiceView.vue'),
     },
     {
+      path: '/menulist',
+      name: 'menu-list',
+      component: () => import('../views/services/MenuList.vue'),
+    },
+    {
       path: '/service/culture',
       name: 'service-culture',
       component: () => import('../views/services/CultureServiceView.vue'),
+    },
+    {
+      path: '/service/youth-activity',
+      name: 'service-youth-activity',
+      component: () => import('../views/services/YouthActivityView.vue'),
     },
     {
       path: '/login',

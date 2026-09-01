@@ -174,7 +174,7 @@ onMounted(() => {
         <DataBoard />
 
         <!-- 数据可视化看板 (Excel 数据) -->
-        <section class="data-section">
+        <!-- <section class="data-section">
           <div class="section-header">
             <div class="header-icon green-icon">
               <img v-if="visSection.icon" :src="visSection.icon.startsWith('http') ? visSection.icon : minioPrefix + '/' + visSection.icon.replace(/^\/+/, '')" style="object-fit: contain;" alt="" />
@@ -247,10 +247,10 @@ onMounted(() => {
               </div>
             </div>
           </div>
-        </section>
+        </section> -->
         <!-- 统计数据查阅 -->
         <section class="data-section">
-          <div class="section-header">
+          <!-- <div class="section-header">
             <div class="header-icon orange-icon">
               <img v-if="statSection.icon" :src="statSection.icon.startsWith('http') ? statSection.icon : minioPrefix + '/' + statSection.icon.replace(/^\/+/, '')" style="object-fit: contain;" alt="" />
               <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
@@ -262,7 +262,7 @@ onMounted(() => {
               <h2>{{ statSection.name || '统计数据查阅' }}</h2>
               <p>{{ statSection.subtitle || '统计公报/年鉴/调查数据' }}</p>
             </div>
-          </div>
+          </div> -->
 
           <div class="cards-grid">
             <div v-for="(card, i) in (statSection.children.length > 0 ? statSection.children : statCardsBackup)" :key="i" class="data-card orange-card clickable-card" @click="handleStatCardClick(card)">
