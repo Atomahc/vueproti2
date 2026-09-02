@@ -34,6 +34,10 @@ const handleNavigate = (item: any) => {
     router.push('/service/culture')
     return
   }
+  if (item.name === '青少年活动中心') {
+    router.push('/service/youth-activity')
+    return
+  }
   if (item.name === '志愿者服务(霍尔果斯云)' || item.linkType === 'qrcode') {
     openModal(item)
     return
@@ -264,7 +268,7 @@ onMounted(() => {
               </div>
               <div class="hot-job-banner">
                 <span>热门职务 <strong>*{{ hotJobsCount }}</strong></span>
-                <a href="javascript:void(0)" class="view-link" @click.prevent="openModal(laodaoInfo)">查看 &rarr;</a>
+                <a href="javascript:void(0)" class="view-link" @click.prevent="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">查看 &rarr;</a>
               </div>
             </div>
           </div>
@@ -286,7 +290,7 @@ onMounted(() => {
 
             <div class="long-job-body">
               <p class="desc-text">{{ zhongyaInfo.remark || '集成长期岗位，与劳道智工短期工形成短期+长期全覆盖就业服务体系。' }}</p>
-              <button class="yellow-action-btn" @click="openModal(zhongyaInfo)">
+              <button class="yellow-action-btn" @click="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
                 找人才/找工作 <span class="sub-link">职位列表 &rarr;</span>
               </button>
             </div>

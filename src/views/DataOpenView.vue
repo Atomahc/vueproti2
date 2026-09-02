@@ -398,8 +398,8 @@ onMounted(() => {
 /* Orange Cards Style */
 .orange-card {
   background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border: 1px solid #fde68a;
-  box-shadow: inset 0 0 20px rgba(245, 158, 11, 0.05);
+  border: 1px solid #e2e8f0;
+
 }
 
 .card-img-placeholder {
@@ -483,7 +483,6 @@ onMounted(() => {
 
 .clickable-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
 /* Dashboard Layout */

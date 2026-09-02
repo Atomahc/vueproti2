@@ -166,12 +166,12 @@ onMounted(() => {
 
               <div class="row-group" style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <div style="flex: 1;">
-                  <input type="text" v-model="formData.contactName" placeholder="姓名" required style="width: 100%; border: none; outline: none; padding: 10px 12px; background: #e2e8f0; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box;" />
+                  <input type="text" v-model="formData.contactName" placeholder="姓名" required style="width: 100%; border: none; outline: none; padding: 10px 12px; background: #eee; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box;" />
                 </div>
                 <div style="flex: 1.5;">
-                  <input type="text" v-model="formData.contactPhone" placeholder="联系电话" required style="width: 100%; border: none; outline: none; padding: 10px 12px; background: #e2e8f0; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box;" />
+                  <input type="text" v-model="formData.contactPhone" placeholder="联系电话" required style="width: 100%; border: none; outline: none; padding: 10px 12px; background: #eee; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box;" />
                 </div>
-                <div style="flex: 1.5; display: flex; align-items: center; background: #e2e8f0; padding: 0 10px; border-radius: 4px;">
+                <div style="flex: 1.5; display: flex; align-items: center; background: #eee; padding: 0 10px; border-radius: 4px;">
                   <select v-model="formData.community" style="border: none; outline: none; flex: 1; padding: 10px 0; background: transparent; font-size: 13px; color: #334155; appearance: none;">
                     <option value="none">所属社区</option>
                     <option value="cooperation_zone">合作区</option>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick, shallowRef } from 'vue'
 import * as echarts from 'echarts'
+import EconomicOperation from './EconomicOperation.vue'
 
-const activeTab = ref('trade') // 'trade' or 'governance'
+const activeTab = ref('trade') // 'trade' or 'governance' or 'economy'
 
 const tradeChartRef = ref<HTMLElement | null>(null)
 const govBarChartRef = ref<HTMLElement | null>(null)
@@ -108,6 +109,9 @@ onMounted(() => {
         <div class="tab" :class="{ active: activeTab === 'governance' }" @click="switchTab('governance')">
           <div class="tab-indicator"></div>城市治理数据
         </div>
+        <div class="tab" :class="{ active: activeTab === 'economy' }" @click="switchTab('economy')">
+          <div class="tab-indicator"></div>经济运行情况
+        </div>
       </div>
     </div>
     
@@ -185,10 +189,19 @@ onMounted(() => {
            </div>
         </div>
       </div>
+
+      <!-- Economy Tab -->
+      <div v-if="activeTab === 'economy'" class="tab-panel">
+        <EconomicOperation />
+      </div>
     </div>
   </div>
 </template>
 <style scoped>
+.board-content{
+  height: 395px;
+  overflow: scroll;
+}
 .data-board {
   border: 1px solid #e2e8f0;
   border-radius: 8px;

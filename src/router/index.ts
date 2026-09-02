@@ -58,6 +58,11 @@ const router = createRouter({
       component: () => import('../views/services/PublicServiceView.vue'),
     },
     {
+      path: '/service/jobs',
+      name: 'service-jobs',
+      component: () => import('../views/services/JobListView.vue'),
+    },
+    {
       path: '/service/government',
       name: 'service-government',
       component: () => import('../views/services/GovServiceView.vue'),
