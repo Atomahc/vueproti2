@@ -248,7 +248,7 @@ onMounted(() => {
           </div>
 
           <!-- 2. 劳道智工 · 短期工 -->
-          <div class="bm-card teal-tint">
+          <div class="bm-card teal-tint" @click="openModal(laodaoInfo)">
             <div class="card-header-flex">
               <div class="header-title-box">
                 <div class="icon-square teal">
@@ -266,15 +266,15 @@ onMounted(() => {
               <div class="job-tags-grid">
                 <span class="j-tag" v-for="(tag, idx) in laodaoTags" :key="idx">{{ tag.name }}</span>
               </div>
-              <div class="hot-job-banner">
+              <div class="hot-job-banner" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">
                 <span>热门职务 <strong>*{{ hotJobsCount }}</strong></span>
-                <a href="javascript:void(0)" class="view-link" @click.prevent="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">查看 &rarr;</a>
+                <a href="javascript:void(0)" class="view-link">查看 &rarr;</a>
               </div>
             </div>
           </div>
 
           <!-- 3. 中亚职通桥 · 长期工 -->
-          <div class="bm-card yellow-tint">
+          <div class="bm-card yellow-tint" @click="openModal(zhongyaInfo)">
             <div class="card-header-flex">
               <div class="header-title-box">
                 <div class="icon-square orange">
@@ -290,7 +290,7 @@ onMounted(() => {
 
             <div class="long-job-body">
               <p class="desc-text">{{ zhongyaInfo.remark || '集成长期岗位，与劳道智工短期工形成短期+长期全覆盖就业服务体系。' }}</p>
-              <button class="yellow-action-btn" @click="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
+              <button class="yellow-action-btn" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
                 找人才/找工作 <span class="sub-link">职位列表 &rarr;</span>
               </button>
             </div>
@@ -680,6 +680,13 @@ onMounted(() => {
   border: 1px solid #ccfbf1;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.teal-tint:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .short-job-body {
@@ -702,6 +709,14 @@ onMounted(() => {
   padding: 6px 0;
   font-size: 12px;
   text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.j-tag:hover {
+  background: #0d9488;
+  color: #ffffff;
+  border-color: #0d9488;
 }
 
 .hot-job-banner {
@@ -713,6 +728,16 @@ onMounted(() => {
   font-size: 13px;
   color: #0d9488;
   margin-top: auto;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hot-job-banner:hover {
+  background: #99f6e4;
+}
+
+.hot-job-banner:active {
+  transform: scale(0.98);
 }
 
 .hot-job-banner strong {
@@ -726,12 +751,23 @@ onMounted(() => {
   font-weight: 500;
 }
 
+.view-link:hover {
+  text-decoration: underline;
+}
+
 /* 中亚职通桥 (Yellow) */
 .yellow-tint {
   background: #fffbeb;
   border: 1px solid #fef3c7;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.yellow-tint:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .long-job-body {
@@ -759,6 +795,15 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
+  transition: all 0.2s;
+}
+
+.yellow-action-btn:hover {
+  background: #d97706;
+}
+
+.yellow-action-btn:active {
+  transform: scale(0.98);
 }
 
 .yellow-action-btn .sub-link {

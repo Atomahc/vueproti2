@@ -138,7 +138,7 @@ const getCompanyName = (job: any) => {
     <TheHeader />
 
     <main class="main-content">
-      <TheNavBar activeId="service" />
+      <TheNavBar activeId="life" />
       
       <div class="job-container">
         <!-- Tabs -->

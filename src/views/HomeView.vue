@@ -160,7 +160,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
             
             <!-- Banner右侧两个竖向3D入口模块 -->
             <div class="banner-side-overlay">
-              <div class="vr-card" @click="handleQuickClick('https://www.720yun.com/t/5avkOl8758e?scene_id=50999361', true)">
+              <div class="vr-card" @click="handleQuickClick('http://sz.xjhegs.gov.cn:3004', true)">
                 <div class="vr-icon-box">
                   <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
                     <rect x="2" y="6" width="20" height="12" rx="3"></rect>
