@@ -34,6 +34,7 @@ const closeModal = () => {
 onMounted(() => {
   fetchCourses()
 })
+import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
 <template>
@@ -45,7 +46,8 @@ onMounted(() => {
       <TheNavBar activeId="life" />
      
 
-      <div class="content-box">
+      <div style="display: flex; gap: 20px; flex: 1; height: 100%;">
+        <div class="content-box" style="flex: 1; min-width: 0;">
         <div v-if="loading" class="loading">加载中...</div>
         <div v-else-if="courses.length === 0" class="empty">暂无课程</div>
         <div v-else class="course-grid">
@@ -70,6 +72,11 @@ onMounted(() => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    
+        <div style="width: 160px; position: relative; flex-shrink: 0; height: 600px;">
+          <BannerSideOverlay />
         </div>
       </div>
     </main>

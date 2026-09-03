@@ -131,6 +131,7 @@ const getJobTitle = (job: any) => {
 const getCompanyName = (job: any) => {
   return activeTab.value === 'zhongya' ? (job.companyName || '未知企业') : (job.memberName || '未知商户')
 }
+import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
 <template>
@@ -139,7 +140,7 @@ const getCompanyName = (job: any) => {
 
     <main class="main-content">
       <TheNavBar activeId="life" />
-      
+      <BannerSideOverlay />
       <div class="job-container">
         <!-- Tabs -->
         <div class="tabs-header">
@@ -170,10 +171,13 @@ const getCompanyName = (job: any) => {
               <span class="tag" v-if="job.education">{{ job.education }}学历</span>
             </div>
              <div class="job-tags" v-if="activeTab === 'laodao'">
-              <span class="tag" v-if="job.workAddress">{{ job.workAddress }}</span>
+              <span class="tag" v-if="job.jobKeywords">{{ job.jobKeywords }}</span>
             </div>
             <div class="job-footer">
-              <span class="company-name">{{ getCompanyName(job) }}</span>
+              <span class="company-name">
+             
+                 {{ job.workAddress  || job.workLocation}}
+              </span>
               <span class="publish-time" v-if="job.createDate || job.publishTimeStr">{{ job.createDate || job.publishTimeStr }}</span>
             </div>
           </div>

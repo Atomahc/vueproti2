@@ -10,6 +10,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import { Pagination, Autoplay } from 'swiper/modules'
+import BannerSideOverlay from '../components/BannerSideOverlay.vue'
 
 const router = useRouter()
 
@@ -136,7 +137,8 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
     <main class="main-content">
       <!-- 提取出的蓝色半透明主导航栏组件 -->
       <TheNavBar activeId="home" />
-
+      <BannerSideOverlay />
+   
 
       <div class="hero-box">
                 <!-- 中间核心布局区：左侧Banner + 右侧3D入口/新闻列表 -->
@@ -158,36 +160,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
               </swiper-slide>
             </swiper>
             
-            <!-- Banner右侧两个竖向3D入口模块 -->
-            <div class="banner-side-overlay">
-              <div class="vr-card" @click="handleQuickClick('http://sz.xjhegs.gov.cn:3004', true)">
-                <div class="vr-icon-box">
-                  <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <rect x="2" y="6" width="20" height="12" rx="3"></rect>
-                    <circle cx="8" cy="12" r="2.5"></circle>
-                    <circle cx="16" cy="12" r="2.5"></circle>
-                  </svg>
-                </div>
-                <div class="vr-text">
-                  <h3>丝路长卷</h3>
-                  <p>数字城市名片 · 3D</p>
-                </div>
-              </div>
 
-              <div class="vr-card" @click="handleQuickClick('https://www.720yun.com/t/5avkOl8758e?scene_id=50999361', true)">
-                <div class="vr-icon-box">
-                  <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <rect x="2" y="6" width="20" height="12" rx="3"></rect>
-                    <circle cx="8" cy="12" r="2.5"></circle>
-                    <circle cx="16" cy="12" r="2.5"></circle>
-                  </svg>
-                </div>
-                <div class="vr-text">
-                  <h3>VR全景游</h3>
-                  <p>口岸/合作中心/景区</p>
-                </div>
-              </div>
-            </div>
 
           </div>
         </div>
@@ -344,6 +317,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 /* Banner轮播卡片 */
 .banner-card {
   flex: 1;
+  height:495px;
   background: #ffffff;
   border-radius: 4px;
   overflow: hidden;
@@ -389,55 +363,6 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
   letter-spacing: 2px;
 }
 
-/* Banner右侧浮动VR卡片 */
-.banner-side-overlay {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 160px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 3;
-  padding:8px;
-}
-
-.vr-card {
-  flex: 1;
-  background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(10px);
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.vr-card:hover {
-  background: rgba(0, 102, 255, 0.466);
-}
-
-.vr-icon-box {
-  margin-bottom: 8px;
-  opacity: 0.9;
-}
-
-.vr-text h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0 0 4px 0;
-}
-
-.vr-text p {
-  font-size: 11px;
-  opacity: 0.75;
-  margin: 0;
-}
 
 .banner-swiper {
   width: 100%;
@@ -674,19 +599,11 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
     grid-template-columns: repeat(1, 1fr) !important;
     height: auto !important;
   }
-  .vr-card{
-    padding: 8px !important;
-  }
-  .vr-icon-box{
-    margin-bottom: 0px;
-  }
-  .vr-text h3{
-    margin:0px;
-    font-size: 14px !important;
-  }
   .quick-banner-title{
     font-size: 16px;
   }
-}
+  }
+
+
 
 </style>

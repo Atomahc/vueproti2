@@ -114,6 +114,7 @@ const submitForm = async () => {
 onMounted(() => {
   fetchPublicOpinion()
 })
+import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
 <template>
@@ -122,8 +123,9 @@ onMounted(() => {
 
     <main class="main-content">
       <TheNavBar activeId="appeals" />
-
-      <div class="content-box" style="display: flex; gap: 24px;">
+      <BannerSideOverlay />
+      <div style="display: flex; gap: 20px; flex: 1; height: 100%;">
+        <div class="content-box" style="flex: 1; min-width: 0; display: flex; gap: 24px;">
         
         <!-- 左侧表单 -->
         <div class="left-form-section" style="flex: 0 0 350px;">
@@ -229,6 +231,8 @@ onMounted(() => {
 
         </div>
 
+      </div>
+    
       </div>
     </main>
 

@@ -159,6 +159,7 @@ const handleStatCardClick = (card: any) => {
 onMounted(() => {
   fetchDataOpen()
 })
+import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
 <template>
@@ -167,7 +168,7 @@ onMounted(() => {
 
     <main class="main-content">
       <TheNavBar activeId="data" />
-
+      <BannerSideOverlay/>
       <div class="data-open-body">
         
         <!-- 口岸贸易与城市治理数据看板 -->

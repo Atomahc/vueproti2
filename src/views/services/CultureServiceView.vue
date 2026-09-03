@@ -43,6 +43,7 @@ const handleItemClick = (item: any) => {
     // Could add modal logic here if needed
   }
 }
+import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
 <template>
@@ -51,8 +52,9 @@ const handleItemClick = (item: any) => {
 
     <main class="main-content">
       <TheNavBar activeId="life" />
-
-      <div class="content-box">
+      <BannerSideOverlay />
+      <div style="display: flex; gap: 20px; flex: 1; height: 100%;">
+        <div class="content-box" style="flex: 1; min-width: 0;">
         <div class="page-header">
           <h2 class="page-title">{{ pageTitle }}</h2>
         </div>
@@ -76,6 +78,9 @@ const handleItemClick = (item: any) => {
             </div>
           </div>
         </div>
+      </div>
+    
+
       </div>
     </main>
 

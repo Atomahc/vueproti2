@@ -9,39 +9,8 @@ import yb from '@/assets/other/Group 60.png'
 import yb2 from '@/assets/other/Group 61.png'
 import yb3 from '@/assets/other/Group 62.png'
 
-// 上半区 驿路法务通 数据 (保留本地静态数据供后续对接文章接口)
-const yiluColumns = ref([
-  {
-    title: '律师/律所',
-    sub: '律师/律所',
-    icon: yb,
-    items: [
-      { left: 'XXX律所', right: '主理律师：张淑娜' },
-      { left: 'XXX律所', right: '主理律师：张淑娜' },
-      { left: 'XXX律所', right: '主理律师：张淑娜' }
-    ]
-  },
-  {
-    title: '案例查询',
-    sub: '案例查询',
-    icon: yb2,
-    items: [
-      { left: '最新案例', right: '07/03' },
-      { left: '最新案例', right: '07/03' },
-      { left: '最新案例', right: '07/03' }
-    ]
-  },
-  {
-    title: '法治资讯',
-    sub: '法治资讯',
-    icon: yb3,
-    items: [
-      { left: '法治公开课', right: '07/03' },
-      { left: '法治公开课', right: '07/03' },
-      { left: '法治公开课', right: '07/03' }
-    ]
-  }
-])
+// 上半区 驿路法务通 数据
+const yiluColumns = ref<any[]>([])
 
 const yiluHeader = ref<any>({})
 const intlHeader = ref<any>({})
@@ -61,39 +30,44 @@ const fetchCloudLegal = async () => {
       if (yilu) {
         yiluHeader.value = yilu
         if (yilu.children && yilu.children.length > 0) {
-          yiluColumns.value.forEach(col => {
-            const matched = yilu.children.find((child: any) => child.name === col.title)
-            if (matched) {
-              col.sub = matched.subtitle || col.sub
-              if (matched.icon) {
-                col.icon = matched.icon.startsWith('http') ? matched.icon : minioPrefix + '/' + matched.icon.replace(/^\/+/, '')
-              }
-              if (matched.bgImage) {
-                (col as any).bgImage = matched.bgImage.startsWith('http') ? matched.bgImage : minioPrefix + '/' + matched.bgImage.replace(/^\/+/, '')
-              }
-              (col as any).url = matched.url || ''
+          yiluColumns.value = yilu.children.map((child: any) => {
+            const col: any = {
+              name: child.name,
+              title: child.name, // Keep both for safety
+              sub: child.subtitle,
+              url: child.url,
+              items: []
+            }
+            if (child.icon) {
+              col.icon = child.icon.startsWith('http') ? child.icon : minioPrefix + '/' + child.icon.replace(/^\/+/, '')
+            }
+            if (child.bgImage) {
+              col.bgImage = child.bgImage.startsWith('http') ? child.bgImage : minioPrefix + '/' + child.bgImage.replace(/^\/+/, '')
+            }
 
-              if (matched.code === 'lawyer_firm' && matched.data) {
-                const arr = []
-                if (matched.data.lawFirms && matched.data.lawFirms.length > 0) {
-                  arr.push(...matched.data.lawFirms.map((f: any) => ({ left: f.name, right: f.specialty || '律所' })))
+            if (child.data) {
+              if (child.code === 'lawyer_firm') {
+                const arr: any[] = []
+                if (child.data.lawFirms && child.data.lawFirms.length > 0) {
+                  arr.push(...child.data.lawFirms.map((f: any) => ({ left: f.name, right: f.specialty || '律所' })))
                 }
-                if (matched.data.lawyers && matched.data.lawyers.length > 0) {
-                  arr.push(...matched.data.lawyers.map((l: any) => ({ left: l.name, right: l.title || '律师' })))
+                if (child.data.lawyers && child.data.lawyers.length > 0) {
+                  arr.push(...child.data.lawyers.map((l: any) => ({ left: l.name, right: l.title || '律师' })))
                 }
-                if (arr.length > 0) col.items = arr.slice(0, 3)
-              } else if (matched.code === 'case' && matched.data && Array.isArray(matched.data)) {
-                col.items = matched.data.slice(0, 3).map((c: any) => ({
+                col.items = arr.slice(0, 3)
+              } else if (child.code === 'case' && Array.isArray(child.data)) {
+                col.items = child.data.slice(0, 3).map((c: any) => ({
                   left: c.title,
                   right: c.caseType || c.updateTime?.split(' ')[0] || ''
                 }))
-              } else if (matched.code === 'news' && matched.data && Array.isArray(matched.data)) {
-                col.items = matched.data.slice(0, 3).map((n: any) => ({
+              } else if (child.code === 'news' && Array.isArray(child.data)) {
+                col.items = child.data.slice(0, 3).map((n: any) => ({
                   left: n.title || n.name,
                   right: n.publishTime?.split(' ')[0] || n.updateTime?.split(' ')[0] || ''
                 }))
               }
             }
+            return col
           })
         }
       }
@@ -199,6 +173,7 @@ onMounted(() => {
   fetchCloudLegal()
   fetchFormOptions()
 })
+import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
 <template>
@@ -207,8 +182,9 @@ onMounted(() => {
 
     <main class="main-content">
       <TheNavBar activeId="cloud" />
-
-      <div class="content-box">
+      <BannerSideOverlay />
+      <div style="display: flex; gap: 20px; flex: 1; height: 100%;">
+        <div class="content-box" style="flex: 1; min-width: 0;">
         <div
           style="width:100%;height:100%;position: absolute;top:0px;left:0px;background: linear-gradient(180deg,#3544936b, rgb(8, 7, 50));">
         </div>
@@ -237,29 +213,29 @@ onMounted(() => {
 
             <!-- 律师预约表单 -->
             <div class="appointment-form-card"
-              style="flex: 1; background: rgb(255, 255, 255);  padding: 16px 20px; border-radius: 8px; display: flex; flex-direction: column;">
+              style="flex: 1; background: rgb(255, 255, 255);  padding: 16px 20px;  display: flex; flex-direction: column;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3
                   style="margin: 0; font-size: 16px; color: #0f172a; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-                  <span style="width: 4px; height: 14px; background: #3b82f6; border-radius: 2px;"></span> 律师预约
+                  <span style="width: 4px; height: 14px; background: #3b82f6; "></span> 律师预约
                 </h3>
               </div>
 
               <div class="form-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1;">
-                <input v-model="appointmentForm.userName" type="text" placeholder="姓名" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9); border-radius: 6px; font-size: 13px; outline: none; box-sizing: border-box;" />
-                <input v-model="appointmentForm.contact" type="text" placeholder="手机号" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9); border-radius: 6px; font-size: 13px; outline: none; box-sizing: border-box;" />
+                <input v-model="appointmentForm.userName" type="text" placeholder="姓名" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box;" />
+                <input v-model="appointmentForm.contact" type="text" placeholder="手机号" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box;" />
                 
-                <select v-model="appointmentForm.lawyerId" @change="handleLawyerChange" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9); border-radius: 6px; font-size: 13px; outline: none; box-sizing: border-box; color: #475569;">
+                <select v-model="appointmentForm.lawyerId" @change="handleLawyerChange" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; color: #475569;">
                   <option value="" disabled>选择律师</option>
                   <option v-for="lawyer in lawyerList" :key="lawyer.id" :value="lawyer.id">{{ lawyer.name }}</option>
                 </select>
 
-                <select v-model="appointmentForm.serviceType" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9); border-radius: 6px; font-size: 13px; outline: none; box-sizing: border-box; color: #475569;">
+                <select v-model="appointmentForm.serviceType" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; color: #475569;">
                   <option v-if="serviceTypeList.length === 0" value="">服务类型...</option>
                   <option v-for="type in serviceTypeList" :key="type.dictValue" :value="type.dictValue">{{ type.dictLabel }}</option>
                 </select>
-                <input v-model="appointmentForm.appointDate" type="date" title="预约日期" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9); border-radius: 6px; font-size: 13px; outline: none; box-sizing: border-box; color: #475569;" />
-                <select v-model="appointmentForm.appointTime" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9); border-radius: 6px; font-size: 13px; outline: none; box-sizing: border-box; color: #475569;">
+                <input v-model="appointmentForm.appointDate" type="date" title="预约日期" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; color: #475569;" />
+                <select v-model="appointmentForm.appointTime" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; color: #475569;">
                   <option value="" disabled>选择时间</option>
                   <option value="09:00:00">09:00</option>
                   <option value="09:30:00">09:30</option>
@@ -279,11 +255,11 @@ onMounted(() => {
                   <option value="18:00:00">18:00</option>
                 </select>
                 
-                <textarea v-model="appointmentForm.description" placeholder="简述您遇到的法律问题..." rows="2" style="grid-column: span 3; width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9); border-radius: 6px; font-size: 13px; outline: none; box-sizing: border-box; resize: none;"></textarea>
+                <textarea v-model="appointmentForm.description" placeholder="简述您遇到的法律问题..." rows="2" style="grid-column: span 3; width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; resize: none;"></textarea>
               </div>
 
               <button @click="submitAppointment"
-                style="margin-top: 12px; width: 100%; padding: 10px; background: linear-gradient(90deg, #2563eb, #3b82f6); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); transition: transform 0.2s;">
+                style="margin-top: 12px; width: 100%; padding: 10px; background: linear-gradient(90deg, #2563eb, #3b82f6); color: white; border: none;  font-size: 14px; font-weight: 500; cursor: pointer;  transition: transform 0.2s;">
                 一键提交预约
               </button>
             </div>
@@ -300,12 +276,15 @@ onMounted(() => {
               @click="handleNavigate((col as any).url)" style="cursor: pointer;">
               <div class="col-head">
                 <div class="col-title-wrap">
-                  <h3>{{ col.title }} <span class="arrow">→</span></h3>
+                  <h3>{{ col.name }} <span class="arrow">→</span></h3>
                   <p>{{ col.sub }}</p>
                 </div>
                 <img :src="col.icon" alt="icon" class="col-icon-img" />
               </div>
               <div class="col-list">
+                <div v-if="!col.items || col.items.length === 0" class="empty-list">
+                  <span style="color: #94a3b8; font-size: 13px;">暂无数据</span>
+                </div>
                 <div v-for="(item, i) in col.items" :key="i" class="list-item">
                   <span class="dot"></span>
                   <span class="left-text">{{ item.left }}</span>
@@ -317,6 +296,8 @@ onMounted(() => {
 
         </div>
 
+      </div>
+  
       </div>
     </main>
 
@@ -354,7 +335,6 @@ onMounted(() => {
 .content-box {
   background: url('http://sz.xjhegs.gov.cn:3003/assets/hero-background-Dyk7mO6K.png') no-repeat center center;
   background-size: 100%;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   padding: 24px;
   min-height: 600px;
   position: relative;
@@ -382,7 +362,6 @@ onMounted(() => {
 .icon-square {
   width: 44px;
   height: 44px;
-  border-radius: 8px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -432,15 +411,12 @@ onMounted(() => {
   background: url('@/assets/other/yb.png') no-repeat center center;
   background-size: 100% 100%;
   border: 1px solid #f1f5f9;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  border-radius: 6px;
   padding: 20px;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .yilu-col-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .col-head {
@@ -474,6 +450,12 @@ onMounted(() => {
   width: 60px;
   height: 60px;
   object-fit: contain;
+}
+
+.empty-list {
+  text-align: center;
+  padding: 20px 0;
+  background: #EDF2FF;
 }
 
 .list-item {
@@ -518,12 +500,13 @@ onMounted(() => {
 /* 驿路国际法务区 四列 */
 .intl-grid {
   width: 600px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 16px;
 }
 
 .intl-card {
+  flex: 1 1 calc(50% - 8px);
   background: #fff;
   padding: 16px;
   box-sizing: border-box;
@@ -533,14 +516,12 @@ onMounted(() => {
   position: relative;
   overflow: hidden;
   height: 134px;
-  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
 }
 
 .intl-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
 }
 
 .intl-title-wrap {
@@ -577,7 +558,10 @@ onMounted(() => {
   }
   .intl-grid {
     width: 100% !important;
-    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+  }
+  .intl-card {
+    flex: 1 1 100% !important;
   }
   .middle-flex-row {
     flex-direction: column !important;

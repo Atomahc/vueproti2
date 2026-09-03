@@ -1,0 +1,47 @@
+--- src/views/HomeView.vue
++++ src/views/HomeView.vue
+@@ -3,6 +3,7 @@
+ import { useRouter } from 'vue-router'
+ import TheHeader from '../components/TheHeader.vue'
+ import TheFooter from '../components/TheFooter.vue'
++import BannerSideOverlay from '../components/BannerSideOverlay.vue'
+ import { Swiper, SwiperSlide } from 'swiper/vue'
+ import { Autoplay, Pagination } from 'swiper/modules'
+ import 'swiper/css'
+@@ -166,32 +167,7 @@
+             </swiper>
+             
+             <!-- Banner右侧两个竖向3D入口模块 -->
+-            <div class="banner-side-overlay">
+-              <div class="vr-card" @click="handleQuickClick('http://sz.xjhegs.gov.cn:3004', true)">
+-                <div class="vr-icon-box">
+-                  <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
+-                    <rect x="2" y="6" width="20" height="12" rx="3"></rect>
+-                    <circle cx="8" cy="12" r="2.5"></circle>
+-                    <circle cx="16" cy="12" r="2.5"></circle>
+-                  </svg>
+-                </div>
+-                <div class="vr-text">
+-                  <h3>丝路长卷</h3>
+-                  <p>数字城市名片 · 3D</p>
+-                </div>
+-              </div>
+-
+-              <div class="vr-card" @click="handleQuickClick('https://www.720yun.com/t/5avkOl8758e?scene_id=50999361', true)">
+-                <div class="vr-icon-box">
+-                  <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
+-                    <rect x="2" y="6" width="20" height="12" rx="3"></rect>
+-                    <circle cx="8" cy="12" r="2.5"></circle>
+-                    <circle cx="16" cy="12" r="2.5"></circle>
+-                  </svg>
+-                </div>
+-                <div class="vr-text">
+-                  <h3>VR全景游</h3>
+-                  <p>口岸/合作中心/景区</p>
+-                </div>
+-              </div>
+-            </div>
++            <BannerSideOverlay />
+ 
+           </div>
+         </div>

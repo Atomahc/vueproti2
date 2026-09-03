@@ -182,6 +182,7 @@ onMounted(() => {
   fetchPolicyMatchArticles()
   fetchSupplyDemand()
 })
+import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
 <template>
@@ -189,10 +190,12 @@ onMounted(() => {
     <TheHeader />
 
     <main class="main-content">
+   
       <!-- 提取出的蓝色半透明主导航栏组件 -->
       <TheNavBar activeId="gov" />
-
-      <div class="content-box">
+      <BannerSideOverlay />
+      <div style="display: flex; gap: 20px; flex: 1; height: 100%;">
+        <div class="content-box" style="flex: 1; min-width: 0;">
         <!-- 二级 Tab 切换菜单: 个人办事 | 企业办事 | 企业服务 -->
         <div class="sub-tab-bar">
           <div class="sub-tabs">
@@ -465,6 +468,9 @@ onMounted(() => {
             <img :src="currentQrImage" alt="二维码" />
           </div>
         </div>
+      </div>
+    
+       
       </div>
     </main>
 

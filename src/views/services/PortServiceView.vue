@@ -59,6 +59,7 @@ const showIntroModal = () => {
 onMounted(() => {
   fetchCrossBorder()
 })
+import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
 <template>
@@ -68,8 +69,9 @@ onMounted(() => {
     <main class="main-content">
       <!-- 提取的主导航栏组件 -->
       <TheNavBar activeId="cross" />
-
-      <div class="content-box">
+      <BannerSideOverlay />
+      <div style="display: flex; gap: 20px; flex: 1; height: 100%;">
+        <div class="content-box" style="flex: 1; min-width: 0;">
         <div class="cross-grid">
           <!-- 1. 境外人员便利化服务 (左上) -->
           <div class="cross-card yellow-tint-card" v-if="foreignServices.id">
@@ -201,6 +203,8 @@ onMounted(() => {
           
          
 
+      </div>
+    
       </div>
     </main>
 

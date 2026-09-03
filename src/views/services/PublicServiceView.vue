@@ -17,13 +17,13 @@ const ssBgs = [ss1, ss2, ss3, ss4, ss5, ss6]
 const snapshotSubmitting = ref(false)
 const uploadedImages = ref<string[]>([])
 const snapshotForm = ref({
-  reportType: 'occupying_business',
+  reportType: '',
   content: '',
   imageUrls: '[]',
   longitude: '',
   latitude: '',
   address: '',
-  community: 'none',
+  community: '',
   contactName: '',
   contactPhone: ''
 })
@@ -78,7 +78,7 @@ const submitSnapshotForm = async () => {
       alert('提交成功')
       uploadedImages.value = []
       snapshotForm.value = {
-        reportType: 'occupying_business', content: '', imageUrls: '[]', longitude: '', latitude: '', address: '', community: 'none', contactName: '', contactPhone: ''
+        reportType: reportTypes.value[0]?.id || '', content: '', imageUrls: '[]', longitude: '', latitude: '', address: '', community: communities.value[0]?.id || '', contactName: '', contactPhone: ''
       }
     } else {
       alert('提交失败: ' + res.msg)
@@ -150,9 +150,51 @@ const fetchConvenience = async () => {
   }
 }
 
+const laodaoJobs = ref<any[]>([])
+const zhongyaJobs = ref<any[]>([])
+const reportTypes = ref<any[]>([])
+const communities = ref<any[]>([])
+
+const fetchDicts = async () => {
+  try {
+    const res: any = await http.get('/api-loca/sys/dict/data', { types: 'portal_complaint_report_type,portal_complaint_community' })
+    if (res.code === 0 && Array.isArray(res.data) && res.data.length >= 2) {
+      reportTypes.value = res.data[0] || []
+      communities.value = res.data[1] || []
+      if (reportTypes.value.length > 0 && !snapshotForm.value.reportType) {
+        snapshotForm.value.reportType = reportTypes.value[0].id
+      }
+      if (communities.value.length > 0 && !snapshotForm.value.community) {
+        snapshotForm.value.community = communities.value[0].id
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch dicts', error)
+  }
+}
+
+const fetchJobs = async () => {
+  try {
+    const resLaodao: any = await http.get('/api-loca/portal/job/page', { page: 1, limit: 2 })
+    if (resLaodao.code === 0 || String(resLaodao.code) === '0') {
+      laodaoJobs.value = resLaodao.data.list || []
+    }
+    
+    const resZhongya: any = await http.get('/api-loca/portal/recruitment/page', { page: 1, limit: 2 })
+    if (resZhongya.code === 0 || String(resZhongya.code) === '0') {
+      zhongyaJobs.value = resZhongya.data.list || []
+    }
+  } catch (e) {
+    console.error('Failed to fetch jobs', e)
+  }
+}
+
 onMounted(() => {
+  fetchDicts()
   fetchConvenience()
+  fetchJobs()
 })
+import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
 <template>
@@ -161,8 +203,9 @@ onMounted(() => {
 
     <main class="main-content">
       <TheNavBar activeId="life" />
-
-      <div class="content-box">
+      <BannerSideOverlay />
+      <div style="display: flex; gap: 20px; flex: 1; height: 100%;">
+        <div class="content-box" style="flex: 1; min-width: 0;">
         <div class="bm-grid">
           <!-- 1. 城市治理 · 随手拍 -->
           <div class="bm-card shoot-card" >
@@ -186,24 +229,13 @@ onMounted(() => {
                 <div class="col" style="margin-right: 10px;">
                   <label class="form-label">上报类型</label>
                   <select class="shoot-input" v-model="snapshotForm.reportType">
-                      <option value="occupying_business">占道经营</option>
-                      <option value="illegal_parking">违章停车</option>
-                      <option value="streetlight_fault">路灯故障</option>
-                      <option value="manhole_missing">井盖缺失</option>
-                      <option value="road_dirty">道路不洁</option>
-                      <option value="uncivilized_behavior">不文明行为</option>
+                    <option v-for="item in reportTypes" :key="item.id" :value="item.id">{{ item.dictLabel }}</option>
                   </select>
                 </div>
                 <div class="col">
                   <label class="form-label">所属社区</label>
                   <select class="shoot-input" v-model="snapshotForm.community">
-                    <option value="none">无社区</option>
-                    <option value="cooperation_zone">合作区</option>
-                    <option value="kalasu">卡拉苏社区</option>
-                    <option value="silu">丝路社区</option>
-                    <option value="suolun">索伦社区</option>
-                    <option value="yingtarr">英塔尔社区</option>
-                    <option value="hongqiao">红桥社区</option>
+                    <option v-for="item in communities" :key="item.id" :value="item.id">{{ item.dictLabel }}</option>
                   </select>
                 </div>
               </div>
@@ -263,8 +295,15 @@ onMounted(() => {
             </div>
 
             <div class="short-job-body">
-              <div class="job-tags-grid">
-                <span class="j-tag" v-for="(tag, idx) in laodaoTags" :key="idx">{{ tag.name }}</span>
+              <div class="job-list-container">
+                <div class="job-item" v-for="(job, idx) in laodaoJobs" :key="idx" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">
+                  <div class="job-item-header">
+                    <span class="job-title">{{ job.positionName }}</span>
+                    <span class="job-salary" v-if="job.salaryMin != null">{{ job.salaryMin }}-{{ job.salaryMax }}</span>
+                    <span class="job-salary" v-else>面议</span>
+                  </div>
+                  <!-- <div class="job-item-company">{{ job.memberName || '未知商户' }}</div> -->
+                </div>
               </div>
               <div class="hot-job-banner" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">
                 <span>热门职务 <strong>*{{ hotJobsCount }}</strong></span>
@@ -289,13 +328,22 @@ onMounted(() => {
             </div>
 
             <div class="long-job-body">
-              <p class="desc-text">{{ zhongyaInfo.remark || '集成长期岗位，与劳道智工短期工形成短期+长期全覆盖就业服务体系。' }}</p>
+              <div class="job-list-container">
+                <div class="job-item yellow" v-for="(job, idx) in zhongyaJobs" :key="idx" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
+                  <div class="job-item-header">
+                    <span class="job-title">{{ job.title }}</span>
+                    <span class="job-salary" v-if="job.minSalary != null">{{ job.minSalary }}-{{ job.maxSalary }}</span>
+                    <span class="job-salary" v-else>面议</span>
+                  </div>
+                  <!-- <div class="job-item-company">{{ job.companyName || '未知企业' }}</div> -->
+                </div>
+              </div>
               <button class="yellow-action-btn" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
                 找人才/找工作 <span class="sub-link">职位列表 &rarr;</span>
               </button>
             </div>
           </div>
-
+          
           <!-- 4. 社区便民 -->
           <div class="bm-card blue-tint-card">
             <div class="card-header-flex">
@@ -351,6 +399,8 @@ onMounted(() => {
           </div>
 
         </div>
+      </div>
+    
       </div>
     </main>
 
@@ -695,28 +745,60 @@ onMounted(() => {
   flex: 1;
 }
 
-.job-tags-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-
+.job-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-.j-tag {
+.job-item {
   background: #ffffff;
   border: 1px solid #99f6e4;
-  color: #0d9488;
-  padding: 6px 0;
-  font-size: 12px;
-  text-align: center;
+  padding: 10px;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
 }
+.job-item:hover {
+  background: #ccfbf1;
+}
+.job-item.yellow {
+  border-color: #fde68a;
+}
+.job-item.yellow:hover {
+  background: #fef3c7;
+}
 
-.j-tag:hover {
-  background: #0d9488;
-  color: #ffffff;
-  border-color: #0d9488;
+.job-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.job-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+}
+
+.job-salary {
+  font-size: 13px;
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.job-item-company {
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hot-job-banner {

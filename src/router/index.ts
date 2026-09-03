@@ -117,6 +117,11 @@ const router = createRouter({
       name: 'site-group',
       component: () => import('../views/SiteGroupView.vue'),
     },
+    {
+      path: '/service/dayu-form',
+      name: 'service-dayu-form',
+      component: () => import('../views/services/DayuFormView.vue'),
+    },
   ],
 })
 
