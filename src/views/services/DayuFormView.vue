@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { http } from '@/api/request'
+import request, { http } from '@/api/request'
 import TheHeader from '@/components/TheHeader.vue'
 import TheNavBar from '@/components/TheNavBar.vue'
 import TheFooter from '@/components/TheFooter.vue'
@@ -24,6 +24,8 @@ const decodeHtml = (html: string) => {
   txt.innerHTML = html
   return txt.value
 }
+
+const communityList = ref<any[]>([])
 
 const fetchForm = async () => {
   try {
@@ -49,6 +51,16 @@ const fetchForm = async () => {
       par.value = res.par
       fields.value = res.fields || []
       
+      // Community data
+      communityList.value = [
+        { id: 26, name: '丝路社区' },
+        { id: 23, name: '卡拉苏社区' },
+        { id: 27, name: '索伦社区' },
+        { id: 57, name: '红桥社区' },
+        { id: 55, name: '英塔尔社区' },
+        { id: 25, name: '霍尔果斯智慧在线' }
+      ]
+      
       // Initialize form data
       fields.value.forEach(f => {
         if (f.type === 'checkbox') {
@@ -59,6 +71,7 @@ const fetchForm = async () => {
       })
       formData.value['member'] = ''
       formData.value['mobile'] = ''
+      formData.value['communityId'] = ''
     } else {
       alert('表单加载失败')
     }
@@ -82,6 +95,10 @@ const handlePluralUpload = (e: any) => {
 
 const submitForm = async () => {
   // basic validation
+  if (!formData.value.communityId) {
+    alert('请选择社区')
+    return
+  }
   if (!formData.value.member) {
     alert('请填写姓名')
     return
@@ -91,11 +108,42 @@ const submitForm = async () => {
     return
   }
   
+  // Validate community user
+  try {
+    const searchParams = new URLSearchParams()
+    searchParams.append('mobile', formData.value.mobile)
+    searchParams.append('communityId', formData.value.communityId)
+    searchParams.append('isapi', '1')
+
+    const validRes: any = await http.post(`/api-dayu/app/index.php`, searchParams, {
+      params: {
+        i: formData.value.communityId,
+        c: 'entry',
+        do: 'CheckCommunityUser',
+        m: 'dayu_form',
+        isapi: 1
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+    
+    if (validRes.status === 0 || String(validRes.status) === '0') {
+      alert(validRes.msg || '当前社区下未找到人员信息 请先在微信平台注册智慧社区')
+      return
+    }
+  } catch (error) {
+    console.error('Validation error:', error)
+    alert('验证人员信息异常')
+    return
+  }
+
   const postData = new FormData()
   postData.append('submit', '1')
   postData.append('isapi', '1')
   postData.append('member', formData.value.member)
   postData.append('mobile', formData.value.mobile)
+  postData.append('communityId', formData.value.communityId)
   
   Object.keys(formData.value).forEach(key => {
     if (key.startsWith('field_')) {
@@ -115,10 +163,13 @@ const submitForm = async () => {
   }
 
   try {
-    const res: any = await http.post('/api-dayu?c=entry&do=dayu_form&m=dayu_form&id=' + formId, null, {
-      data: postData,
-      headers: {
-        'Content-Type': 'multipart/form-data'
+    const res: any = await http.post('/api-dayu/app/index.php', postData, {
+      params: {
+        i: formData.value.communityId,
+        c: 'entry',
+        do: 'dayu_form',
+        m: 'dayu_form',
+        id: formId
       }
     })
     
@@ -189,7 +240,14 @@ onMounted(() => {
         </div>
         
         <div class="form-body">
-          <h2>{{ activity.title }}</h2>
+          <h2 style="margin-top:0px">{{ activity.title }}</h2>
+          <div class="form-group">
+            <label class="required">所属社区</label>
+            <select v-model="formData.communityId" class="form-input">
+              <option value="">请选择社区</option>
+              <option v-for="com in communityList" :key="com.id" :value="com.id">{{ com.name }}</option>
+            </select>
+          </div>
           <div class="form-group">
             <label class="required">姓名</label>
             <input type="text" v-model="formData.member" placeholder="请输入您的姓名" class="form-input" />
@@ -267,7 +325,7 @@ onMounted(() => {
 
 <style scoped>
 .form-page {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -287,6 +345,7 @@ onMounted(() => {
   background: #fff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   height: 600px;
+  padding:24px 0px;
   margin: 0 auto;
 }
 

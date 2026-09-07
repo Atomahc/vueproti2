@@ -194,7 +194,7 @@ const handleLogout = () => {
 .mobile-header-wrapper {
   position: sticky;
   top: 0;
-  width: 100vw;
+  width: 100%;
   background: #ffffff;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   z-index: 999;

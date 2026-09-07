@@ -22,11 +22,11 @@ const fetchCrossBorder = async () => {
     })
     if (res.code === 0 && res.data && res.data.cross_border) {
       const list = res.data.cross_border
-      foreignServices.value = list.find((item: any) => item.name === '境外人员便利化专区') || { children: [] }
-      portCloudItems.value = list.find((item: any) => item.name === '口岸云集') || { children: [] }
-      passServices.value = list.find((item: any) => item.name === '霍数通·通关服务') || { children: [] }
-      coopServices.value = list.find((item: any) => item.name === '中哈合作中心智慧服务') || { children: [] }
-      cultureBase.value = list.find((item: any) => item.name === '国家对外文化贸易基地(伊犁)') || { children: [] }
+      foreignServices.value = list[0] || { children: [] }
+      passServices.value = list[1] || { children: [] }
+      cultureBase.value = list[2] || { children: [] }
+      portCloudItems.value = list[3] || { children: [] }
+      coopServices.value = list[4] || { children: [] }
     }
   } catch (e) {
     console.error('Failed to fetch cross border data:', e)
@@ -89,7 +89,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <div v-for="(item, i) in foreignServices.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
                 <span class="box-title" style="color: #634F00;">{{ item.name }}</span>
                 <div class="img-wrapper">
-                  <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
+                  <img style="height: 180px;" :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
                   <button class="arrow-btn yellownext" >&rarr;</button>
                 </div>
               </div>
@@ -98,7 +98,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
           <!-- 3. 霍数通·通关服务 (右上) -->
           <div class="cross-card cyan-tint-card" v-if="passServices.id">
-            <div class="card-title-header">
+            <div class="card-title-header" style="margin-bottom: 50px;">
               <div class="title-with-square cyan">
                   <img :src="passServices.icon ? (passServices.icon.startsWith('http') ? passServices.icon : minioPrefix + passServices.icon) : ''" alt="">
               </div>
@@ -226,7 +226,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 <style scoped>
 
 .grid-4 .image-item-box {
-  width: calc(25% - 10px);
+  width: calc(20% - 10px);
 }
 .image-item-box img {
   width: 100%;
@@ -329,7 +329,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 600px;
+  width: 744px;
 }
 .blue-tint-card {
   background: linear-gradient( 180deg, rgba(0,89,255,0.2) 0%, rgba(0,89,255,0.02) 100%), #FFFFFF;
@@ -346,7 +346,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 600px;
+  width: 472px;
 }
 
 .purple-tint-card {
@@ -355,11 +355,11 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 660px;
+  width: 676px;
 }
 
 .port-page-container {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   position: relative;
   display: flex;

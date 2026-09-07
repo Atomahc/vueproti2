@@ -10,7 +10,7 @@
 
 <style scoped>
 .mobile-footer-wrapper {
-  width: 100vw;
+  width: 100%;
   padding: 20px 16px 20px 16px;
   background: rgba(30, 41, 59, 0.8);
   border-top: 1px solid rgba(255, 255, 255, 0.15);

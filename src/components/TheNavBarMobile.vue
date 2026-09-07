@@ -67,7 +67,7 @@ const handleNavClick = (item: any) => {
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   background: #ffffff;
   box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
   z-index: 9999;

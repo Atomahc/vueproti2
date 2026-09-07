@@ -156,7 +156,9 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
             >
               <swiper-slide v-for="item in bannerList" :key="item.id">
                 <img :src="item.coverImage || '@/assets/img/indexbg.png'" alt="Banner" class="banner-img" />
-    
+                <div class="banner-title-overlay" v-if="item.title">
+                  {{ item.title }}
+                </div>
               </swiper-slide>
             </swiper>
             
@@ -236,7 +238,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 
 <style scoped>
 .home-page-container {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   position: relative;
   display: flex;
@@ -337,6 +339,19 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
   object-fit: cover;
 }
 
+.banner-title-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 18px;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
 .banner-content {
   position: absolute;
   top: 40px;
@@ -367,6 +382,14 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 .banner-swiper {
   width: 100%;
   height: 100%;
+}
+
+:deep(.swiper-pagination) {
+  width: auto;
+  left: auto;
+  right: 20px;
+  bottom: 20px;
+  z-index: 20;
 }
 
 :deep(.swiper-pagination-bullet) {

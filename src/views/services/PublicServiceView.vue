@@ -42,8 +42,13 @@ const handleNavigate = (item: any) => {
     openModal(item)
     return
   }
+
   if (item.url) {
-    window.open(item.url, '_blank')
+    if (item.url.startsWith('http')) {
+      window.open(item.url, '_blank')
+    } else {
+      router.push(item.url)
+    }
   }
 }
 const handleImageUpload = (e: any) => {
@@ -175,12 +180,12 @@ const fetchDicts = async () => {
 
 const fetchJobs = async () => {
   try {
-    const resLaodao: any = await http.get('/api-loca/portal/job/page', { page: 1, limit: 2 })
+    const resLaodao: any = await http.get('/api-loca/portal/job/page', { page: 1, limit: 2, jobType: 1 })
     if (resLaodao.code === 0 || String(resLaodao.code) === '0') {
       laodaoJobs.value = resLaodao.data.list || []
     }
     
-    const resZhongya: any = await http.get('/api-loca/portal/recruitment/page', { page: 1, limit: 2 })
+    const resZhongya: any = await http.get('/api-loca/portal/recruitment/page', { page: 1, limit: 2, workType: 1 })
     if (resZhongya.code === 0 || String(resZhongya.code) === '0') {
       zhongyaJobs.value = resZhongya.data.list || []
     }
@@ -279,70 +284,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
             </div>
           </div>
 
-          <!-- 2. 劳道智工 · 短期工 -->
-          <div class="bm-card teal-tint" @click="openModal(laodaoInfo)">
-            <div class="card-header-flex">
-              <div class="header-title-box">
-                <div class="icon-square teal">
-                  <img v-if="laodaoInfo.bgImage && (laodaoInfo.bgImage.includes('/') || laodaoInfo.bgImage.includes('.'))" :src="laodaoInfo.bgImage.startsWith('http') ? laodaoInfo.bgImage : minioPrefix + laodaoInfo.bgImage" style="width: 36px; height: 36px; object-fit: contain; " />
-                  <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
-                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                  </svg>
-                </div>
-                <h2>{{ laodaoInfo.name ? laodaoInfo.name : '劳道智工' }} · <span>短期工</span></h2>
-              </div>
-              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
-            </div>
-
-            <div class="short-job-body">
-              <div class="job-list-container">
-                <div class="job-item" v-for="(job, idx) in laodaoJobs" :key="idx" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">
-                  <div class="job-item-header">
-                    <span class="job-title">{{ job.positionName }}</span>
-                    <span class="job-salary" v-if="job.salaryMin != null">{{ job.salaryMin }}-{{ job.salaryMax }}</span>
-                    <span class="job-salary" v-else>面议</span>
-                  </div>
-                  <!-- <div class="job-item-company">{{ job.memberName || '未知商户' }}</div> -->
-                </div>
-              </div>
-              <div class="hot-job-banner" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">
-                <span>热门职务 <strong>*{{ hotJobsCount }}</strong></span>
-                <a href="javascript:void(0)" class="view-link">查看 &rarr;</a>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. 中亚职通桥 · 长期工 -->
-          <div class="bm-card yellow-tint" @click="openModal(zhongyaInfo)">
-            <div class="card-header-flex">
-              <div class="header-title-box">
-                <div class="icon-square orange">
-                  <img v-if="zhongyaInfo.bgImage && (zhongyaInfo.bgImage.includes('/') || zhongyaInfo.bgImage.includes('.'))" :src="zhongyaInfo.bgImage.startsWith('http') ? zhongyaInfo.bgImage : minioPrefix + zhongyaInfo.bgImage" style="width: 36px; height: 36px; object-fit: contain;" />
-                  <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
-                    <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
-                  </svg>
-                </div>
-                <h2>{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : '中亚职通桥' }} · <span>长期工</span></h2>
-              </div>
-              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
-            </div>
-
-            <div class="long-job-body">
-              <div class="job-list-container">
-                <div class="job-item yellow" v-for="(job, idx) in zhongyaJobs" :key="idx" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
-                  <div class="job-item-header">
-                    <span class="job-title">{{ job.title }}</span>
-                    <span class="job-salary" v-if="job.minSalary != null">{{ job.minSalary }}-{{ job.maxSalary }}</span>
-                    <span class="job-salary" v-else>面议</span>
-                  </div>
-                  <!-- <div class="job-item-company">{{ job.companyName || '未知企业' }}</div> -->
-                </div>
-              </div>
-              <button class="yellow-action-btn" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
-                找人才/找工作 <span class="sub-link">职位列表 &rarr;</span>
-              </button>
-            </div>
-          </div>
+       
           
           <!-- 4. 社区便民 -->
           <div class="bm-card blue-tint-card">
@@ -381,7 +323,90 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               </div>
             </div>
           </div>
+             <!-- 2. 劳道智工 · 短期工 -->
+          <div class="bm-card teal-tint" @click="openModal(laodaoInfo)">
+            <div class="card-header-flex">
+              <div class="header-title-box">
+                <div class="icon-square teal">
+                  <img v-if="laodaoInfo.bgImage && (laodaoInfo.bgImage.includes('/') || laodaoInfo.bgImage.includes('.'))" :src="laodaoInfo.bgImage.startsWith('http') ? laodaoInfo.bgImage : minioPrefix + laodaoInfo.bgImage" style="width: 36px; height: 36px; object-fit: contain; " />
+                  <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
+                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                  </svg>
+                </div>
+                <h2>{{ laodaoInfo.name ? laodaoInfo.name : '劳道智工' }} · <span>短期工</span></h2>
+              </div>
+              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
+            </div>
 
+            <div class="short-job-body">
+              <div class="job-list-container">
+                <div class="job-item" v-for="(job, idx) in laodaoJobs" :key="idx" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">
+                  <div class="job-item-header">
+                    <span class="job-title" style="font-size: 15px;">{{ job.positionName }}</span>
+                    <span class="job-salary" style="font-size: 14px;" v-if="job.salaryShow">{{ job.salaryShow }}</span>
+                    <span class="job-salary" style="font-size: 14px;" v-else-if="job.salaryMin != null">{{ job.salaryMin }}K-{{ job.salaryMax }}K</span>
+                    <span class="job-salary" style="font-size: 14px;" v-else>面议</span>
+                  </div>
+                  <div class="job-item-tags" style="margin: 6px 0; display: flex; gap: 6px; flex-wrap: wrap;">
+                    <span v-for="(tag, tIdx) in [job.districtName, job.experienceLabel, ...(job.welfareBenefits || [])].filter(Boolean).slice(0, 2)" :key="tIdx" style="background: #f0fdfa; border: 1px solid #ccfbf1; color: #0d9488; font-size: 11px; padding: 2px 6px; border-radius: 4px;">{{ tag }}</span>
+                  </div>
+                  <div class="job-item-footer" style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-top: 8px;">
+                    <span style="display: flex; align-items: center; gap: 4px;width: 100px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      {{ job.workAddress || '地址不详' }}
+                    </span>
+                    <span>{{ (job.publishTimeStr || job.createTimeStr || '').split(' ')[0] }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="hot-job-banner" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">
+                <span>热门职务 <strong>*{{ hotJobsCount }}</strong></span>
+                <a href="javascript:void(0)" class="view-link">查看 &rarr;</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. 中亚职通桥 · 长期工 -->
+          <div class="bm-card yellow-tint" @click="openModal(zhongyaInfo)">
+            <div class="card-header-flex">
+              <div class="header-title-box">
+                <div class="icon-square orange">
+                  <img v-if="zhongyaInfo.bgImage && (zhongyaInfo.bgImage.includes('/') || zhongyaInfo.bgImage.includes('.'))" :src="zhongyaInfo.bgImage.startsWith('http') ? zhongyaInfo.bgImage : minioPrefix + zhongyaInfo.bgImage" style="width: 36px; height: 36px; object-fit: contain;" />
+                  <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
+                    <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
+                  </svg>
+                </div>
+                <h2>{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : '中亚职通桥' }} · <span>长期工</span></h2>
+              </div>
+              <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
+            </div>
+
+            <div class="long-job-body">
+              <div class="job-list-container">
+                <div class="job-item yellow" v-for="(job, idx) in zhongyaJobs" :key="idx" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
+                  <div class="job-item-header">
+                    <span class="job-title" style="font-size: 15px;">{{ job.title }}</span>
+                    <span class="job-salary" style="font-size: 14px;" v-if="job.salaryShow">{{ job.salaryShow }}</span>
+                    <span class="job-salary" style="font-size: 14px;" v-else-if="job.minSalary != null">{{ job.minSalary }}-{{ job.maxSalary }}</span>
+                    <span class="job-salary" style="font-size: 14px;" v-else>面议</span>
+                  </div>
+                  <div class="job-item-tags" style="margin: 6px 0; display: flex; gap: 6px; flex-wrap: wrap;">
+                    <span v-for="(tag, tIdx) in [job.city, job.experienceLabel, job.educationLabel].filter(Boolean).slice(0, 2)" :key="tIdx" style="background: #fef3c7; border: 1px solid #fde68a; color: #d97706; font-size: 11px; padding: 2px 6px; border-radius: 4px;">{{ tag }}</span>
+                  </div>
+                  <div class="job-item-footer" style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-top: 8px;">
+                    <span style="display: flex; align-items: center; gap: 4px;">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      {{ job.workLocation || job.city || '地址不详' }}
+                    </span>
+                    <span>{{ (job.createDate || '').split(' ')[0] }}</span>
+                  </div>
+                </div>
+              </div>
+              <button class="yellow-action-btn" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
+                找人才/找工作 <span class="sub-link">职位列表 &rarr;</span>
+              </button>
+            </div>
+          </div>
           <!-- 底部三列横向入口卡片 -->
             <div v-for="(bc, i) in bottomCards" :style="{ backgroundImage: `url(${ssBgs[i]})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', border: 'none' }" :key="i" class="bm-card footer-small-card" @click="handleNavigate(bc)">
               <div class="small-card-content">
@@ -439,7 +464,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
 <style scoped>
 .public-page-container {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   position: relative;
   display: flex;
@@ -750,6 +775,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   flex-direction: column;
   gap: 8px;
   margin-bottom: 12px;
+  flex-flow:wrap
 }
 
 .job-item {
@@ -759,6 +785,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
+  flex:1
 }
 .job-item:hover {
   background: #ccfbf1;
@@ -899,11 +926,13 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   background: linear-gradient( 180deg, rgba(0,140,245,0.1) 0%, rgba(241,242,243,0) 100%), #FFFFFF;
   border: 1px solid #ddd;
   grid-column: span 1;
+  height:240px;
 }
 .pur-tint-card {
   background: linear-gradient( 180deg, rgba(68,106,245,0.1) 0%, rgba(243,243,243,0) 100%), #FFFFFF;
   border: 1px solid #ddd;
   grid-column: span 1;
+  height:240px;
 }
 
 /* 底部小卡片 */
@@ -1014,7 +1043,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);

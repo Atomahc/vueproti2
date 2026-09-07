@@ -432,7 +432,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
@@ -445,7 +445,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 .modal-content {
   background: white;
   width: 500px;
-  max-width: 90vw;
+  max-width: 90%;
   border-radius: 8px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
   animation: modalIn 0.3s ease-out;

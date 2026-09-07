@@ -10,6 +10,7 @@ import TheNavBar from '../../components/TheNavBar.vue'
 
 // 二级 Tab 切换: 'personal' | 'enterprise_bs' | 'enterprise_fw'
 const activeSubTab = ref<'personal' | 'enterprise_bs' | 'enterprise_fw'>('personal')
+const activeMergedTab = ref<'policy' | 'business'>('policy')
 
 const router = useRouter()
 
@@ -128,7 +129,7 @@ const enterpriseFwData = ref<Record<string, any>>({})
 
 const creditSearchKeyword = ref('')
 const handleCreditSearch = () => {
-  window.open(`https://www.creditxj.gov.cn/qycx/interfaceqycx.do?qymc=${encodeURIComponent(creditSearchKeyword.value)}`, '_blank')
+  window.open(`https://www.creditchina.gov.cn/xinyongxinxi/index.html?index=0&scenes=defaultScenario&tableName=credit_xyzx_tyshxydm&searchState=2&entityType=1,2,4,5,6,7,8&keyword==${encodeURIComponent(creditSearchKeyword.value)}`, '_blank')
 }
 
 const qrModalVisible = ref(false)
@@ -167,7 +168,7 @@ const supplyDemandList = ref<any[]>([])
 
 const fetchSupplyDemand = async () => {
   try {
-    const res: any = await getSupplyDemandList({ page: 1, limit: 3 })
+    const res: any = await getSupplyDemandList({ page: 1, limit: 5 })
     if (res.code === 0 && res.data) {
       supplyDemandList.value = res.data.list || []
     }
@@ -271,60 +272,51 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
         <div v-else-if="activeSubTab === 'enterprise_fw'" class="enterprise-fw-container">
           <!-- 顶部两张大卡片 -->
           <div class="top-cards-row">
-              <!-- 政策匹配推荐 -->
-            <div class="big-card blue-tint" @click="router.push({ path: '/news', query: { tab: '政策推送' } })" style="cursor: pointer;">
-              <div class="card-title-row">
-                <div class="title-with-icon">
-                  <div class="card-icon-square blue">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2">
-                      <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                  </div>
-                  <h2>{{ enterpriseFwData['政策匹配推荐']?.name || '政策匹配推荐' }}</h2>
+              <!-- 政策匹配推荐 & 营商环境监测 融合版 -->
+            <div class="big-card merged-big-card" style="grid-column: span 2; padding: 0; background: linear-gradient(180deg, #fdf0f0 0%, #fff 100%); border: 1px solid #e2e8f0;">
+              <div class="merged-card-tabs">
+                <div 
+                  :class="['merged-tab-item', { active: activeMergedTab === 'policy' }]" 
+                  @click="activeMergedTab = 'policy'"
+                >
+                  <span class="tab-title">{{ enterpriseFwData['政策匹配推荐']?.name || '政策匹配推荐' }}</span>
                 </div>
-                <span class="view-more" @click.stop="router.push({ path: '/news', query: { tab: '政策推送' } })" style="font-size: 13px; color: #0066ff; cursor: pointer;">更多</span>
-              </div>
-              
-
-
-              <ul class="article-list" style="margin-top: 16px; flex: 1;">
-                <li v-for="(item, i) in policyMatchArticles" :key="i" @click.stop="goToArticleDetail(item)" style="cursor: pointer;">
-                  <span class="art-title">{{ item.title }}</span>
-                  <span class="art-date">{{ item.date }}</span>
-                </li>
-              </ul>
-
-              <div class="match-banner" style="margin-top: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; padding: 10px 16px;">
-                <div class="match-info">
-                  <span>行业 <strong>跨境电商</strong></span>
-                  <span class="gap">|</span>
-                  <span>规模 <strong>中型</strong></span>
+                <div 
+                  :class="['merged-tab-item', { active: activeMergedTab === 'business' }]" 
+                  @click="activeMergedTab = 'business'"
+                >
+                  <span class="tab-title">{{ enterpriseFwData['营商环境监测']?.name || '营商环境监测' }}</span>
                 </div>
-                <a href="#" class="match-link" @click.stop>已匹配5项适配政策 &rarr;</a>
+                <div style="flex: 1; border-bottom: 1px solid #e2e8f0;"></div>
+                <span class="view-more-tab" style="border-bottom: 1px solid #e2e8f0;" @click="router.push({ path: '/news', query: { tab: activeMergedTab === 'policy' ? '政策推送' : '营商环境监测' } })">更多<span style="background:#b91c1c; color:#fff; display:inline-block; margin-left:4px; padding:0 4px; font-size:12px;">+</span></span>
               </div>
-            </div>
 
-            <!-- 营商环境监测 -->
-            <div class="big-card blue-tint">
-              <div class="card-title-row">
-                <div class="title-with-icon">
-                  <div class="card-icon-square blue">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2">
-                      <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9" />
-                    </svg>
-                  </div>
-                  <h2>{{ enterpriseFwData['营商环境监测']?.name || '营商环境监测' }}</h2>
-                </div>
-                <span class="view-more" @click="router.push({ path: '/news', query: { tab: '营商环境监测' } })" style="font-size: 13px; color: #0066ff; cursor: pointer;">更多
-                </span>
+              <div class="merged-card-body" v-if="activeMergedTab === 'policy'">
+                <ul class="fancy-article-list">
+                  <li v-for="(item, i) in policyMatchArticles" :key="i" @click.stop="goToArticleDetail(item)">
+                    <div class="fancy-date">
+                      <span class="day">{{ item.date.split('/')[1] || item.date }}</span>
+                      <span class="year-month">2026-{{ item.date.split('/')[0] || '09' }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="fancy-title">{{ item.title }}</div>
+                  </li>
+                </ul>
+  
               </div>
-              <p class="card-desc">{{ enterpriseFwData['营商环境监测']?.remark || '改革举措/成效数据/典型案例集中展示' }}</p>
-              <ul class="article-list">
-                <li v-for="(item, i) in enterpriseArticles" :key="i" @click="goToArticleDetail(item)" style="cursor: pointer;">
-                  <span class="art-title">{{ item.title }}</span>
-                  <span class="art-date">{{ item.date }}</span>
-                </li>
-              </ul>
+
+              <div class="merged-card-body" v-if="activeMergedTab === 'business'">
+                <ul class="fancy-article-list">
+                  <li v-for="(item, i) in enterpriseArticles" :key="i" @click.stop="goToArticleDetail(item)">
+                    <div class="fancy-date">
+                      <span class="day">{{ item.date.split('/')[1] || item.date }}</span>
+                      <span class="year-month">2026-{{ item.date.split('/')[0] || '09' }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="fancy-title">{{ item.title }}</div>
+                  </li>
+                </ul>
+              </div>
             </div>
           
             
@@ -439,20 +431,14 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
       <!-- 平台介绍弹窗 -->
       <div v-if="introModalVisible" class="qr-modal-overlay" @click="introModalVisible = false">
-        <div class="qr-modal-content" @click.stop style="max-width: 500px; padding: 24px;">
+        <div class="qr-modal-content" @click.stop style="max-width: 800px; padding: 24px;">
           <div class="qr-modal-header" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
             <h3 style="margin: 0; font-size: 18px; color: #0f172a;">乐享霍尔果斯平台介绍</h3>
             <button class="close-btn" @click="introModalVisible = false" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
           </div>
           <div class="qr-modal-body" style="font-size: 14px; color: #334155; line-height: 1.6;">
-            <p>“乐享霍尔果斯”平台是一个专为本地商户和企业提供的高效资金与数字化管理平台。</p>
-            <p>主要功能包含：</p>
-            <ul style="padding-left: 20px; margin-top: 8px;">
-              <li><strong>商户收款流水：</strong>实时查看并导出交易流水，账单清晰明了。</li>
-              <li><strong>到账语音提醒：</strong>支持多端同步的语音播报，防漏单、防错单。</li>
-              <li><strong>资金无感结算：</strong>安全便捷的资金结算体系，加速资金周转。</li>
-            </ul>
-            <p style="margin-top: 12px; font-weight: 500; color: #ea580c;">更多精彩功能，敬请期待！</p>
+            <p>{{ enterpriseFwData['乐享霍尔果斯']?.linkDesc  }}</p>
+         
           </div>
         </div>
       </div>
@@ -480,7 +466,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
 <style scoped>
 .gov-page-container {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   position: relative;
   display: flex;
@@ -735,7 +721,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 270px;
+  height: 300px;
   transition: all 0.3s ease;
 }
 
@@ -858,6 +844,102 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   color: #d97706;
 }
 
+/* 融合卡片样式 */
+.merged-big-card {
+  display: flex;
+  flex-direction: column;
+}
+.merged-card-tabs {
+  display: flex;
+  align-items: flex-end;
+  padding: 0 20px;
+  position: relative;
+}
+.merged-tab-item {
+  padding: 16px 20px;
+  font-size: 18px;
+  color: #475569;
+  cursor: pointer;
+  position: relative;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.merged-tab-item.active {
+  color: #b91c1c;
+  font-weight: 700;
+  border-bottom-color: #b91c1c;
+}
+.view-more-tab {
+  font-size: 14px;
+  color: #b91c1c;
+  cursor: pointer;
+  padding: 16px 0;
+  margin-bottom: -1px;
+}
+.merged-card-body {
+  padding: 20px;
+  padding-bottom:0px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.fancy-article-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height:220px;
+  overflow-y: scroll;
+}
+.fancy-article-list li {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 4px;
+}
+.fancy-article-list li:hover {
+  background: #fef2f2;
+}
+.fancy-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+}
+.fancy-date .day {
+  font-size: 24px;
+  font-weight: 700;
+  color: #b91c1c;
+  line-height: 1;
+}
+.fancy-date .year-month {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+.fancy-article-list .divider {
+  width: 1px;
+  height: 30px;
+  background-color: #e2e8f0;
+  margin: 0 16px;
+}
+.fancy-title {
+  flex: 1;
+  font-size: 15px;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fancy-article-list li:hover .fancy-title {
+  color: #b91c1c;
+}
+
 /* 底部4列卡片 */
 .bottom-cards-row {
   display: grid;
@@ -884,10 +966,10 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 .border-blue { 
   border: 1px solid #e0f2fe; 
   background:url('@/assets/other/qyxy.jpg') no-repeat;
-  background-size: 100%;
+  background-size: 100% 100%;
 }
 .border-teal { 
-  height:270px;
+  height:252px;
   padding:24px;
   border: 1px solid #ccfbf1; 
   background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%);
@@ -895,13 +977,13 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 .border-orange { 
   border: 1px solid #ffedd5; 
   background:url('@/assets/other/ggs.jpg') no-repeat;
-  background-size: 100%;
+  background-size: 100% 100%;
   /* background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%); */
 }
 .border-orange2 { 
   border: 1px solid #ffedd5; 
   background:url('@/assets/other/zsyz.jpg') no-repeat;
-  background-size: 100%;
+  background-size: 100% 100%;
   /* background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%); */
 }
 .card-desc {
@@ -993,7 +1075,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
@@ -1005,7 +1087,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 .qr-modal-content {
   background: #fff;
   border-radius: 8px;
-  width: 320px;
+  width: 520px;
   max-width: 90%;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   overflow: hidden;

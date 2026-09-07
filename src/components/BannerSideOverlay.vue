@@ -115,7 +115,7 @@ const closeIframe = () => {
 
 .iframe-modal-content {
   position: relative;
-  width: 90vw;
+  width: 90%;
   height: 85vh;
   background: #fff;
   border-radius: 8px;

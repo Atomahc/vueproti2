@@ -92,10 +92,12 @@ export const http = {
     return request<T>(url, { method: 'GET', params, ...options })
   },
   post: <T = any>(url: string, body?: any, options?: RequestOptions) => {
-    return request<T>(url, { method: 'POST', body: JSON.stringify(body), ...options })
+    const isSpecialBody = body instanceof FormData || body instanceof URLSearchParams
+    return request<T>(url, { method: 'POST', body: isSpecialBody ? body : JSON.stringify(body), ...options })
   },
   put: <T = any>(url: string, body?: any, options?: RequestOptions) => {
-    return request<T>(url, { method: 'PUT', body: JSON.stringify(body), ...options })
+    const isSpecialBody = body instanceof FormData || body instanceof URLSearchParams
+    return request<T>(url, { method: 'PUT', body: isSpecialBody ? body : JSON.stringify(body), ...options })
   },
   delete: <T = any>(url: string, params?: Record<string, any>, options?: RequestOptions) => {
     return request<T>(url, { method: 'DELETE', params, ...options })

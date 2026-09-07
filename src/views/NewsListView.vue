@@ -165,7 +165,7 @@ const goToDetail = (news: any) => {
 <style scoped>
 /* 主体布局 */
 .news-page-container {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   position: relative;
   display: flex;

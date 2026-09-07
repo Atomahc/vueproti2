@@ -135,7 +135,7 @@ const barOption1 = ref({
 
 const barOption2 = ref({
   tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-  legend: { data: ['1-6月', '去年同期'] },
+ 
   grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
   xAxis: { type: 'category', data: ['地区生产总值', '规上工业总产值', '规上工业增加值', '营利性服务业营收', '限上批发业销售额', '一般公共预算收入'] },
   yAxis: { type: 'value', name: '金额(亿元)' },

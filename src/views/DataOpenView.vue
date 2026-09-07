@@ -288,7 +288,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
 <style scoped>
 .data-open-container {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   position: relative;
   display: flex;

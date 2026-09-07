@@ -183,12 +183,12 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
     <main class="main-content">
       <TheNavBar activeId="cloud" />
       <BannerSideOverlay />
-      <div style="display: flex; gap: 20px; flex: 1; height: 100%;">
+    
         <div class="content-box" style="flex: 1; min-width: 0;">
-        <div
+        <!-- <div
           style="width:100%;height:100%;position: absolute;top:0px;left:0px;background: linear-gradient(180deg,#3544936b, rgb(8, 7, 50));">
         </div>
-        <!-- 上方板块：驿路法务通 -->
+  
         <div class="legal-block">
           <div class="block-header" style="justify-content: space-between;">
             <div class="header-text">
@@ -211,7 +211,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               </div>
             </div>
 
-            <!-- 律师预约表单 -->
+ 
             <div class="appointment-form-card"
               style="flex: 1; background: rgb(255, 255, 255);  padding: 16px 20px;  display: flex; flex-direction: column;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -267,7 +267,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
         </div>
 
-        <!-- 下方板块：驿路国际法务区 -->
+   
         <div class="legal-block mt-40">
 
           <div class="yilu-grid">
@@ -294,9 +294,11 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
             </div>
           </div>
 
-        </div>
+        </div> -->
 
-      </div>
+         <iframe src="http://sz.xjhegs.gov.cn:3003/fawu" style="width: 
+          100%; height: 100%; border: none; height: 648px;"></iframe>
+
   
       </div>
     </main>
@@ -333,13 +335,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 }
 
 .content-box {
-  background: url('http://sz.xjhegs.gov.cn:3003/assets/hero-background-Dyk7mO6K.png') no-repeat center center;
-  background-size: 100%;
-  padding: 24px;
-  min-height: 600px;
+  min-height: 648px;
   position: relative;
-  background-position: 0px 0px;
-  background-size: 100% 100%;
 }
 
 .legal-block {

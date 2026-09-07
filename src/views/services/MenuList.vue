@@ -119,7 +119,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
 <style scoped>
 .menu-list-container {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   position: relative;
   display: flex;
@@ -139,7 +139,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 .content-box {
   background: #ffffff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  height: 600px;
+  height: 648px;
+
   overflow: hidden;
   display: flex;
 }

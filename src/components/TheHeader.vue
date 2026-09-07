@@ -192,7 +192,7 @@ import TheHeaderMobile from './TheHeaderMobile.vue'
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 120px;
   box-sizing: border-box;
   z-index: 100;;
@@ -427,5 +427,14 @@ import TheHeaderMobile from './TheHeaderMobile.vue'
   width: 140px;
   height: auto;
   border-radius: 4px;
+}
+
+/* 宽屏设备 16:9 居中展示 */
+@media (min-aspect-ratio: 21/9) {
+  .header-wrapper {
+    width: calc(100vh * 21 / 9);
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
 </style>

@@ -34,7 +34,6 @@ const closeModal = () => {
 onMounted(() => {
   fetchCourses()
 })
-import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
 <template>
@@ -75,9 +74,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
         </div>
       </div>
     
-        <div style="width: 160px; position: relative; flex-shrink: 0; height: 600px;">
-          <BannerSideOverlay />
-        </div>
+
       </div>
     </main>
 
@@ -108,6 +105,13 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
             <h3>报名须知</h3>
             <div class="html-content" v-html="activeCourse.notice"></div>
           </div>
+          <div class="detail-section">
+            <h3>报名方式</h3>
+            <div class="enrollment-tip">
+              <p class="tip-text">温馨提示：本平台仅提供课程信息展示，课程报名、缴费请扫描下方二维码，跳转公众号完成操作。</p>
+              <img class="qrcode-img" src="@/assets/other/image.jpeg" alt="报名二维码" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -118,7 +122,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
 <style scoped>
 .youth-page-container {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   position: relative;
   display: flex;
@@ -344,6 +348,28 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   font-size: 14px;
   line-height: 1.6;
   color: #475569;
+}
+
+.enrollment-tip {
+  text-align: center;
+  background: #fff8f1;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #ffedd5;
+  margin-top: 12px;
+}
+
+.tip-text {
+  color: #ea580c;
+  font-size: 14px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.qrcode-img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
 }
 
 /* Fix inner img inside html-content */

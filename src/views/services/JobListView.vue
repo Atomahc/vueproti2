@@ -7,7 +7,7 @@ import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
 
 const route = useRoute()
-const activeTab = ref('zhongya') // 'zhongya' | 'laodao'
+const activeTab = ref('zhongya') // 'zhongya' | 'laodao' | 'serviceOrder'
 
 const jobList = ref<any[]>([])
 const total = ref(0)
@@ -31,8 +31,17 @@ const fetchList = async () => {
         jobList.value = res.data.list || []
         total.value = res.data.total || 0
       }
-    } else {
+    } else if (activeTab.value === 'laodao') {
       const res: any = await http.get('/api-loca/portal/job/page', {
+        page: currentPage.value,
+        limit: pageSize.value
+      })
+      if (res.code === 0 || String(res.code) === '0') {
+        jobList.value = res.data.list || []
+        total.value = res.data.total || 0
+      }
+    } else if (activeTab.value === 'serviceOrder') {
+      const res: any = await http.get('/api-loca/portal/service-order/page', {
         page: currentPage.value,
         limit: pageSize.value
       })
@@ -58,8 +67,13 @@ const openJobDetail = async (id: number) => {
       if (res.code === 0 || String(res.code) === '0') {
         jobDetail.value = res.data
       }
-    } else {
+    } else if (activeTab.value === 'laodao') {
       const res: any = await http.get(`/api-loca/portal/job/${id}`)
+      if (res.code === 0 || String(res.code) === '0') {
+        jobDetail.value = res.data
+      }
+    } else if (activeTab.value === 'serviceOrder') {
+      const res: any = await http.get(`/api-loca/portal/service-order/${id}`)
       if (res.code === 0 || String(res.code) === '0') {
         jobDetail.value = res.data
       }
@@ -96,15 +110,15 @@ const nextPage = () => {
 }
 
 onMounted(() => {
-  if (route.query.tab === 'laodao' || route.query.tab === 'zhongya') {
+  if (route.query.tab === 'laodao' || route.query.tab === 'zhongya' || route.query.tab === 'serviceOrder') {
     activeTab.value = route.query.tab as string
   }
   fetchList()
 })
 
 watch(() => route.query.tab, (newTab) => {
-  if (newTab === 'laodao' || newTab === 'zhongya') {
-    activeTab.value = newTab
+  if (newTab === 'laodao' || newTab === 'zhongya' || newTab === 'serviceOrder') {
+    activeTab.value = newTab as string
     currentPage.value = 1
     fetchList()
   }
@@ -113,23 +127,31 @@ watch(() => route.query.tab, (newTab) => {
 // Utilities
 const formatSalary = (job: any) => {
   if (activeTab.value === 'zhongya') {
+    if (job.salaryShow) return job.salaryShow
     if (job.minSalary != null && job.maxSalary != null) {
       return `${job.minSalary}-${job.maxSalary}`
     }
     return '面议'
-  } else {
+  } else if (activeTab.value === 'laodao') {
+    if (job.salaryShow) return job.salaryShow
     if (job.salaryMin != null && job.salaryMax != null) {
-      return `${job.salaryMin}-${job.salaryMax}`
+      return `${job.salaryMin}-${job.salaryMax}K`
     }
     return '面议'
+  } else if (activeTab.value === 'serviceOrder') {
+    return job.expectIncomeShow || job.priceShow || '面议'
   }
 }
 
 const getJobTitle = (job: any) => {
-  return activeTab.value === 'zhongya' ? job.title : job.positionName
+  if (activeTab.value === 'zhongya') return job.title
+  if (activeTab.value === 'laodao') return job.positionName
+  if (activeTab.value === 'serviceOrder') return job.serviceName
 }
 const getCompanyName = (job: any) => {
-  return activeTab.value === 'zhongya' ? (job.companyName || '未知企业') : (job.memberName || '未知商户')
+  if (activeTab.value === 'zhongya') return job.companyName || '未知企业'
+  if (activeTab.value === 'laodao') return job.memberName || '未知商户'
+  if (activeTab.value === 'serviceOrder') return '限时订单'
 }
 import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
@@ -156,29 +178,49 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
           >
             劳道智工
           </button>
+          <button 
+            :class="['tab-btn', { active: activeTab === 'serviceOrder' }]"
+            @click="handleTabSwitch('serviceOrder')"
+          >
+            劳道智工-限时订单
+          </button>
         </div>
 
         <!-- List -->
         <div class="job-list" v-if="!loading">
-          <div v-for="job in jobList" :key="job.id || job.jobId" class="job-card" @click="openJobDetail(job.id || job.jobId)">
+          <div v-for="job in jobList" :key="job.id || job.jobId || job.ssoId" class="job-card" @click="openJobDetail(job.id || job.jobId || job.ssoId)">
             <div class="job-main">
               <h3 class="job-title">{{ getJobTitle(job) }}</h3>
               <span class="job-salary">{{ formatSalary(job) }}</span>
             </div>
             <div class="job-tags" v-if="activeTab === 'zhongya'">
               <span class="tag" v-if="job.city">{{ job.city }}</span>
-              <span class="tag" v-if="job.experience">{{ job.experience }}年经验</span>
-              <span class="tag" v-if="job.education">{{ job.education }}学历</span>
+              <span class="tag" v-if="job.workLocation">{{ job.workLocation }}</span>
+              <span class="tag" v-if="job.experienceLabel">{{ job.experienceLabel }}</span>
+              <span class="tag" v-if="job.educationLabel">{{ job.educationLabel }}</span>
+              <span class="tag" v-if="job.workTypeLabel">{{ job.workTypeLabel }}</span>
+              <span class="tag" v-if="job.recruitsNumShow || job.recruitsNum != null">{{ job.recruitsNumShow || `招${job.recruitsNum}人` }}</span>
             </div>
              <div class="job-tags" v-if="activeTab === 'laodao'">
-              <span class="tag" v-if="job.jobKeywords">{{ job.jobKeywords }}</span>
+              <span class="tag" v-if="job.districtName || job.city">{{ job.districtName || job.city }}</span>
+              <span class="tag" v-if="job.experienceLabel">{{ job.experienceLabel }}</span>
+              <span class="tag" v-if="job.educationLabel">{{ job.educationLabel }}</span>
+              <span class="tag" v-if="job.jobTypeLabel">{{ job.jobTypeLabel }}</span>
+              <span class="tag" v-for="(tag, tIdx) in (job.welfareBenefits || []).slice(0, 3)" :key="'wf'+tIdx">{{ tag }}</span>
+              <span class="tag" v-for="(tag, tIdx) in (job.jobKeywords || '').split(',').filter(Boolean)" :key="'kw'+tIdx">{{ tag }}</span>
+            </div>
+            <div class="job-tags" v-if="activeTab === 'serviceOrder'">
+              <span class="tag" v-if="job.dateShow">{{ job.dateShow }}</span>
+              <span class="tag" v-if="job.timeShow">{{ job.timeShow }}</span>
+              <span class="tag" v-if="job.hoursShow">{{ job.hoursShow }}</span>
+              <span class="tag" v-if="job.statusLabel">{{ job.statusLabel }}</span>
             </div>
             <div class="job-footer">
               <span class="company-name">
-             
-                 {{ job.workAddress  || job.workLocation}}
+                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                 {{ job.workAddress  || job.workLocation || '地址不详' }}
               </span>
-              <span class="publish-time" v-if="job.createDate || job.publishTimeStr">{{ job.createDate || job.publishTimeStr }}</span>
+              <span class="publish-time" v-if="job.createDate || job.publishTimeStr || job.dateShow">{{ (job.createDate || job.publishTimeStr || job.dateShow).split(' ')[0] }}</span>
             </div>
           </div>
           
@@ -207,11 +249,22 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
           <h2 class="detail-title">{{ getJobTitle(jobDetail) }}</h2>
           <div class="detail-salary">{{ formatSalary(jobDetail) }}</div>
           
-          <div class="detail-section">
+          <div class="detail-section" v-if="activeTab !== 'serviceOrder'">
             <h3>职位描述</h3>
             <div class="detail-html" v-html="jobDetail.content || jobDetail.positionDescription || '暂无描述'"></div>
           </div>
           
+          <div class="detail-section" v-if="activeTab === 'zhongya'">
+            <h3>职位基本信息</h3>
+            <p>
+              <span v-if="jobDetail.city" style="margin-right: 15px;"><strong>城市:</strong> {{ jobDetail.city }}</span>
+              <span v-if="jobDetail.workLocation" style="margin-right: 15px;"><strong>工作地点:</strong> {{ jobDetail.workLocation }}</span>
+              <span v-if="jobDetail.experienceLabel" style="margin-right: 15px;"><strong>经验要求:</strong> {{ jobDetail.experienceLabel }}</span>
+              <span v-if="jobDetail.educationLabel" style="margin-right: 15px;"><strong>学历要求:</strong> {{ jobDetail.educationLabel }}</span>
+              <span v-if="jobDetail.workTypeLabel" style="margin-right: 15px;"><strong>工作类型:</strong> {{ jobDetail.workTypeLabel }}</span>
+              <span v-if="jobDetail.recruitsNumShow || jobDetail.recruitsNum != null" style="margin-right: 15px;"><strong>招聘人数:</strong> {{ jobDetail.recruitsNumShow || jobDetail.recruitsNum }}</span>
+            </p>
+          </div>
           <div class="detail-section" v-if="activeTab === 'zhongya' && jobDetail.benefits">
             <h3>福利待遇</h3>
             <p>{{ jobDetail.benefits }}</p>
@@ -220,9 +273,62 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
             <h3>技能要求</h3>
             <p>{{ jobDetail.skills }}</p>
           </div>
-          <div class="detail-section" v-if="activeTab === 'laodao' && jobDetail.jobKeywords">
+          <div class="detail-section" v-if="activeTab === 'laodao'">
+            <h3>职位基本信息</h3>
+            <p>
+              <span v-if="jobDetail.districtName || jobDetail.city" style="margin-right: 15px;"><strong>区域:</strong> {{ jobDetail.districtName || jobDetail.city }}</span>
+              <span v-if="jobDetail.experienceLabel" style="margin-right: 15px;"><strong>经验要求:</strong> {{ jobDetail.experienceLabel }}</span>
+              <span v-if="jobDetail.educationLabel" style="margin-right: 15px;"><strong>学历要求:</strong> {{ jobDetail.educationLabel }}</span>
+              <span v-if="jobDetail.jobTypeLabel" style="margin-right: 15px;"><strong>工作类型:</strong> {{ jobDetail.jobTypeLabel }}</span>
+              <span v-if="jobDetail.companyScaleLabel" style="margin-right: 15px;"><strong>公司规模:</strong> {{ jobDetail.companyScaleLabel }}</span>
+              <span v-if="jobDetail.financingStageLabel" style="margin-right: 15px;"><strong>融资阶段:</strong> {{ jobDetail.financingStageLabel }}</span>
+            </p>
+          </div>
+          <div class="detail-section" v-if="activeTab === 'laodao' && jobDetail.welfareBenefits && jobDetail.welfareBenefits.length > 0">
+            <h3>福利待遇</h3>
+            <p>
+              <span v-for="(tag, i) in jobDetail.welfareBenefits" :key="i" style="background: #f1f5f9; padding: 4px 10px; margin-right: 8px; border-radius: 4px; font-size: 13px;">{{ tag }}</span>
+            </p>
+          </div>
+          <div class="detail-section" v-if="activeTab === 'laodao'">
             <h3>职位关键词</h3>
-            <p>{{ jobDetail.jobKeywords }}</p>
+            <p>
+              <span v-for="(tag, i) in (jobDetail.jobKeywords || '').split(',').filter(Boolean)" :key="i" style="background: #f1f5f9; padding: 4px 10px; margin-right: 8px; border-radius: 4px; font-size: 13px;">{{ tag }}</span>
+              <span v-if="!jobDetail.jobKeywords">无</span>
+            </p>
+          </div>
+          <div class="detail-section" v-if="activeTab === 'laodao'">
+            <h3>工作地址</h3>
+            <p>{{ jobDetail.workAddress || '地址不详' }}</p>
+          </div>
+          <div class="detail-section" v-if="activeTab === 'laodao'">
+            <h3>联系信息</h3>
+            <p>
+              <span v-if="jobDetail.contactName" style="margin-right: 15px;"><strong>联系人:</strong> {{ jobDetail.contactName }}</span>
+              <span v-if="jobDetail.contactRate" style="margin-right: 15px;"><strong>回复率:</strong> 极高 ({{ jobDetail.contactRate.parsedValue || jobDetail.contactRate.source }})</span>
+            </p>
+          </div>
+          <div class="detail-section" v-if="activeTab === 'laodao'">
+            <h3>发布时间</h3>
+            <p>{{ jobDetail.publishTimeStr || jobDetail.createTimeStr || '不详' }}</p>
+          </div>
+
+          <div class="detail-section" v-if="activeTab === 'serviceOrder'">
+            <h3>订单基本信息</h3>
+            <p>
+              <span v-if="jobDetail.serviceDate" style="margin-right: 15px;"><strong>服务日期:</strong> {{ jobDetail.serviceDate }}</span>
+              <span v-if="jobDetail.startTimeShow" style="margin-right: 15px;"><strong>时间段:</strong> {{ jobDetail.startTimeShow }} - {{ jobDetail.endTimeShow }}</span>
+              <span v-if="jobDetail.serviceHours != null" style="margin-right: 15px;"><strong>服务时长:</strong> {{ jobDetail.serviceHours }}小时</span>
+              <span v-if="jobDetail.statusLabel || jobDetail.status != null" style="margin-right: 15px;"><strong>状态:</strong> {{ jobDetail.statusLabel || jobDetail.status }}</span>
+            </p>
+          </div>
+          <div class="detail-section" v-if="activeTab === 'serviceOrder'">
+            <h3>服务需求</h3>
+            <p>{{ jobDetail.serviceDemand || '暂无描述' }}</p>
+          </div>
+          <div class="detail-section" v-if="activeTab === 'serviceOrder'">
+            <h3>用工地址</h3>
+            <p>{{ jobDetail.workAddress || '地址不详' }}</p>
           </div>
           
         </div>
@@ -238,7 +344,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
 <style scoped>
 .job-list-page {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -400,7 +506,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(4px);
@@ -412,7 +518,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 .modal-content {
   background: #fff;
   width: 700px;
-  max-width: 90vw;
+  max-width: 90%;
   max-height: 85vh;
   border-radius: 12px;
   padding: 32px;

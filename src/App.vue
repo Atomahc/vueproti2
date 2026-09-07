@@ -61,7 +61,7 @@ onMounted(() => {
 html, body {
   margin: 0;
   padding: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   overflow-x: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -96,7 +96,7 @@ a {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   z-index: 0;
   overflow: hidden;
@@ -104,7 +104,7 @@ a {
 }
 
 .global-bg-img {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   object-fit: cover;
 }
@@ -153,5 +153,23 @@ a {
 .global-back-btn span {
   font-size: 12px;
   font-weight: 500;
+}
+
+/* 宽屏设备 16:9 居中展示，高度占满 */
+@media (min-aspect-ratio: 21/9) {
+  body{
+    background: #000;
+  }
+  .global-app-container {
+    width: calc(100vh * 21 / 9);
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+  }
+  .global-bg-img {
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>
