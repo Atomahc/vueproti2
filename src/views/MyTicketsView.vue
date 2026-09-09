@@ -200,7 +200,6 @@ onMounted(() => {
   background: #fff;
   min-height: 600px;
   padding: 24px;
-  border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 .content-container h2 {
