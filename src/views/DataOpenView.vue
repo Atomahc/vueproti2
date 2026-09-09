@@ -367,6 +367,12 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   gap: 20px;
 }
 
+@media screen and (max-width: 768px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .data-card {
   border-radius: 8px;
   padding: 20px;

@@ -305,4 +305,30 @@ onMounted(() => {
   color: #1e293b;
   margin-bottom: 10px;
 }
+
+@media screen and (max-width: 768px) {
+  .cards-grid-4, .cards-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .gov-charts-grid {
+    flex-direction: column !important;
+  }
+  .tabs {
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    font-size: 14px;
+  }
+  .board-content {
+    height: auto;
+    max-height: 600px;
+  }
+  .chart-container {
+    padding: 10px;
+  }
+  .data-board{
+    padding:10px;
+  }
+}
 </style>

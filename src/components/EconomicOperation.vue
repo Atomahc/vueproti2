@@ -256,4 +256,26 @@ const barOption3 = ref({
 .chart {
   height: 350px;
 }
+
+@media screen and (max-width: 768px) {
+  .top-indicators, .bottom-indicators {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .indicator-card {
+    flex: 0 0 calc(50% - 5px);
+    box-sizing: border-box;
+    padding: 10px;
+  }
+  .ind-value {
+    font-size: 20px;
+  }
+  .charts-row {
+    flex-direction: column;
+  }
+  .chart-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
 </style>
