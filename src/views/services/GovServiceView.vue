@@ -26,7 +26,7 @@ const defaultBgColors = ['#e6fcfc', '#e6f7ff', '#f0f5ff', '#f6ffed', '#fff7e6', 
 
 const fetchGovServices = async () => {
   try {
-    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'gov_service',
       platform: 'portal',
       userType: ''

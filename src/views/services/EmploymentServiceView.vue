@@ -38,7 +38,7 @@ const themes = ['red', 'orange', 'blue', 'cyan', 'green', 'purple']
 
 const fetchPublicOpinion = async () => {
   try {
-    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'public_opinion',
       platform: 'portal',
       userType: ''
@@ -87,7 +87,7 @@ const submitForm = async () => {
   }
   submitting.value = true
   try {
-    const res: any = await http.post('/api-loca/portal/complaint/direct/create', null, { params: formData.value })
+    const res: any = await http.post('/prod-api/portal/complaint/direct/create', null, { params: formData.value })
     if (res.code === 0 || String(res.code) === '0') {
       alert('提交成功')
       showModal.value = false

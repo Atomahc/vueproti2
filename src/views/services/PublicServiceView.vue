@@ -78,7 +78,7 @@ const submitSnapshotForm = async () => {
   }
   snapshotSubmitting.value = true
   try {
-    const res: any = await http.post('/api-loca/portal/complaint/snapshot/create', null, { params: snapshotForm.value })
+    const res: any = await http.post('/prod-api/portal/complaint/snapshot/create', null, { params: snapshotForm.value })
     if (res.code === 0 || String(res.code) === '0') {
       alert('提交成功')
       uploadedImages.value = []
@@ -117,7 +117,7 @@ const closeModal = () => {
 
 const fetchConvenience = async () => {
   try {
-    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'convenience',
       platform: 'portal',
       userType: ''
@@ -162,7 +162,7 @@ const communities = ref<any[]>([])
 
 const fetchDicts = async () => {
   try {
-    const res: any = await http.get('/api-loca/sys/dict/data', { types: 'portal_complaint_report_type,portal_complaint_community' })
+    const res: any = await http.get('/prod-api/sys/dict/data', { types: 'portal_complaint_report_type,portal_complaint_community' })
     if (res.code === 0 && Array.isArray(res.data) && res.data.length >= 2) {
       reportTypes.value = res.data[0] || []
       communities.value = res.data[1] || []
@@ -180,12 +180,12 @@ const fetchDicts = async () => {
 
 const fetchJobs = async () => {
   try {
-    const resLaodao: any = await http.get('/api-loca/portal/job/page', { page: 1, limit: 2, jobType: 1 })
+    const resLaodao: any = await http.get('/prod-api/portal/job/page', { page: 1, limit: 2, jobType: 1 })
     if (resLaodao.code === 0 || String(resLaodao.code) === '0') {
       laodaoJobs.value = resLaodao.data.list || []
     }
     
-    const resZhongya: any = await http.get('/api-loca/portal/recruitment/page', { page: 1, limit: 2, workType: 1 })
+    const resZhongya: any = await http.get('/prod-api/portal/recruitment/page', { page: 1, limit: 2, workType: 1 })
     if (resZhongya.code === 0 || String(resZhongya.code) === '0') {
       zhongyaJobs.value = resZhongya.data.list || []
     }

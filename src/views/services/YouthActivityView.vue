@@ -10,7 +10,7 @@ const loading = ref(true)
 
 const fetchCourses = async () => {
   try {
-    const res: any = await http.get('/api-loca/portal/course/page')
+    const res: any = await http.get('/prod-api/portal/course/page')
     if (res.code === 0 && res.data && res.data.list) {
       courses.value = res.data.list
     }

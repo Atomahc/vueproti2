@@ -18,7 +18,7 @@ const intlCards = ref<any[]>([])
 
 const fetchCloudLegal = async () => {
   try {
-    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'cloud_legal',
       platform: 'portal',
       userType: ''
@@ -106,7 +106,7 @@ const serviceTypeList = ref<any[]>([])
 
 const fetchFormOptions = async () => {
   try {
-    const res: any = await http.get('/api-loca/fawu/lawyer/page', { page: 1, limit: 100 })
+    const res: any = await http.get('/prod-api/fawu/lawyer/page', { page: 1, limit: 100 })
     if (res.code === 0 && res.data && res.data.list) {
       lawyerList.value = res.data.list
     }
@@ -115,7 +115,7 @@ const fetchFormOptions = async () => {
   }
   
   try {
-    const dictRes: any = await http.get('/api-loca/sys/dict/data', { types: 'fawu_service_type' })
+    const dictRes: any = await http.get('/prod-api/sys/dict/data', { types: 'fawu_service_type' })
     if (dictRes.code === 0 && dictRes.data) {
       serviceTypeList.value = Array.isArray(dictRes.data[0]) ? dictRes.data[0] : dictRes.data
       if (serviceTypeList.value.length > 0) {
@@ -154,7 +154,7 @@ const submitAppointment = async () => {
   }
   
   try {
-    const res: any = await http.post('/api-loca/fawu/appointment', payload)
+    const res: any = await http.post('/prod-api/fawu/appointment', payload)
     if (res.code === 0 || res.code === '0' || res.status === 'ok') {
       alert('预约提交成功！')
       appointmentForm.value = {
@@ -195,7 +195,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <h2>{{ yiluHeader.name || '云上法务 让每一次法律求助都有清晰路径' }}</h2>
               <p>{{ yiluHeader.remark || '基础法律服务 · 普惠便民' }}</p>
             </div>
-            <a href="http://sz.xjhegs.gov.cn:3003/fawu" target="_blank" style="color: #fff; font-size: 14px; text-decoration: none; cursor: pointer;">查看更多 &gt;</a>
+            <a href="https://sz.xjhegs.gov.cn:3003/fawu" target="_blank" style="color: #fff; font-size: 14px; text-decoration: none; cursor: pointer;">查看更多 &gt;</a>
           </div>
           <div class="middle-flex-row" style="display: flex; justify-content: space-between; align-items: stretch; gap: 24px;">
             <div class="intl-grid">
@@ -296,7 +296,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
         </div> -->
 
-         <iframe src="http://sz.xjhegs.gov.cn:3003/fawu" style="width: 
+         <iframe src="https://sz.xjhegs.gov.cn:3003/fawu" style="width: 
           100%; height: 100%; border: none; height: 648px;"></iframe>
 
   

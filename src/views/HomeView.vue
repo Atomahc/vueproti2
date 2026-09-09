@@ -79,7 +79,7 @@ const bannerList = ref<any[]>([])
 onMounted(async () => {
   fetchNews(newsTab.value)
   try {
-    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'home',
       platform: 'portal',
       userType: ''
@@ -101,7 +101,7 @@ onMounted(async () => {
   }
 
   try {
-    const res: any = await http.get('/api-loca/portal/section/page', {
+    const res: any = await http.get('/prod-api/portal/section/page', {
       page: 1,
       limit: 10,
       sectionType: 'banner',

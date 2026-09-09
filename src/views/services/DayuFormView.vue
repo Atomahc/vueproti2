@@ -58,7 +58,6 @@ const fetchForm = async () => {
         { id: 27, name: '索伦社区' },
         { id: 57, name: '红桥社区' },
         { id: 55, name: '英塔尔社区' },
-        { id: 25, name: '霍尔果斯智慧在线' }
       ]
       
       // Initialize form data

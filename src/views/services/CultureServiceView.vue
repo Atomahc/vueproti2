@@ -14,7 +14,7 @@ const pageTitle = ref('文旅服务')
 
 const fetchConvenience = async () => {
   try {
-    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'convenience',
       platform: 'portal',
       userType: ''

@@ -120,7 +120,7 @@ const handleMenuClick = (menuId: string) => {
 
 const fetchDataOpen = async () => {
   try {
-    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'data_open',
       platform: 'portal',
       userType: ''

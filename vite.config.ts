@@ -37,11 +37,11 @@ export default defineConfig(({ mode }) => {
             })
           }
         },
-        '/api-loca': {
+        '/prod-api': {
           target: env.VITE_API_LOCAL_PREFIX ,
           changeOrigin: true,
           autoRewrite: true,
-          rewrite: (path) => path.replace(/^\/api-loca/, ''),
+          rewrite: (path) => path.replace(/^\/prod-api/, ''),
           configure: (proxy, options) => {
             proxy.on('proxyReq', (proxyReq) => {
               if (options.target && typeof options.target === 'string') {

@@ -69,7 +69,7 @@ onMounted(async () => {
   if (token) {
     isLoggedIn.value = true
     try {
-      const res: any = await http.get('/api-loca/member/auth/user-info')
+      const res: any = await http.get('/prod-api/member/auth/user-info')
       const userData = res.data || res
 
       if (userData) {

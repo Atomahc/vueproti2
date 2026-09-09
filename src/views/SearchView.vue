@@ -21,7 +21,7 @@ const fetchSearch = async () => {
     return
   }
   try {
-    const res: any = await http.get('/api-loca/portal/search', {
+    const res: any = await http.get('/prod-api/portal/search', {
       keyword: keyword.value,
       platform: '',
       limit: 10,

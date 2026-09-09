@@ -15,7 +15,7 @@ const activeIndex = ref<number>(0)
 
 const fetchCrossBorder = async () => {
   try {
-    const res: any = await http.get('/api-loca/ncmanagement/class/zones-tree', {
+    const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'cross_border',
       platform: 'portal',
       userType: ''
@@ -112,7 +112,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <div v-for="(item, i) in passServices.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
                 <span class="box-title" style="color: #005562;">{{ item.name }}</span>
                 <div class="img-wrapper">
-                  <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
+                  <img style="height: 144px;" :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
                   <button class="arrow-btn lightblue" >&rarr;</button>
                 </div>
               </div>
@@ -302,7 +302,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   display:flex;
   flex-wrap:wrap;
   gap:10px;
-  justify-content: flex-start;
+  justify-content: space-between;
 }
 .title-with-square{
   margin-right: 10px;

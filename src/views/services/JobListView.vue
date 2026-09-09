@@ -23,7 +23,7 @@ const fetchList = async () => {
   loading.value = true
   try {
     if (activeTab.value === 'zhongya') {
-      const res: any = await http.get('/api-loca/portal/recruitment/page', {
+      const res: any = await http.get('/prod-api/portal/recruitment/page', {
         page: currentPage.value,
         limit: pageSize.value
       })
@@ -32,7 +32,7 @@ const fetchList = async () => {
         total.value = res.data.total || 0
       }
     } else if (activeTab.value === 'laodao') {
-      const res: any = await http.get('/api-loca/portal/job/page', {
+      const res: any = await http.get('/prod-api/portal/job/page', {
         page: currentPage.value,
         limit: pageSize.value
       })
@@ -41,7 +41,7 @@ const fetchList = async () => {
         total.value = res.data.total || 0
       }
     } else if (activeTab.value === 'serviceOrder') {
-      const res: any = await http.get('/api-loca/portal/service-order/page', {
+      const res: any = await http.get('/prod-api/portal/service-order/page', {
         page: currentPage.value,
         limit: pageSize.value
       })
@@ -63,17 +63,17 @@ const openJobDetail = async (id: number) => {
   jobDetail.value = null
   try {
     if (activeTab.value === 'zhongya') {
-      const res: any = await http.get(`/api-loca/portal/recruitment/${id}`)
+      const res: any = await http.get(`/prod-api/portal/recruitment/${id}`)
       if (res.code === 0 || String(res.code) === '0') {
         jobDetail.value = res.data
       }
     } else if (activeTab.value === 'laodao') {
-      const res: any = await http.get(`/api-loca/portal/job/${id}`)
+      const res: any = await http.get(`/prod-api/portal/job/${id}`)
       if (res.code === 0 || String(res.code) === '0') {
         jobDetail.value = res.data
       }
     } else if (activeTab.value === 'serviceOrder') {
-      const res: any = await http.get(`/api-loca/portal/service-order/${id}`)
+      const res: any = await http.get(`/prod-api/portal/service-order/${id}`)
       if (res.code === 0 || String(res.code) === '0') {
         jobDetail.value = res.data
       }
@@ -153,6 +153,35 @@ const getCompanyName = (job: any) => {
   if (activeTab.value === 'laodao') return job.memberName || '未知商户'
   if (activeTab.value === 'serviceOrder') return '限时订单'
 }
+
+const getJobTags = (job: any) => {
+  const tags: string[] = []
+  if (activeTab.value === 'zhongya') {
+    if (job.city) tags.push(job.city)
+    if (job.workLocation) tags.push(job.workLocation)
+    if (job.experienceLabel) tags.push(job.experienceLabel)
+    if (job.educationLabel) tags.push(job.educationLabel)
+    if (job.workTypeLabel) tags.push(job.workTypeLabel)
+    if (job.recruitsNumShow || job.recruitsNum != null) tags.push(job.recruitsNumShow || `招${job.recruitsNum}人`)
+  } else if (activeTab.value === 'laodao') {
+    if (job.districtName || job.city) tags.push(job.districtName || job.city)
+    if (job.experienceLabel) tags.push(job.experienceLabel)
+    if (job.educationLabel) tags.push(job.educationLabel)
+    if (job.jobTypeLabel) tags.push(job.jobTypeLabel)
+    if (job.welfareBenefits && job.welfareBenefits.length) {
+      tags.push(...job.welfareBenefits)
+    }
+    if (job.jobKeywords) {
+      tags.push(...job.jobKeywords.split(',').filter(Boolean))
+    }
+  } else if (activeTab.value === 'serviceOrder') {
+    if (job.dateShow) tags.push(job.dateShow)
+    if (job.timeShow) tags.push(job.timeShow)
+    if (job.hoursShow) tags.push(job.hoursShow)
+    if (job.statusLabel) tags.push(job.statusLabel)
+  }
+  return tags.slice(0, 5)
+}
 import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </script>
 
@@ -193,27 +222,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <h3 class="job-title">{{ getJobTitle(job) }}</h3>
               <span class="job-salary">{{ formatSalary(job) }}</span>
             </div>
-            <div class="job-tags" v-if="activeTab === 'zhongya'">
-              <span class="tag" v-if="job.city">{{ job.city }}</span>
-              <span class="tag" v-if="job.workLocation">{{ job.workLocation }}</span>
-              <span class="tag" v-if="job.experienceLabel">{{ job.experienceLabel }}</span>
-              <span class="tag" v-if="job.educationLabel">{{ job.educationLabel }}</span>
-              <span class="tag" v-if="job.workTypeLabel">{{ job.workTypeLabel }}</span>
-              <span class="tag" v-if="job.recruitsNumShow || job.recruitsNum != null">{{ job.recruitsNumShow || `招${job.recruitsNum}人` }}</span>
-            </div>
-             <div class="job-tags" v-if="activeTab === 'laodao'">
-              <span class="tag" v-if="job.districtName || job.city">{{ job.districtName || job.city }}</span>
-              <span class="tag" v-if="job.experienceLabel">{{ job.experienceLabel }}</span>
-              <span class="tag" v-if="job.educationLabel">{{ job.educationLabel }}</span>
-              <span class="tag" v-if="job.jobTypeLabel">{{ job.jobTypeLabel }}</span>
-              <span class="tag" v-for="(tag, tIdx) in (job.welfareBenefits || []).slice(0, 3)" :key="'wf'+tIdx">{{ tag }}</span>
-              <span class="tag" v-for="(tag, tIdx) in (job.jobKeywords || '').split(',').filter(Boolean)" :key="'kw'+tIdx">{{ tag }}</span>
-            </div>
-            <div class="job-tags" v-if="activeTab === 'serviceOrder'">
-              <span class="tag" v-if="job.dateShow">{{ job.dateShow }}</span>
-              <span class="tag" v-if="job.timeShow">{{ job.timeShow }}</span>
-              <span class="tag" v-if="job.hoursShow">{{ job.hoursShow }}</span>
-              <span class="tag" v-if="job.statusLabel">{{ job.statusLabel }}</span>
+            <div class="job-tags">
+              <span class="tag" v-for="(tag, tIdx) in getJobTags(job)" :key="tIdx">{{ tag }}</span>
             </div>
             <div class="job-footer">
               <span class="company-name">
@@ -305,7 +315,6 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
             <h3>联系信息</h3>
             <p>
               <span v-if="jobDetail.contactName" style="margin-right: 15px;"><strong>联系人:</strong> {{ jobDetail.contactName }}</span>
-              <span v-if="jobDetail.contactRate" style="margin-right: 15px;"><strong>回复率:</strong> 极高 ({{ jobDetail.contactRate.parsedValue || jobDetail.contactRate.source }})</span>
             </p>
           </div>
           <div class="detail-section" v-if="activeTab === 'laodao'">

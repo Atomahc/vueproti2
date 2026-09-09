@@ -34,7 +34,7 @@ const fetchArticle = async () => {
 
   // 2. 根据 id 使用新接口获取完整最新渲染数据
   try {
-    const json = await http.get(`/api-loca/portal/article/${nameId}`)
+    const json = await http.get(`/prod-api/portal/article/${nameId}`)
     if (json.code === 0 && json.data) {
       const data = json.data
       let dateStr = data.publishTime || 'N/A'
