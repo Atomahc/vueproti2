@@ -131,7 +131,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
         <div class="left-form-section" style="flex: 0 0 350px;">
           <div style=" border-radius: 4px; overflow: hidden;padding:20px 20px 0px; height: 100%;">
             <div class="form-header" style=" padding: 5px 10px; background:linear-gradient(90deg, rgba(0, 180, 120, 0.5) 0%, rgba(255, 255, 255, 0) 100%), rgba(255, 255, 255, 0);">
-              <h3 style="margin: 0; font-size: 16px; color: #047857; font-weight: 600;">创建诉求直通车工单</h3>
+              <h3 style="margin: 0; font-size: 16px; color: #047857; font-weight: 600;">创建诉求直通</h3>
             </div>
             <form @submit.prevent="submitForm" class="complaint-form" style="padding: 20px 0px 0px;">
               

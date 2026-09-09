@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const showIframe = ref(false)
 const iframeUrl = ref('')
 
@@ -16,8 +18,9 @@ const closeIframe = () => {
 </script>
 
 <template>
+  <template v-if="route.path === '/'">
   <div class="banner-side-overlay">
-    <div class="vr-card" @click="openIframe('http://sz.xjhegs.gov.cn:3004')">
+    <div class="vr-card" @click="openIframe('https://sz.xjhegs.gov.cn:3004')">
       <div class="vr-icon-box">
         <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
           <rect x="2" y="6" width="20" height="12" rx="3"></rect>
@@ -27,6 +30,7 @@ const closeIframe = () => {
       </div>
       <div class="vr-text">
         <h3>丝路长卷</h3>
+        <p> 霍尔果斯·数字城市名片</p>
       </div>
     </div>
 
@@ -40,6 +44,7 @@ const closeIframe = () => {
       </div>
       <div class="vr-text">
         <h3>VR全景游</h3>
+        <p>口岸/合作中心/景区</p>
       </div>
     </div>
   </div>
@@ -52,20 +57,25 @@ const closeIframe = () => {
       </div>
     </div>
   </Teleport>
+  </template>
 </template>
 
 <style scoped>
 .banner-side-overlay {
   position: absolute;
-  right:-60px;
-  top: 300px;
-  width: 60px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 160px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
   z-index: 3;
+  padding: 8px;
 }
 
 .vr-card {
+  flex: 1;
   background: rgba(0,0,0,0.3);
   backdrop-filter: blur(10px);
   color: #ffffff;
@@ -145,5 +155,18 @@ const closeIframe = () => {
 
 .modal-close-btn:hover {
   background: rgba(0,0,0,0.8);
+}
+
+@media screen and (max-width: 768px) {
+  .vr-card{
+    padding: 8px !important;
+  }
+  .vr-icon-box{
+    margin-bottom: 0px;
+  }
+  .vr-text h3{
+    margin:0px;
+    font-size: 14px !important;
+  }
 }
 </style>

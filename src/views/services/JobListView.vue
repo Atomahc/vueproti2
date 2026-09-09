@@ -7,6 +7,7 @@ import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
 
 const route = useRoute()
+const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
 const activeTab = ref('zhongya') // 'zhongya' | 'laodao' | 'serviceOrder'
 
 const jobList = ref<any[]>([])
@@ -18,6 +19,28 @@ const loading = ref(false)
 const activeJobId = ref<number | null>(null)
 const jobDetail = ref<any>(null)
 const modalVisible = ref(false)
+
+const laodaoInfo = ref<any>({})
+const zhongyaInfo = ref<any>({})
+
+const fetchConvenience = async () => {
+  try {
+    const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
+      zoneType: 'convenience',
+      platform: 'portal',
+      userType: ''
+    })
+    if (res.code === 0 && res.data && res.data.convenience) {
+      const list = res.data.convenience
+      const ld = list.find((item: any) => item.name === '劳道智工')
+      if (ld) laodaoInfo.value = ld
+      const zy = list.find((item: any) => item.name?.includes('中亚职通桥'))
+      if (zy) zhongyaInfo.value = zy
+    }
+  } catch(e) {
+    console.error('Failed to fetch convenience services', e)
+  }
+}
 
 const fetchList = async () => {
   loading.value = true
@@ -113,6 +136,7 @@ onMounted(() => {
   if (route.query.tab === 'laodao' || route.query.tab === 'zhongya' || route.query.tab === 'serviceOrder') {
     activeTab.value = route.query.tab as string
   }
+  fetchConvenience()
   fetchList()
 })
 
@@ -338,6 +362,14 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
           <div class="detail-section" v-if="activeTab === 'serviceOrder'">
             <h3>用工地址</h3>
             <p>{{ jobDetail.workAddress || '地址不详' }}</p>
+          </div>
+          
+          <div class="detail-qrcode-wrapper">
+            <div class="qrcode-content">
+              <div class="qrcode-hint">温馨提示：本平台仅提供信息展示，招聘咨询请扫描下方二维码，跳转小程序完成操作。</div>
+              <img v-if="(activeTab === 'laodao' || activeTab === 'serviceOrder') && laodaoInfo.qrcode" :src="laodaoInfo.qrcode.startsWith('http') ? laodaoInfo.qrcode : minioPrefix + laodaoInfo.qrcode" alt="劳道智工" class="qrcode-img" />
+              <img v-if="activeTab === 'zhongya' && zhongyaInfo.qrcode" :src="zhongyaInfo.qrcode.startsWith('http') ? zhongyaInfo.qrcode : minioPrefix + zhongyaInfo.qrcode" alt="中亚职通桥" class="qrcode-img" />
+            </div>
           </div>
           
         </div>
@@ -575,5 +607,33 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   color: #475569;
   line-height: 1.7;
   font-size: 15px;
+}
+.detail-qrcode-wrapper {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px dashed #e2e8f0;
+}
+.qrcode-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 280px;
+  text-align: center;
+}
+.qrcode-hint {
+  font-size: 13px;
+  color: #ef4444;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.qrcode-img {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  border: 1px solid #e2e8f0;
+  padding: 4px;
+  border-radius: 4px;
 }
 </style>

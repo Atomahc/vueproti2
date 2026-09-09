@@ -9,7 +9,8 @@ import TheNavBar from '../components/TheNavBar.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import 'swiper/css'
 import 'swiper/css/pagination'
-import { Pagination, Autoplay } from 'swiper/modules'
+import 'swiper/css/effect-fade'
+import { Pagination, Autoplay, EffectFade } from 'swiper/modules'
 import BannerSideOverlay from '../components/BannerSideOverlay.vue'
 
 const router = useRouter()
@@ -74,7 +75,7 @@ watch(newsTab, (newTab) => {
 
 const quickServices = ref<any[]>([])
 
-const swiperModules = [Pagination, Autoplay]
+const swiperModules = [Pagination, Autoplay, EffectFade]
 const bannerList = ref<any[]>([])
 onMounted(async () => {
   fetchNews(newsTab.value)
@@ -137,7 +138,6 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
     <main class="main-content">
       <!-- 提取出的蓝色半透明主导航栏组件 -->
       <TheNavBar activeId="home" />
-      <BannerSideOverlay />
    
 
       <div class="hero-box">
@@ -149,6 +149,8 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
             <swiper
               v-if="bannerList.length > 0"
               :modules="swiperModules"
+              effect="fade"
+              :fadeEffect="{ crossFade: true }"
               :pagination="{ clickable: true }"
               :autoplay="{ delay: 5000, disableOnInteraction: false }"
               :loop="true"
@@ -161,9 +163,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
                 </div>
               </swiper-slide>
             </swiper>
-            
-
-
+            <BannerSideOverlay />
           </div>
         </div>
 
@@ -341,11 +341,12 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 
 .banner-title-overlay {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  bottom: 8px;
+  left: 8px;
+  width: calc(100% - 184px);
   padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
   color: #fff;
   font-size: 18px;
   box-sizing: border-box;

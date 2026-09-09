@@ -296,7 +296,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
         </div> -->
 
-         <iframe src="https://sz.xjhegs.gov.cn:3003/fawu" style="width: 
+         <iframe src="https://sz.xjhegs.gov.cn:3003/fawu?ifram=1" style="width: 
           100%; height: 100%; border: none; height: 648px;"></iframe>
 
   

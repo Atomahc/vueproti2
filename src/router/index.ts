@@ -122,6 +122,11 @@ const router = createRouter({
       name: 'service-dayu-form',
       component: () => import('../views/services/DayuFormView.vue'),
     },
+    {
+      path: '/my-tickets',
+      name: 'my-tickets',
+      component: () => import('../views/MyTicketsView.vue'),
+    },
   ],
 })
 

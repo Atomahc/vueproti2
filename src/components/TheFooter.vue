@@ -6,19 +6,21 @@ import TheFooterMobile from './TheFooterMobile.vue'
   <TheFooterMobile class="mobile-only-comp" />
   <footer class="footer-wrapper desktop-only-comp">
     <div class="footer-content">
-      <div class="footer-links">
-        <span class="footer-label">友情链接：</span>
-        <a href="http://www.xjhegs.gov.cn/" target="_blank">霍尔果斯市人民政府</a>
-        <a href="http://urumqi.customs.gov.cn/" target="_blank">乌鲁木齐海关</a>
-        <a href="https://www.horgoseport.com/#/" target="_blank">云港·霍数通</a>
-        <a href="https://hegsrcjt.com/" target="_blank">霍尔果斯人才集团</a>
-      </div>
       <div class="banner-inner">
         <div class="banner-left">
           <div class="banner-text">主办：霍尔果斯市人民政府办公室 &nbsp;&nbsp; 关于我们 | 版权保护 | 隐私声明 | 联系我们</div>
-          <div class="banner-text">服务热线：0999-8795893 &nbsp;&nbsp; 地址：新疆伊犁州霍尔果斯</div>
+          <div class="banner-text">服务热线：0999-8795893 &nbsp;&nbsp; 地址：新疆伊犁州霍尔果斯 &nbsp;&nbsp; 新ICP备17002354号-4</div>
         </div>
-        <span class="banner-text right-text">数字霍尔果斯 · 全域统一综合服务门户</span>
+        <div class="banner-right">
+          <span class="banner-text right-text">数字霍尔果斯 · 全域统一综合服务门户</span>
+          <div class="footer-links">
+            <span class="footer-label">友情链接：</span>
+            <a href="http://www.xjhegs.gov.cn/" target="_blank">霍尔果斯市人民政府</a>
+            <a href="http://urumqi.customs.gov.cn/" target="_blank">乌鲁木齐海关</a>
+            <a href="https://www.horgoseport.com/#/" target="_blank">云港·霍数通</a>
+            <a href="https://hegsrcjt.com/" target="_blank">霍尔果斯人才集团</a>
+          </div>
+        </div>
       </div>
     </div>
   </footer>
@@ -86,6 +88,13 @@ import TheFooterMobile from './TheFooterMobile.vue'
 .banner-left {
   display: flex;
   flex-direction: column;
+  gap: 6px;
+}
+
+.banner-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 6px;
 }
 

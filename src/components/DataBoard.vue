@@ -3,7 +3,7 @@ import { ref, onMounted, watch, nextTick, shallowRef } from 'vue'
 import * as echarts from 'echarts'
 import EconomicOperation from './EconomicOperation.vue'
 
-const activeTab = ref('trade') // 'trade' or 'governance' or 'economy'
+const activeTab = ref('economy') // 'trade' or 'governance' or 'economy'
 
 const tradeChartRef = ref<HTMLElement | null>(null)
 const govBarChartRef = ref<HTMLElement | null>(null)
@@ -103,15 +103,16 @@ onMounted(() => {
   <div class="data-board">
     <div class="board-header">
       <div class="tabs">
+        <div class="tab" :class="{ active: activeTab === 'economy' }" @click="switchTab('economy')">
+          <div class="tab-indicator"></div>经济运行情况
+        </div>
         <div class="tab" :class="{ active: activeTab === 'trade' }" @click="switchTab('trade')">
           <div class="tab-indicator"></div>口岸贸易数据
         </div>
         <div class="tab" :class="{ active: activeTab === 'governance' }" @click="switchTab('governance')">
           <div class="tab-indicator"></div>城市治理数据
         </div>
-        <div class="tab" :class="{ active: activeTab === 'economy' }" @click="switchTab('economy')">
-          <div class="tab-indicator"></div>经济运行情况
-        </div>
+      
       </div>
     </div>
     

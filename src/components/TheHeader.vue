@@ -60,7 +60,7 @@ onMounted(async () => {
       const userData = res.data || res
 
       if (userData) {
-        const name = userData.name || userData.username || userData.memberName || userData.realName
+        const name = userData.nickName || userData.name || userData.username || userData.memberName || userData.realName
         if (name) {
           userInfo.value.name = name
         }
@@ -142,8 +142,8 @@ import TheHeaderMobile from './TheHeaderMobile.vue'
             <div class="user-profile user-dropdown">
               <span class="username" @click.stop="toggleDropdown">{{ userInfo.name }}</span>
               <div class="dropdown-content" :class="{ 'show': showDropdown }" @click.stop>
-                <router-link to="/certify?type=enterprise">{{ t('header.enterpriseCert') }}</router-link>
-                <router-link to="/certify?type=gov">{{ t('header.govCert') }}</router-link>
+                <router-link to="https://sz.xjhegs.gov.cn:3003/profile?ifram=1">个人中心</router-link>
+                <router-link to="/my-tickets">我的工单</router-link>
                 <a href="#" class="logout-btn" @click.prevent="handleLogout">{{ t('header.logout') }}</a>
               </div>
             </div>
