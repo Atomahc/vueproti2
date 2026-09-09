@@ -142,7 +142,7 @@ import TheHeaderMobile from './TheHeaderMobile.vue'
             <div class="user-profile user-dropdown">
               <span class="username" @click.stop="toggleDropdown">{{ userInfo.name }}</span>
               <div class="dropdown-content" :class="{ 'show': showDropdown }" @click.stop>
-                <router-link to="https://sz.xjhegs.gov.cn:3003/profile?ifram=1">个人中心</router-link>
+                <a href="https://sz.xjhegs.gov.cn:3003/profile" target="_blank">个人中心</a>
                 <router-link to="/my-tickets">我的工单</router-link>
                 <a href="#" class="logout-btn" @click.prevent="handleLogout">{{ t('header.logout') }}</a>
               </div>

@@ -18,13 +18,27 @@ const initTradeChart = () => {
   if (!tradeChart) tradeChart = echarts.init(tradeChartRef.value)
   const option = {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    legend: { show: false },
-    grid: { left: '3%', right: '4%', bottom: '3%', top:'6%'},
-    xAxis: { type: 'category',  },
+    legend: { show: true, right: '4%', top: 0 },
+    grid: { left: '3%', right: '4%', bottom: '3%', top:'18%', containLabel: true },
+    xAxis: { type: 'category', data: ['重车', '商品车'] },
     yAxis: { type: 'value' },
     series: [
-      { name: '放行数量', type: 'bar', barWidth: 30, data: [38928, 22731], itemStyle: { color: '#2563eb' } },
-      { name: '预约数量', type: 'bar', barWidth: 30, data: [38928, 22731], itemStyle: { color: '#93c5fd' } }
+      { 
+        name: '放行数量', 
+        type: 'bar', 
+        barWidth: 30, 
+        data: [38928, 22731], 
+        itemStyle: { color: '#2563eb' },
+        label: { show: true, position: 'top', color: '#2563eb', formatter: (params) => params.value.toLocaleString() }
+      },
+      { 
+        name: '预约数量', 
+        type: 'bar', 
+        barWidth: 30, 
+        data: [38928, 22731], 
+        itemStyle: { color: '#93c5fd' },
+        label: { show: true, position: 'top', color: '#93c5fd', formatter: (params) => params.value.toLocaleString() }
+      }
     ]
   }
   tradeChart.setOption(option)
@@ -84,8 +98,15 @@ const initGovCharts = () => {
 const switchTab = (tab: string) => {
   activeTab.value = tab
   nextTick(() => {
-    if (tab === 'trade') initTradeChart()
-    if (tab === 'governance') initGovCharts()
+    if (tab === 'trade') {
+      initTradeChart()
+      if (tradeChart) tradeChart.resize()
+    }
+    if (tab === 'governance') {
+      initGovCharts()
+      if (govBarChart) govBarChart.resize()
+      if (govPieChart) govPieChart.resize()
+    }
   })
 }
 
