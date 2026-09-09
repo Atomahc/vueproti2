@@ -985,7 +985,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 /* 5列 Icon 布局 */
 .services-icon-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, 1fr) !important;
   gap: 16px 0px;
   margin-top: 10px;
 }
@@ -1150,5 +1150,10 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   width: 140px;
   height: 140px;
   object-fit: contain;
+}
+@media screen and (max-width: 768px) {
+  .shoot-textarea-inner{
+    width: 200px;
+  }
 }
 </style>

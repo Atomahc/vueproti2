@@ -29,7 +29,7 @@ const fetchServiceList = async (id: string) => {
       isapi: 'true'
     })
     
-    let data = res.data || res;
+    const data = res.data || res;
     if (data && data.forms) {
       formsList.value = Object.values(data.forms)
       navList.value = Object.values(data.navlist || {})

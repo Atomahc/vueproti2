@@ -462,7 +462,8 @@ h3 {
 @media screen and (max-width: 768px) {
   .image-cards-grid{
     font-size: 12px !important;
-    gap: 12px !important;
+    gap: 8px !important;
+    justify-content: flex-start;
   }
   .arrow-btn{
     padding: 5px !important;
@@ -483,7 +484,25 @@ h3 {
     padding:10px;
   }
 }
+.card-title-header{
+  margin-bottom:20px !important;
+}
 
+.yellow-tint-card .image-item-box{
+  width:31%
+}
+.yellow-tint-card .img-wrapper img{
+  height:130px !important;
+}
+.grid-5 .image-item-box{
+  width: calc(33% - 10px) !important;
+}
+.blue-tint-card .image-item-box{
+  width: calc(51% - 10px) !important;
+}
+.cyan-tint-card .img-wrapper img{
+  height:130px !important;
+}
 .red-tint-card {
   background: linear-gradient(180deg, rgba(220,38,38,0.2) 0%, rgba(220,38,38,0.02) 100%), #FFFFFF;
   border-radius: 0;

@@ -477,7 +477,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 }
 
 .main-content {
-  height: 850px;
+  min-height: 850px;
+  height: auto;
   position: relative;
   z-index: 5;
   width: 1280px;
@@ -537,7 +538,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   background: #ffffff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   padding: 24px;
-  height:600px
+  min-height: 600px;
+  height: auto;
 }
 
 /* 二级 Tab */
@@ -723,6 +725,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   justify-content: space-between;
   height: 300px;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .big-card:hover {
@@ -829,7 +832,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 }
 
 .tag-item {
-  width:45%;
+  width:44%;
   font-size: 14px;
   color: #334155;
   font-weight: 500;
@@ -956,6 +959,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   height: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .fw-card:hover {
@@ -969,8 +973,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   background-size: 100% 100%;
 }
 .border-teal { 
-  height:252px;
-  padding:24px;
+  height: 300px;
+  padding: 24px;
   border: 1px solid #ccfbf1; 
   background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%);
 }
@@ -1150,6 +1154,19 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
     height: auto !important;
     min-height: 200px;
     box-sizing: border-box;
+  }
+  .fancy-title{
+    white-space: wrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .merged-tab-item{
+    font-size: 14px;
+    padding-left:0px;
+ 
   }
   .fw-card{
     box-sizing: border-box;
