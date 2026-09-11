@@ -32,6 +32,11 @@ const fetchArticle = async () => {
   const nameId = route.params.id as string
   if (!nameId) return
 
+  // 避免 CAS 的文章 ID 去主库请求导致覆盖成不相关的文章
+  if (route.query.source === 'cas') {
+    return
+  }
+
   // 2. 根据 id 使用新接口获取完整最新渲染数据
   try {
     const json = await http.get(`/prod-api/portal/article/${nameId}`)

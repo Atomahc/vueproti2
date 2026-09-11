@@ -158,7 +158,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
             >
               <swiper-slide v-for="item in bannerList" :key="item.id">
                 <img :src="item.coverImage || '@/assets/img/indexbg.png'" alt="Banner" class="banner-img" />
-                <div class="banner-title-overlay" v-if="item.title">
+                <div class="banner-title-overlay" >
                   {{ item.title }}
                 </div>
               </swiper-slide>
@@ -341,12 +341,13 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 
 .banner-title-overlay {
   position: absolute;
-  bottom: 8px;
-  left: 8px;
-  width: calc(100% - 184px);
+  bottom: 0px;
+  left: 0px;
+  width: 100% ;
+  height:60px;
   padding: 16px 20px;
   background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(2px);
   color: #fff;
   font-size: 18px;
   box-sizing: border-box;

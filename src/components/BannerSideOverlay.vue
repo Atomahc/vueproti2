@@ -66,10 +66,11 @@ const closeIframe = () => {
   right: 0;
   top: 0;
   bottom: 0;
-  width: 160px;
+  height:420px;
+  width: 150px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   z-index: 3;
   padding: 8px;
 }
@@ -77,7 +78,7 @@ const closeIframe = () => {
 .vr-card {
   flex: 1;
   background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(2px);
   color: #ffffff;
   display: flex;
   flex-direction: column;

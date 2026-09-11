@@ -110,6 +110,32 @@ const handleLogout = () => {
   showDropdown.value = false
   window.location.reload()
 }
+
+const openGovPhone = async () => {
+  try {
+    const res: any = await http.get('/api-cas/api/get-articles', { categoryIds: '政务电话', owner: 'hgsso' })
+    let articles = []
+    if (res.code === 0 || res.code === 200 || String(res.code) === '0' || res.status === 'ok') {
+      articles = res.data?.list || res.data || []
+    } else if (Array.isArray(res)) {
+      articles = res
+    } else if (Array.isArray(res.data)) {
+      articles = res.data
+    }
+    
+    if (articles && articles.length > 0) {
+      const firstArticle = articles[0]
+      const firstArticleId = firstArticle.id || firstArticle.articleId || 'cas-article'
+      sessionStorage.setItem('currentArticle', JSON.stringify(firstArticle))
+      router.push({ path: `/article/${firstArticleId}`, query: { source: 'cas' } })
+    } else {
+      console.warn('未找到政务电话相关文章')
+    }
+  } catch (e) {
+    console.error('获取政务电话文章失败', e)
+  }
+}
+
 import TheHeaderMobile from './TheHeaderMobile.vue'
 </script>
 
@@ -125,7 +151,7 @@ import TheHeaderMobile from './TheHeaderMobile.vue'
           <span class="divider">|</span>
           <a href="#" class="top-link">{{ t('header.mobile') }}</a>
           <span class="divider">|</span>
-          <a href="#" class="top-link">{{ t('header.govPhone') }}</a>
+          <a href="#" class="top-link" @click.prevent="openGovPhone">{{ t('header.govPhone') }}</a>
           <span class="divider">|</span>
           <div class="user-dropdown hover-menu-left">
             <a href="#" class="top-link" @click.prevent>请销假平台</a>
