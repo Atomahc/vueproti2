@@ -115,6 +115,109 @@ const closeModal = () => {
   activeModal.value = null
 }
 
+const showMapModal = ref(false)
+let mapInstance: any = null
+let mapMarker: any = null
+const tempLocation = ref({ lng: '', lat: '', address: '' })
+
+const openMapModal = () => {
+  showMapModal.value = true
+  setTimeout(() => {
+    initMap()
+  }, 200)
+}
+
+const closeMapModal = () => {
+  if (mapInstance) {
+    mapInstance.destroy()
+    mapInstance = null
+    mapMarker = null
+  }
+  showMapModal.value = false
+}
+
+const initMap = () => {
+  if (typeof (window as any).AMap === 'undefined') {
+    alert('高德地图加载失败，请刷新重试')
+    return
+  }
+  const AMap = (window as any).AMap
+  
+  mapInstance = new AMap.Map('amap-container', {
+    zoom: 15,
+    resizeEnable: true
+  })
+  
+  mapInstance.on('click', (e: any) => {
+    setMapMarker(e.lnglat.getLng(), e.lnglat.getLat())
+  })
+  
+  if (snapshotForm.value.longitude && snapshotForm.value.latitude) {
+    setMapMarker(Number(snapshotForm.value.longitude), Number(snapshotForm.value.latitude))
+    mapInstance.setCenter([snapshotForm.value.longitude, snapshotForm.value.latitude])
+  } else {
+    AMap.plugin('AMap.Geolocation', () => {
+      const geolocation = new AMap.Geolocation({
+        enableHighAccuracy: true,
+        timeout: 5000, // reduce timeout to fallback to IP quicker
+        buttonPosition: 'RB',
+        zoomToAccuracy: true
+      })
+      mapInstance.addControl(geolocation)
+      geolocation.getCurrentPosition((status: string, result: any) => {
+        if (status === 'complete') {
+          setMapMarker(result.position.lng, result.position.lat)
+          mapInstance.setCenter([result.position.lng, result.position.lat])
+        } else {
+          // Fallback to IP location
+          geolocation.getCityInfo((cityStatus: string, cityResult: any) => {
+            if (cityStatus === 'complete' && cityResult.center) {
+              setMapMarker(cityResult.center[0], cityResult.center[1])
+              mapInstance.setCenter(cityResult.center)
+            }
+          })
+        }
+      })
+    })
+  }
+}
+
+const setMapMarker = (lng: number, lat: number) => {
+  const AMap = (window as any).AMap
+  if (mapMarker) {
+    mapMarker.setMap(null)
+  }
+  mapMarker = new AMap.Marker({
+    position: [lng, lat],
+    map: mapInstance
+  })
+  
+  tempLocation.value.lng = String(lng)
+  tempLocation.value.lat = String(lat)
+  
+  AMap.plugin('AMap.Geocoder', () => {
+    const geocoder = new AMap.Geocoder()
+    geocoder.getAddress([lng, lat], (status: string, result: any) => {
+      if (status === 'complete' && result.info === 'OK') {
+        tempLocation.value.address = result.regeocode.formattedAddress
+      }
+    })
+  })
+}
+
+const confirmLocation = () => {
+  if (!tempLocation.value.lng || !tempLocation.value.lat) {
+    alert('请在地图上点击选择一个位置')
+    return
+  }
+  snapshotForm.value.longitude = tempLocation.value.lng
+  snapshotForm.value.latitude = tempLocation.value.lat
+  if (tempLocation.value.address) {
+    snapshotForm.value.address = tempLocation.value.address
+  }
+  closeMapModal()
+}
+
 const fetchConvenience = async () => {
   try {
     const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
@@ -276,7 +379,13 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               </div>
               
               <label class="form-label" style="margin-top: 10px;">地址</label>
-              <input type="text" class="shoot-input" v-model="snapshotForm.address" placeholder="请输入地址" style="margin-bottom: 16px;" />
+              <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+                <input type="text" class="shoot-input" v-model="snapshotForm.address" placeholder="请输入地址" style="margin-bottom: 0;" />
+                <button type="button" class="btn-location" @click="openMapModal">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  定位
+                </button>
+              </div>
 
               <button class="submit-btn green" @click="submitSnapshotForm" :disabled="snapshotSubmitting">
                 {{ snapshotSubmitting ? '提交中...' : '立即上传' }}
@@ -458,11 +567,51 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
       </div>
     </div>
 
+    <!-- 地图选址弹窗 -->
+    <div class="modal-overlay" v-if="showMapModal" @click.self="closeMapModal">
+      <div class="modal-content" style="width: 600px; max-width: 90vw;">
+        <button class="modal-close-btn" @click="closeMapModal">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="modal-header">
+          <h2 class="modal-title">选择位置</h2>
+        </div>
+        <div id="amap-container" style="width: 100%; height: 400px; border-radius: 4px; border: 1px solid #cbd5e1; margin-top: 10px;"></div>
+        <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+          <span style="flex: 1; align-self: center; font-size: 13px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ tempLocation.address }}</span>
+          <button class="action-btn" style="background-color: #94a3b8;" @click="closeMapModal">取消</button>
+          <button class="action-btn" style="background-color: #10b981;" @click="confirmLocation">确定</button>
+        </div>
+      </div>
+    </div>
+
     <TheFooter />
   </div>
 </template>
 
 <style scoped>
+.btn-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 0 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+.btn-location:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
 .public-page-container {
   width: 100%;
   min-height: 100vh;
