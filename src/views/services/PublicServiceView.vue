@@ -169,12 +169,20 @@ const initMap = () => {
           setMapMarker(result.position.lng, result.position.lat)
           mapInstance.setCenter([result.position.lng, result.position.lat])
         } else {
-          // Fallback to IP location
-          geolocation.getCityInfo((cityStatus: string, cityResult: any) => {
-            if (cityStatus === 'complete' && cityResult.center) {
-              setMapMarker(cityResult.center[0], cityResult.center[1])
-              mapInstance.setCenter(cityResult.center)
-            }
+          // Fallback to IP location using CitySearch
+          AMap.plugin('AMap.CitySearch', () => {
+            const citySearch = new (AMap as any).CitySearch()
+            citySearch.getLocalCity((cityStatus: string, cityResult: any) => {
+              if (cityStatus === 'complete' && cityResult.info === 'OK') {
+                mapInstance.setCity(cityResult.city, () => {
+                  // After setting city center, grab the new center and place marker
+                  setTimeout(() => {
+                    const center = mapInstance.getCenter()
+                    setMapMarker(center.lng, center.lat)
+                  }, 500)
+                })
+              }
+            })
           })
         }
       })

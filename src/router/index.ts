@@ -127,6 +127,16 @@ const router = createRouter({
       name: 'my-tickets',
       component: () => import('../views/MyTicketsView.vue'),
     },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileView.vue'),
+    },
+    {
+      path: '/my-fawu',
+      name: 'my-fawu',
+      component: () => import('../views/MyFawuView.vue'),
+    },
   ],
 })
 

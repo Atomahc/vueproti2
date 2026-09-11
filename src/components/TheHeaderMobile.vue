@@ -154,6 +154,8 @@ const handleLogout = () => {
     <!-- Dropdown for mobile user -->
     <div v-if="showDropdown && isLoggedIn" class="mobile-dropdown-menu">
       <div class="mobile-user-name">{{ userInfo.name }}</div>
+      <router-link to="/profile" class="mobile-menu-item">个人中心</router-link>
+      <router-link to="/my-tickets" class="mobile-menu-item">我的工单</router-link>
       <router-link to="/certify?type=enterprise" class="mobile-menu-item">{{ t('header.enterpriseCert') }}</router-link>
       <router-link to="/certify?type=gov" class="mobile-menu-item">{{ t('header.govCert') }}</router-link>
       <a href="#" class="mobile-menu-item logout" @click.prevent="handleLogout">{{ t('header.logout') }}</a>
