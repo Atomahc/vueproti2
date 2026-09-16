@@ -166,7 +166,7 @@ const goToDetail = (news: any) => {
 /* 主体布局 */
 .news-page-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   position: relative;
   display: flex;
   flex-direction: column;
@@ -180,7 +180,7 @@ const goToDetail = (news: any) => {
   z-index: 5;
   width: 1280px;
   margin: 0 auto;
-  padding: 120px 0px 40px 0px;
+  padding: 140px 0px 40px 0px;
   flex: 1;
   box-sizing: border-box;
   display: flex;

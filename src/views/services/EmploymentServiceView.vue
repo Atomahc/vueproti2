@@ -242,7 +242,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
 <style scoped>
 .appeal-page-container {
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   display: flex;
   flex-direction: column;
   background-color: transparent;
@@ -254,7 +254,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   z-index: 5;
   width: 1280px;
   margin: 0 auto;
-  padding: 120px 0px 40px 0px;
+  padding: 140px 0px 40px 0px;
   box-sizing: border-box;
 }
 
@@ -433,7 +433,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh / var(--app-zoom, 1));
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
   z-index: 1000;

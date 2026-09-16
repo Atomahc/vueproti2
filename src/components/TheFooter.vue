@@ -113,7 +113,7 @@ import TheFooterMobile from './TheFooterMobile.vue'
 /* 宽屏设备 16:9 居中展示 */
 @media (min-aspect-ratio: 21/9) {
   .footer-wrapper {
-    width: calc(100vh * 21 / 9);
+    width: calc((100vh * 21 / 9) / var(--app-zoom, 1));
     left: 50%;
     transform: translateX(-50%);
   }

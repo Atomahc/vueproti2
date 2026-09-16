@@ -145,7 +145,7 @@ const menuItems = [
 .internal-container {
   background: #f0f5fa url('../assets/img/zbg1.png') no-repeat center center;
   background-size: cover;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   display: flex;
   flex-direction: column;
 }

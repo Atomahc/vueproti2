@@ -6,9 +6,14 @@ import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
 import TheNavBar from '../components/TheNavBar.vue'
 
+const props = defineProps({
+  asComponent: { type: Boolean, default: false },
+  defaultTab: { type: String, default: 'consult' }
+})
+
 const route = useRoute()
 const router = useRouter()
-const activeTab = ref(route.query.tab === 'appointment' ? 'appointment' : 'consult') // 'consult' | 'appointment'
+const activeTab = ref(props.asComponent ? props.defaultTab : (route.query.tab === 'appointment' ? 'appointment' : 'consult')) // 'consult' | 'appointment'
 const list = ref<any[]>([])
 const total = ref(0)
 const currentPage = ref(1)
@@ -50,7 +55,9 @@ const fetchList = async () => {
 const handleTabSwitch = (tab: string) => {
   activeTab.value = tab
   currentPage.value = 1
-  router.replace({ query: { tab } })
+  if (!props.asComponent) {
+    router.replace({ query: { tab } })
+  }
   fetchList()
 }
 
@@ -103,12 +110,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="my-tickets-page">
-    <TheHeader />
-    <main class="main-content">
-      <TheNavBar activeId="" />
-      <div class="content-container">
-        <h2>法务服务记录</h2>
+  <div :class="['my-tickets-page', { 'is-component': asComponent }]">
+    <TheHeader v-if="!asComponent" />
+    <main :class="['main-content', { 'component-main': asComponent }]">
+      <TheNavBar v-if="!asComponent" activeId="" />
+      <div :class="['content-container', { 'component-container': asComponent }]">
+        <h2 v-if="!asComponent">法务服务记录</h2>
         
         <div class="tabs-header">
           <button :class="['tab-btn', { active: activeTab === 'consult' }]" @click="handleTabSwitch('consult')">我的咨询</button>
@@ -144,7 +151,7 @@ onMounted(() => {
         </div>
       </div>
     </main>
-    <TheFooter />
+    <TheFooter v-if="!asComponent" />
 
     <!-- Detail Modal -->
     <div class="modal-overlay" v-if="detailVisible" @click.self="closeDetail">
@@ -189,9 +196,12 @@ onMounted(() => {
 <style scoped>
 .my-tickets-page {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   display: flex;
   flex-direction: column;
+}
+.my-tickets-page.is-component {
+  min-height: auto;
 }
 .main-content {
   flex: 1;
@@ -199,11 +209,20 @@ onMounted(() => {
   margin: 0 auto;
   padding: 120px 0 40px 0;
 }
+.main-content.component-main {
+  width: 100%;
+  padding: 0;
+}
 .content-container {
   background: #fff;
   min-height: 600px;
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.content-container.component-container {
+  min-height: auto;
+  box-shadow: none;
+  padding: 0;
 }
 .content-container h2 {
   margin-top: 0;
@@ -328,7 +347,7 @@ onMounted(() => {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh / var(--app-zoom, 1));
   background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(4px);
   display: flex;

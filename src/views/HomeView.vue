@@ -239,7 +239,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 <style scoped>
 .home-page-container {
   width: 100%;
-  height: 100vh;
+  height: calc(100vh / var(--app-zoom, 1));
   position: relative;
   display: flex;
   flex-direction: column;
@@ -255,7 +255,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
   z-index: 5;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 120px 0px 40px 0px;
+  padding: 140px 0px 40px 0px;
   width: 100%;
   box-sizing: border-box;
   display: flex;

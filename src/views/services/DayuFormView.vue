@@ -325,7 +325,7 @@ onMounted(() => {
 <style scoped>
 .form-page {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   display: flex;
   flex-direction: column;
 

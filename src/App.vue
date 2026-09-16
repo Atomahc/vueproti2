@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView, useRoute, useRouter } from 'vue-router'
-import { onMounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -32,6 +32,33 @@ onMounted(() => {
   // 禁止移动端手势双指放大
   document.addEventListener('gesturestart', (e: Event) => {
     e.preventDefault()
+  })
+
+  // 动态缩放页面以确保 main-content 完整展示
+  const adjustScale = () => {
+    // 移除旧版直接作用在 body 上的缩放（如果有）
+    document.body.style.zoom = ''
+
+    if (window.innerWidth <= 768) {
+      document.documentElement.style.setProperty('--app-zoom', '1')
+      return
+    }
+    
+    const designWidth = 1920
+    const designHeight = 1080
+    const scaleX = window.innerWidth / designWidth
+    const scaleY = window.innerHeight / designHeight
+    
+    let scale = Math.min(scaleX, scaleY)
+    
+    document.documentElement.style.setProperty('--app-zoom', scale.toString())
+  }
+
+  adjustScale()
+  window.addEventListener('resize', adjustScale)
+  
+  onUnmounted(() => {
+    window.removeEventListener('resize', adjustScale)
   })
 })
 </script>
@@ -106,7 +133,6 @@ a {
 .global-bg-img {
   width: 100%;
   height: 100vh;
-  object-fit: cover;
 }
 
 
@@ -115,7 +141,8 @@ a {
   position: relative;
   z-index: 0;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
+  zoom: var(--app-zoom, 1);
 }
 
 
@@ -136,6 +163,7 @@ a {
   z-index: 9999;
   color: #3b82f6;
   transition: all 0.3s;
+  zoom: var(--app-zoom, 1);
 }
 
 .global-back-btn:hover {

@@ -1,22 +1,32 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
+import TheNavBar from '../components/TheNavBar.vue'
+import MyTicketsView from './MyTicketsView.vue'
+import MyFawuView from './MyFawuView.vue'
 
 const router = useRouter()
+const route = useRoute()
 const userInfo = ref<any>({})
+
+const currentMenu = ref(route.query.tab ? String(route.query.tab) : 'profile')
 
 const fetchUserInfo = async () => {
   try {
     const res: any = await http.get('/prod-api/member/auth/user-info')
-    const userData = res.data || res
+    const userData = (res && res.data) ? res.data : (res && (res.id || res.name || res.username || res.nickName) ? res : null)
+    
     if (userData) {
       userInfo.value = userData
+    } else {
+      handleLogout()
     }
   } catch (e) {
     console.error('获取用户信息失败', e)
+    handleLogout()
   }
 }
 
@@ -39,12 +49,15 @@ const handleLogout = () => {
   }, 100)
 }
 
-const navigateTo = (path: string, query?: any) => {
-  if (query) {
-    router.push({ path, query })
-  } else {
-    router.push(path)
-  }
+const switchMenu = (menu: string) => {
+  currentMenu.value = menu
+}
+
+const getUserTypeName = (type: string) => {
+  if (type === 'foreigner') return '境外人员'
+  if (type === 'citizen') return '个人'
+  if (type === 'enterprise') return '企业'
+  if (type === 'gov') return '政务'
 }
 </script>
 
@@ -53,6 +66,7 @@ const navigateTo = (path: string, query?: any) => {
     <TheHeader />
     
     <main class="main-content">
+      <TheNavBar activeId="" />
       <div class="profile-container">
         
         <!-- 左侧菜单 / 侧边栏 -->
@@ -64,23 +78,23 @@ const navigateTo = (path: string, query?: any) => {
           </div>
           
           <nav class="profile-nav">
-            <a href="javascript:void(0)" class="nav-item active">
+            <a href="javascript:void(0)" :class="['nav-item', { active: currentMenu === 'profile' }]" @click="switchMenu('profile')">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
               我的资料
             </a>
-            <a href="javascript:void(0)" class="nav-item" @click="navigateTo('/my-tickets', { tab: 'direct' })">
+            <a href="javascript:void(0)" :class="['nav-item', { active: currentMenu === 'direct' }]" @click="switchMenu('direct')">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
               诉求工单
             </a>
-            <a href="javascript:void(0)" class="nav-item" @click="navigateTo('/my-tickets', { tab: 'snapshot' })">
+            <a href="javascript:void(0)" :class="['nav-item', { active: currentMenu === 'snapshot' }]" @click="switchMenu('snapshot')">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
               我的随手拍
             </a>
-            <a href="javascript:void(0)" class="nav-item" @click="navigateTo('/my-fawu', { tab: 'consult' })">
+            <a href="javascript:void(0)" :class="['nav-item', { active: currentMenu === 'consult' }]" @click="switchMenu('consult')">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
               我的咨询
             </a>
-            <a href="javascript:void(0)" class="nav-item" @click="navigateTo('/my-fawu', { tab: 'appointment' })">
+            <a href="javascript:void(0)" :class="['nav-item', { active: currentMenu === 'appointment' }]" @click="switchMenu('appointment')">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
               我的预约
             </a>
@@ -93,38 +107,48 @@ const navigateTo = (path: string, query?: any) => {
 
         <!-- 右侧内容区 -->
         <div class="content-area">
-          <div class="content-header">
-            <h2>我的资料</h2>
-          </div>
-          
-          <div class="info-list">
-            <div class="info-item">
-              <span class="label">头像</span>
-              <div class="value">
-                <img :src="userInfo.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'" class="info-avatar" alt="avatar" />
+          <div v-if="currentMenu === 'profile'">
+            <div class="content-header">
+              <h2>我的资料</h2>
+            </div>
+            
+            <div class="info-list">
+              <div class="info-item">
+                <span class="label">头像</span>
+                <div class="value">
+                  <img :src="userInfo.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'" class="info-avatar" alt="avatar" />
+                </div>
+              </div>
+              <div class="info-item">
+                <span class="label">用户名</span>
+                <span class="value">{{ userInfo.username || userInfo.name || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">姓名/昵称</span>
+                <span class="value">{{ userInfo.realName || userInfo.nickName || userInfo.memberName || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">用户身份</span>
+                <span class="value">{{ getUserTypeName(userInfo.userType) }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">手机号码</span>
+                <span class="value">{{ userInfo.phone || userInfo.mobile || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">电子邮箱</span>
+                <span class="value">{{ userInfo.email || '-' }}</span>
+              </div>
+              <div class="info-item" v-if="userInfo.idCard">
+                <span class="label">身份证号</span>
+                <span class="value">{{ userInfo.idCard.replace(/^(.{4})(.*)(.{4})$/, '$1**********$3') }}</span>
               </div>
             </div>
-            <div class="info-item">
-              <span class="label">用户名</span>
-              <span class="value">{{ userInfo.username || userInfo.name || '-' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">姓名/昵称</span>
-              <span class="value">{{ userInfo.realName || userInfo.nickName || userInfo.memberName || '-' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">手机号码</span>
-              <span class="value">{{ userInfo.phone || userInfo.mobile || '-' }}</span>
-            </div>
-            <div class="info-item" v-if="userInfo.email">
-              <span class="label">电子邮箱</span>
-              <span class="value">{{ userInfo.email }}</span>
-            </div>
-            <div class="info-item" v-if="userInfo.idCard">
-              <span class="label">身份证号</span>
-              <span class="value">{{ userInfo.idCard.replace(/^(.{4})(.*)(.{4})$/, '$1**********$3') }}</span>
-            </div>
           </div>
+
+          <MyTicketsView v-else-if="currentMenu === 'direct' || currentMenu === 'snapshot'" :asComponent="true" :defaultTab="currentMenu" :key="'tickets-'+currentMenu" />
+          
+          <MyFawuView v-else-if="currentMenu === 'consult' || currentMenu === 'appointment'" :asComponent="true" :defaultTab="currentMenu" :key="'fawu-'+currentMenu" />
           
         </div>
         
@@ -137,10 +161,10 @@ const navigateTo = (path: string, query?: any) => {
 
 <style scoped>
 .profile-page {
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   display: flex;
   flex-direction: column;
-  background-color: #f8fafc;
+
 }
 
 .main-content {
@@ -148,7 +172,7 @@ const navigateTo = (path: string, query?: any) => {
   max-width: 1280px;
   width: 100%;
   margin: 0 auto;
-  padding: 140px 20px 40px;
+  padding: 120px 0px 40px;
   box-sizing: border-box;
 }
 
@@ -156,6 +180,9 @@ const navigateTo = (path: string, query?: any) => {
   display: flex;
   gap: 24px;
   min-height: 600px;
+  background: #f8fafc;
+  padding: 24px;
+
 }
 
 /* 侧边栏 */
@@ -172,6 +199,7 @@ const navigateTo = (path: string, query?: any) => {
   border-radius: 12px;
   padding: 30px 20px;
   text-align: center;
+  border: 1px solid #e2e8f0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
@@ -201,6 +229,7 @@ const navigateTo = (path: string, query?: any) => {
   background: #ffffff;
   border-radius: 12px;
   padding: 16px 0;
+  border: 1px solid #e2e8f0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
@@ -245,6 +274,7 @@ const navigateTo = (path: string, query?: any) => {
   background: #ffffff;
   border-radius: 12px;
   padding: 32px;
+  border: 1px solid #e2e8f0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 

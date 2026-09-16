@@ -70,7 +70,10 @@ onMounted(async () => {
     isLoggedIn.value = true
     try {
       const res: any = await http.get('/prod-api/member/auth/user-info')
-      const userData = res.data || res
+      // Some APIs might return the user object directly, some might wrap it in 'data'
+      // If wrapped, res.data is the user object. If not wrapped, res is the user object.
+      // However, if the response is just a code/msg wrapper without user data, we should consider it empty.
+      const userData = (res && res.data) ? res.data : (res && (res.id || res.name || res.username || res.nickName) ? res : null)
 
       if (userData) {
         const name = userData.name || userData.username || userData.memberName || userData.realName
@@ -80,9 +83,18 @@ onMounted(async () => {
         if (userData.avatar) {
           userInfo.value.avatar = userData.avatar
         }
+      } else {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        sessionStorage.removeItem('sso_state')
+        isLoggedIn.value = false
       }
     } catch (e) {
       console.warn('获取用户信息失败', e)
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      sessionStorage.removeItem('sso_state')
+      isLoggedIn.value = false
     }
   }
 })
@@ -280,7 +292,7 @@ const handleLogout = () => {
   position: fixed;
   top: 0; left: -300px;
   width: 280px;
-  height: 100vh;
+  height: calc(100vh / var(--app-zoom, 1));
   background: #fff;
   z-index: 1001;
   transition: left 0.3s ease;

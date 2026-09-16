@@ -298,7 +298,7 @@ const submitGov = async () => {
 
 <style scoped>
 .certify-page {
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   background-color: #f8fafc;
   padding-bottom: 60px;
 }

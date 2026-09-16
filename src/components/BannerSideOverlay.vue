@@ -130,7 +130,6 @@ const closeIframe = () => {
   height: 100vh;
   border-radius: 8px;
   overflow: hidden;
-
 }
 
 .modal-close-btn {

@@ -41,6 +41,10 @@ const handleNavigate = (url: string) => {
   }
 }
 
+const handleCoopClick = () => {
+  alert('敬请期待等待系统接入')
+}
+
 const handleCloudClick = (item: any) => {
   activeModal.value = item
 }
@@ -189,7 +193,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
             </div>
 
             <div class="image-cards-grid grid-5">
-              <div v-for="(item, i) in coopServices.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
+              <div v-for="(item, i) in coopServices.children" :key="i" class="image-item-box" @click="handleCoopClick()">
                 <span class="box-title" style="color: #000741;">{{ item.name }}</span>
                 <div class="img-wrapper">
                   <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
@@ -346,7 +350,7 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 472px;
+  width: 471px;
 }
 
 .purple-tint-card {
@@ -355,12 +359,12 @@ h3 {
   border: 1px solid #DDDDDD;
   padding:20px;
   box-sizing: border-box;
-  width: 676px;
+  width: 675px;
 }
 
 .port-page-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   position: relative;
   display: flex;
   flex-direction: column;
@@ -375,7 +379,7 @@ h3 {
   z-index: 5;
   width: 1280px;
   margin: 0 auto;
-  padding: 120px 0px 40px 0px;
+  padding: 140px 0px 40px 0px;
   box-sizing: border-box;
 }
 
@@ -460,6 +464,13 @@ h3 {
 }
 
 @media screen and (max-width: 768px) {
+
+  .yellow-tint-card .image-item-box{
+    width:31%
+  }
+  .yellow-tint-card .img-wrapper img{
+    height:130px !important;
+  }
   .image-cards-grid{
     font-size: 12px !important;
     gap: 8px !important;
@@ -483,26 +494,26 @@ h3 {
   .cross-card{
     padding:10px;
   }
-}
-.card-title-header{
-  margin-bottom:20px !important;
+  .cyan-tint-card .img-wrapper img{
+    height:130px !important;
+  }
+  .card-title-header{
+    margin-bottom:20px !important;
+  }
+  .blue-tint-card .image-item-box{
+    width: calc(51% - 10px) !important;
+  }
+  .grid-5 .image-item-box{
+    width: calc(33% - 10px) !important;
+  }
 }
 
-.yellow-tint-card .image-item-box{
-  width:31%
-}
-.yellow-tint-card .img-wrapper img{
-  height:130px !important;
-}
-.grid-5 .image-item-box{
-  width: calc(33% - 10px) !important;
-}
-.blue-tint-card .image-item-box{
-  width: calc(51% - 10px) !important;
-}
-.cyan-tint-card .img-wrapper img{
-  height:130px !important;
-}
+
+
+
+
+
+
 .red-tint-card {
   background: linear-gradient(180deg, rgba(220,38,38,0.2) 0%, rgba(220,38,38,0.02) 100%), #FFFFFF;
   border-radius: 0;

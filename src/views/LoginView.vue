@@ -142,7 +142,7 @@ const resetState = () => {
 
 <style scoped>
 .login-container {
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   display: flex;
   align-items: center;
   justify-content: center;

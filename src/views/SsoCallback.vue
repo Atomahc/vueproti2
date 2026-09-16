@@ -67,7 +67,7 @@ onMounted(async () => {
 
 <style scoped>
 .sso-callback-container {
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   display: flex;
   justify-content: center;
   align-items: center;

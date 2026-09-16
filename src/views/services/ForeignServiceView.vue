@@ -102,7 +102,7 @@ const squares = ['乐游霍尔果斯', '乐食霍尔果斯', '乐购霍尔果斯
 <style scoped>
 .foreign-page {
   background-color: transparent;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   color: #1e293b;
 }
 

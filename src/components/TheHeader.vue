@@ -57,7 +57,10 @@ onMounted(async () => {
     isLoggedIn.value = true
     try {
       const res: any = await http.get('/prod-api/member/auth/user-info')
-      const userData = res.data || res
+      // Some APIs might return the user object directly, some might wrap it in 'data'
+      // If wrapped, res.data is the user object. If not wrapped, res is the user object.
+      // However, if the response is just a code/msg wrapper without user data, we should consider it empty.
+      const userData = (res && res.data) ? res.data : (res && (res.id || res.name || res.username || res.nickName) ? res : null)
 
       if (userData) {
         const name = userData.nickName || userData.name || userData.username || userData.memberName || userData.realName
@@ -67,9 +70,18 @@ onMounted(async () => {
         if (userData.avatar) {
           userInfo.value.avatar = userData.avatar
         }
+      } else {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        sessionStorage.removeItem('sso_state')
+        isLoggedIn.value = false
       }
     } catch (e) {
       console.warn('获取用户信息失败', e)
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      sessionStorage.removeItem('sso_state')
+      isLoggedIn.value = false
     }
   }
 })
@@ -169,7 +181,6 @@ import TheHeaderMobile from './TheHeaderMobile.vue'
               <span class="username" @click.stop="toggleDropdown">{{ userInfo.name }}</span>
               <div class="dropdown-content" :class="{ 'show': showDropdown }" @click.stop>
                 <router-link to="/profile">个人中心</router-link>
-                <router-link to="/my-tickets">我的工单</router-link>
                 <a href="#" class="logout-btn" @click.prevent="handleLogout">{{ t('header.logout') }}</a>
               </div>
             </div>
@@ -458,7 +469,7 @@ import TheHeaderMobile from './TheHeaderMobile.vue'
 /* 宽屏设备 16:9 居中展示 */
 @media (min-aspect-ratio: 21/9) {
   .header-wrapper {
-    width: calc(100vh * 21 / 9);
+    width: calc((100vh * 21 / 9) / var(--app-zoom, 1));
     left: 50%;
     transform: translateX(-50%);
   }

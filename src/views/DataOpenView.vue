@@ -289,7 +289,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 <style scoped>
 .data-open-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   position: relative;
   display: flex;
   flex-direction: column;
@@ -303,7 +303,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   z-index: 5;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 120px 0px 40px 0px;
+  padding: 140px 0px 40px 0px;
   width: 100%;
   box-sizing: border-box;
  

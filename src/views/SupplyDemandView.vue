@@ -443,7 +443,7 @@ const getTypeColor = (type: string) => {
 <style scoped>
 .supply-demand-page-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   position: relative;
   display: flex;
   flex-direction: column;
@@ -547,6 +547,7 @@ const getTypeColor = (type: string) => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow:auto
 }
 
 .data-wrapper {

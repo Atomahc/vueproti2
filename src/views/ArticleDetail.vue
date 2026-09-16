@@ -132,7 +132,7 @@ watch(() => route.params.id, () => {
 
 <style scoped>
 .article-page {
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
   display: flex;
   flex-direction: column;
   background-color: transparent;
@@ -297,7 +297,7 @@ watch(() => route.params.id, () => {
   }
   .article-page{
     display: block;
-    height: 100vh;
+    height: calc(100vh / var(--app-zoom, 1));
   }
   .article-header .title {
     font-size: 24px;
