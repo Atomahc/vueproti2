@@ -9,6 +9,10 @@ const showBackButton = computed(() => {
   return route.path !== '/' && !route.path.startsWith('/login')
 })
 
+const showAiButton = computed(() => {
+  return !route.path.startsWith('/login')
+})
+
 const goBack = () => {
   router.back()
 }
@@ -51,6 +55,9 @@ onMounted(() => {
     
     let scale = Math.min(scaleX, scaleY)
     
+    // 增加 10% 的缩放比例
+    scale = scale * 1.1
+    
     document.documentElement.style.setProperty('--app-zoom', scale.toString())
   }
 
@@ -73,13 +80,36 @@ onMounted(() => {
       <RouterView />
     </div>
 
-    <!-- 悬浮返回按钮 -->
-    <div v-if="showBackButton" class="global-back-btn" @click="goBack" title="返回">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-      </svg>
-      <span>返回</span>
+    <!-- 全局悬浮按钮组 -->
+    <div class="global-floating-group">
+      <!-- 智能问答按钮 -->
+      <a
+        v-if="showAiButton"
+        href="https://sz.xjhegs.gov.cn/ai-chat/4a6ba8f18f3c671e/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="global-floating-btn global-ai-btn"
+        title="智能问答"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 8V4H8"></path>
+          <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+          <path d="M2 14h2"></path>
+          <path d="M20 14h2"></path>
+          <path d="M15 13v2"></path>
+          <path d="M9 13v2"></path>
+        </svg>
+        <span>智能问答</span>
+      </a>
+
+      <!-- 悬浮返回按钮 -->
+      <div v-if="showBackButton" class="global-floating-btn global-back-btn" @click="goBack" title="返回">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>返回</span>
+      </div>
     </div>
   </div>
 </template>
@@ -94,6 +124,17 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   touch-action: manipulation;
   -webkit-text-size-adjust: 100%;
+}
+
+/* 隐藏所有滚动条，但保留滚动功能 */
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
 }
 
 #app {
@@ -146,10 +187,19 @@ a {
 }
 
 
-.global-back-btn {
+.global-floating-group {
   position: fixed;
   right: 40px;
   bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 9999;
+  zoom: var(--app-zoom, 1);
+}
+
+.global-floating-btn {
   width: 50px;
   height: 50px;
   background: #ffffff;
@@ -160,19 +210,19 @@ a {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 9999;
   color: #3b82f6;
   transition: all 0.3s;
-  zoom: var(--app-zoom, 1);
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
-.global-back-btn:hover {
+.global-floating-btn:hover {
   background: #f0f9ff;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0,0,0,0.2);
 }
 
-.global-back-btn svg {
+.global-floating-btn svg {
   width: 20px;
   height: 20px;
   margin-bottom: 2px;
@@ -181,6 +231,20 @@ a {
 .global-back-btn span {
   font-size: 12px;
   font-weight: 500;
+}
+
+.global-ai-btn span {
+  font-size: 10.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+@media screen and (max-width: 768px) {
+  .global-floating-group {
+    right: 20px;
+    bottom: 80px;
+  }
 }
 
 /* 宽屏设备 16:9 居中展示，高度占满 */

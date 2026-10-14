@@ -663,9 +663,13 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
 .card-items {
   padding: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 10px;
+  justify-items: center;
+  align-items: start;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .item-badge {
@@ -673,8 +677,10 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  width: 76px;
+  width: 100%;
+  max-width: 86px;
   cursor: pointer;
+  text-align: center;
 }
 
 .item-badge:hover .item-name {

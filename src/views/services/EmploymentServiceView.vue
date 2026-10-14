@@ -225,7 +225,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               </svg>
             </div>
             <div class="banner-text">
-              <strong>诉求办理公示：</strong> 本月共受理诉求 <strong>1,256</strong> 件，办结率 <strong>98.6%</strong> ，平均响应时长 <strong>1.2小时</strong>
+              <strong>诉求办理公示：</strong> 本月共受理诉求 <strong>0</strong> 件，办结率 <strong>0%</strong> ，平均响应时长 <strong>0小时</strong>
             </div>
           </div>
 
