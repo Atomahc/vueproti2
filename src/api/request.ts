@@ -35,6 +35,11 @@ async function request<T = any>(url: string, options: RequestOptions = {}): Prom
     customHeaders.set('Authorization', `Bearer ${token}`)
   }
 
+  // 标记 Ajax 请求，防止后端框架 (如微擎) 在检测到微信 User-Agent 时执行 302 跳转到微信授权页导致跨域 Failed to fetch
+  if (!customHeaders.has('X-Requested-With')) {
+    customHeaders.set('X-Requested-With', 'XMLHttpRequest')
+  }
+
   // 默认配置 Content-Type 为 JSON (如果非 FormData)
   if (!customHeaders.has('Content-Type') && !(restOptions.body instanceof FormData)) {
     customHeaders.set('Content-Type', 'application/json')

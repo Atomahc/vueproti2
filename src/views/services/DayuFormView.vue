@@ -36,6 +36,10 @@ const fetchForm = async () => {
       m: 'dayu_form',
       id: formId,
       isapi: 1
+    }, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
     })
     
     // res should be the json from our isapi=1 block

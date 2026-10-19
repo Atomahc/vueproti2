@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView, useRoute, useRouter } from 'vue-router'
-import { onMounted, onUnmounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed, ref, watch } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,6 +11,24 @@ const showBackButton = computed(() => {
 
 const showAiButton = computed(() => {
   return !route.path.startsWith('/login')
+})
+
+const isAiChatOpen = ref(false)
+const hasLoadedAiChat = ref(false)
+
+const toggleAiChat = () => {
+  hasLoadedAiChat.value = true
+  isAiChatOpen.value = !isAiChatOpen.value
+}
+
+const closeAiChat = () => {
+  isAiChatOpen.value = false
+}
+
+watch(showAiButton, (val) => {
+  if (!val) {
+    isAiChatOpen.value = false
+  }
 })
 
 const goBack = () => {
@@ -26,12 +44,16 @@ onMounted(() => {
     }
   }, { passive: false })
 
-  // 禁止 Ctrl/Command + '+' / '-' / '0' 键盘缩放
-  document.addEventListener('keydown', (e: KeyboardEvent) => {
+  // 禁止 Ctrl/Command + '+' / '-' / '0' 键盘缩放，按 ESC 关闭智能问答
+  const handleKeydown = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
       e.preventDefault()
     }
-  })
+    if (e.key === 'Escape' && isAiChatOpen.value) {
+      closeAiChat()
+    }
+  }
+  document.addEventListener('keydown', handleKeydown)
 
   // 禁止移动端手势双指放大
   document.addEventListener('gesturestart', (e: Event) => {
@@ -66,6 +88,7 @@ onMounted(() => {
   
   onUnmounted(() => {
     window.removeEventListener('resize', adjustScale)
+    document.removeEventListener('keydown', handleKeydown)
   })
 })
 </script>
@@ -82,14 +105,24 @@ onMounted(() => {
 
     <!-- 全局悬浮按钮组 -->
     <div class="global-floating-group">
+            <!-- 悬浮返回按钮 -->
+      <div v-if="showBackButton" class="global-floating-btn global-back-btn" @click="goBack" title="返回">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>返回</span>
+      </div>
+
+
+
       <!-- 智能问答按钮 -->
-      <a
+      <div
         v-if="showAiButton"
-        href="https://sz.xjhegs.gov.cn/ai-chat/4a6ba8f18f3c671e/"
-        target="_blank"
-        rel="noopener noreferrer"
         class="global-floating-btn global-ai-btn"
+        :class="{ active: isAiChatOpen }"
         title="智能问答"
+        @click="toggleAiChat"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 8V4H8"></path>
@@ -100,15 +133,42 @@ onMounted(() => {
           <path d="M9 13v2"></path>
         </svg>
         <span>智能问答</span>
-      </a>
+      </div>
+    </div>
 
-      <!-- 悬浮返回按钮 -->
-      <div v-if="showBackButton" class="global-floating-btn global-back-btn" @click="goBack" title="返回">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        <span>返回</span>
+    <!-- 智能问答右下角弹窗 -->
+    <div
+      v-if="hasLoadedAiChat && showAiButton"
+      v-show="isAiChatOpen"
+      class="ai-chat-window"
+    >
+      <div class="ai-chat-header">
+        <div class="ai-chat-header-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ai-chat-header-icon">
+            <path d="M12 8V4H8"></path>
+            <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+            <path d="M2 14h2"></path>
+            <path d="M20 14h2"></path>
+            <path d="M15 13v2"></path>
+            <path d="M9 13v2"></path>
+          </svg>
+          <span>智能问答</span>
+        </div>
+        <button type="button" class="ai-chat-close-btn" @click="closeAiChat" title="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="ai-chat-body">
+        <iframe
+          src="https://sz.xjhegs.gov.cn/ai-chat/4a6ba8f18f3c671e?mode=mobile"
+          style="width: 100%; height: 100%;"
+          frameborder="0"
+          allow="microphone"
+          title="智能问答"
+        ></iframe>
       </div>
     </div>
   </div>
@@ -240,10 +300,124 @@ a {
   line-height: 1;
 }
 
+.global-ai-btn.active {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.global-ai-btn.active:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* 智能问答右下角弹窗 */
+.ai-chat-window {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 420px;
+  height: 640px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 48px);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10000;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  animation: aiChatFadeIn 0.25s ease-out;
+}
+
+@keyframes aiChatFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ai-chat-header {
+  height: 44px;
+  background: #3b82f6;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.ai-chat-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ai-chat-header-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.ai-chat-close-btn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  line-height: 1;
+}
+
+.ai-chat-close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.ai-chat-close-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ai-chat-body {
+  flex: 1;
+  width: 100%;
+  height: calc(100% - 44px);
+  position: relative;
+  background: #ffffff;
+}
+
+.ai-chat-body iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
 @media screen and (max-width: 768px) {
   .global-floating-group {
     right: 20px;
     bottom: 80px;
+  }
+
+  .ai-chat-window {
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+    height: calc(100vh - 24px);
+    max-width: none;
+    max-height: none;
+    border-radius: 10px;
   }
 }
 
