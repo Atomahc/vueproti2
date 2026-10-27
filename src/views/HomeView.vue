@@ -142,14 +142,16 @@ const fetchPolicyNews = async () => {
     const res: any = await http.get('/api-cas/api/get-articles', {
       owner: 'hgsso',
       categoryIds: '政策解读',
-      pageSize: 5
+      pageSize: 5,
+      language: locale.value || 'zh'
     })
     let list = (res.status === 'ok' && res.data && res.data.length > 0) ? res.data : []
     if (list.length === 0) {
       const fallbackRes: any = await http.get('/api-cas/api/get-articles', {
         owner: 'hgsso',
         categoryIds: '政策推送',
-        pageSize: 5
+        pageSize: 5,
+        language: locale.value || 'zh'
       })
       list = (fallbackRes.status === 'ok' && fallbackRes.data) ? fallbackRes.data : []
     }
@@ -181,14 +183,16 @@ const fetchYaowenNews = async () => {
     const res: any = await http.get('/api-cas/api/get-articles', {
       owner: 'hgsso',
       categoryIds: '新闻资讯',
-      pageSize: 10
+      pageSize: 10,
+      language: locale.value || 'zh'
     })
     let list = (res.status === 'ok' && res.data && res.data.length > 0) ? res.data : []
     if (list.length < 5) {
       const fallbackRes: any = await http.get('/api-cas/api/get-articles', {
         owner: 'hgsso',
         categoryIds: '重大活动',
-        pageSize: 10
+        pageSize: 10,
+        language: locale.value || 'zh'
       })
       if (fallbackRes.status === 'ok' && fallbackRes.data) {
         list = [...list, ...fallbackRes.data]
@@ -248,14 +252,16 @@ const fetchNoticeNews = async () => {
     const res: any = await http.get('/api-cas/api/get-articles', {
       owner: 'hgsso',
       categoryIds: '通知公告',
-      pageSize: 10
+      pageSize: 10,
+      language: locale.value || 'zh'
     })
     let list = (res.status === 'ok' && res.data && res.data.length > 0) ? res.data : []
     if (list.length < 6) {
       const fallbackRes: any = await http.get('/api-cas/api/get-articles', {
         owner: 'hgsso',
         categoryIds: '城市形象',
-        pageSize: 10
+        pageSize: 10,
+        language: locale.value || 'zh'
       })
       if (fallbackRes.status === 'ok' && fallbackRes.data) {
         list = [...list, ...fallbackRes.data]
@@ -567,6 +573,9 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 }
 
 watch(locale, () => {
+  fetchPolicyNews()
+  fetchYaowenNews()
+  fetchNoticeNews()
   fetchQuickServices()
 })
 
@@ -597,7 +606,7 @@ onUnmounted(() => {
     <!-- 主体区域 -->
     <main class="main-content">
       <!-- 蓝色主导航栏 (与设计图一致，6项简洁文字) -->
-      <TheNavBar activeId="home" :hide-icons="true" :tabs="['home', 'gov', 'life', 'cross', 'cloud', 'appeals']" />
+      <TheNavBar activeId="home"  :tabs="['home', 'gov', 'life', 'cross', 'cloud', 'appeals']" />
 
       <!-- 主体核心白底卡片 -->
       <div class="hero-box">
@@ -702,7 +711,7 @@ onUnmounted(() => {
             <!-- 子列 1: 要闻 -->
             <div class="sub-col yaowen-col">
               <div class="news-tab-badge yaowen-badge" @click="goToNewsCategory('新闻资讯')">
-                要闻
+                重大活动
               </div>
               <div class="yaowen-featured" v-if="featuredYaowen" @click="goToArticle(featuredYaowen)">
                 <h3 class="featured-title" :title="featuredYaowen.title">{{ featuredYaowen.title }}</h3>
@@ -728,7 +737,7 @@ onUnmounted(() => {
             <!-- 子列 2: 通知公告 -->
             <div class="sub-col notice-col">
               <div class="news-tab-badge notice-badge" @click="goToNewsCategory('通知公告')">
-                通知公告
+                城市形象
               </div>
               <ul class="sub-news-list notice-list">
                 <li
@@ -1159,7 +1168,7 @@ onUnmounted(() => {
   margin: 0 0 6px 0;
   font-size: 16px;
   font-weight: 700;
-  text-align: left;
+ 
   color: #0f172a;
   line-height: 1.35;
   white-space: pre-line;
@@ -1179,6 +1188,7 @@ onUnmounted(() => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-align: left;
   text-overflow: ellipsis;
 }
 
@@ -1415,7 +1425,7 @@ onUnmounted(() => {
 }
 
 .quick-title-text-main {
-  white-space: nowrap;
+
 }
 
 .quick-arrow-circle {

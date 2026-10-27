@@ -92,7 +92,8 @@ const fetchEnterpriseArticles = async () => {
   try {
     const res: any = await http.get('/api-cas/api/get-articles', {
       owner: 'hgsso',
-      categoryIds: '营商环境监测'
+      categoryIds: '营商环境监测',
+      language: locale.value || 'zh'
     })
     if (res.status === 'ok' && res.data) {
       enterpriseArticles.value = res.data.slice(0, 5).map((item: any) => ({
@@ -114,7 +115,8 @@ const fetchPolicyMatchArticles = async () => {
     const res: any = await http.get('/api-cas/api/get-articles', {
       owner: 'hgsso',
       categoryIds: '政策推送',
-      recommend: true
+      recommend: true,
+      language: locale.value || 'zh'
     })
     if (res.status === 'ok' && res.data) {
       policyMatchArticles.value = res.data.slice(0, 3).map((item: any) => ({
@@ -183,6 +185,8 @@ const fetchSupplyDemand = async () => {
 
 watch(locale, () => {
   fetchGovServices()
+  fetchEnterpriseArticles()
+  fetchPolicyMatchArticles()
 })
 
 onMounted(() => {

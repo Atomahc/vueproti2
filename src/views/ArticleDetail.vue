@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
@@ -8,6 +9,7 @@ import TheNavBar from '../components/TheNavBar.vue'
 
 const route = useRoute()
 const router = useRouter()
+const { locale } = useI18n()
 const isInternal = ref(false)
 
 const articleData = ref<{ title: string; date: string; content: string } | null>(null)
@@ -39,7 +41,9 @@ const fetchArticle = async () => {
 
   // 2. 根据 id 使用新接口获取完整最新渲染数据
   try {
-    const json = await http.get(`/prod-api/portal/article/${nameId}`)
+    const json = await http.get(`/prod-api/portal/article/${nameId}`, {
+      language: locale.value || 'zh'
+    })
     if (json.code === 0 && json.data) {
       const data = json.data
       let dateStr = data.publishTime || 'N/A'
@@ -68,6 +72,10 @@ onMounted(() => {
 watch(() => route.params.id, () => {
   fetchArticle()
   window.scrollTo(0, 0)
+})
+
+watch(locale, () => {
+  fetchArticle()
 })
 </script>
 
@@ -115,9 +123,6 @@ watch(() => route.params.id, () => {
 
         <footer class="article-footer">
           <div class="share-actions">
-            <span>分享至：</span>
-            <button class="share-btn wechat" title="分享到微信">微信</button>
-            <button class="share-btn weibo" title="分享到微博">微博</button>
           </div>
           <div class="nav-links">
             <button class="nav-btn" @click="router.back()">返回上一页</button>

@@ -128,7 +128,11 @@ const handleLogout = () => {
 
 const openGovPhone = async () => {
   try {
-    const res: any = await http.get('/api-cas/api/get-articles', { categoryIds: '政务电话', owner: 'hgsso' })
+    const res: any = await http.get('/api-cas/api/get-articles', {
+      categoryIds: '政务电话',
+      owner: 'hgsso',
+      language: locale.value || 'zh'
+    })
     let articles = []
     if (res.code === 0 || res.code === 200 || String(res.code) === '0' || res.status === 'ok') {
       articles = res.data?.list || res.data || []

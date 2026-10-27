@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
@@ -8,6 +9,7 @@ import TheNavBar from '../components/TheNavBar.vue'
 
 const router = useRouter()
 const route = useRoute()
+const { locale } = useI18n()
 
 const activeCategory = ref((route.query.tab as string) || '')
 const loading = ref(false)
@@ -26,7 +28,8 @@ const fetchArticles = async () => {
     const params: any = {
       owner: 'hgsso',
       p: currentPage.value,
-      pageSize: pageSize
+      pageSize: pageSize,
+      language: locale.value || 'zh'
     }
     if (activeCategory.value && activeCategory.value !== '全部') {
       params.categoryIds = activeCategory.value
@@ -61,6 +64,11 @@ const fetchArticles = async () => {
 }
 
 onMounted(() => {
+  fetchArticles()
+})
+
+watch(locale, () => {
+  currentPage.value = 1
   fetchArticles()
 })
 
