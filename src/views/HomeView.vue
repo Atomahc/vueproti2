@@ -929,7 +929,6 @@ onUnmounted(() => {
   width: 100%;
   height: 340px;
   position: relative;
-  border-radius: 4px;
   overflow: hidden;
   background: #f1f5f9;
 }
@@ -981,10 +980,8 @@ onUnmounted(() => {
 .banner-controls-bar {
   position: absolute;
   bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 2%;
   display: flex;
-  align-items: center;
   gap: 10px;
   z-index: 10;
   pointer-events: auto;
@@ -1056,10 +1053,9 @@ onUnmounted(() => {
 }
 
 .policy-badge {
-  width: 100px;
+  width: 110px;
   background: #00b578;
   color: #ffffff;
-  border-radius: 3px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1109,7 +1105,7 @@ onUnmounted(() => {
 
 .policy-date {
   color: #94a3b8;
-  font-size: 12px;
+  font-size: 14px;
   margin-left: 8px;
   flex-shrink: 0;
 }
@@ -1131,7 +1127,6 @@ onUnmounted(() => {
 
 .news-tab-badge {
   height: 42px;
-  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1148,7 +1143,7 @@ onUnmounted(() => {
 }
 
 .notice-badge {
-  background: #f1f5f9;
+  background: #e5e5e5;
   color: #334155;
 }
 
@@ -1231,21 +1226,20 @@ onUnmounted(() => {
 
 .news-item-date {
   color: #94a3b8;
-  font-size: 11.5px;
+  font-size: 14px;
   margin-left: 8px;
   flex-shrink: 0;
 }
 
 .col-more-btn {
   margin-top: auto;
-  padding-top: 6px;
-  height: 26px;
+  padding: 10px;
+  height: 30px;
   background: #f8fafc;
-  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 14px;
   color: #94a3b8;
   cursor: pointer;
   transition: all 0.2s;
@@ -1272,7 +1266,6 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   background: #ffffff;
-  border-radius: 4px;
   padding: 20px 10px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1291,7 +1284,6 @@ onUnmounted(() => {
 .vr-icon-box {
   width: 38px;
   height: 38px;
-  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1334,8 +1326,7 @@ onUnmounted(() => {
   gap: 12px;
   margin-top: 4px;
   background:#fff;
-  padding: 14px;
-  height:100px;
+  height:128px;
 
 }
 
@@ -1344,7 +1335,6 @@ onUnmounted(() => {
   color: #ffffff;
   width: 160px;
   flex-shrink: 0;
-  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1363,7 +1353,7 @@ onUnmounted(() => {
 .quick-title-text {
   display: flex;
   flex-direction: column;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: 2px;
   line-height: 1.25;
@@ -1382,7 +1372,6 @@ onUnmounted(() => {
   gap: 12px;
   padding: 10px 14px;
   background: #ffffff;
-  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid #f1f5f9;
@@ -1396,9 +1385,7 @@ onUnmounted(() => {
 }
 
 .quick-icon-wrapper {
-  width: 38px;
-  height: 38px;
-  border-radius: 4px;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1407,8 +1394,8 @@ onUnmounted(() => {
 }
 
 .quick-api-img {
-  width: 22px;
-  height: 22px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
 }
 
@@ -1419,7 +1406,7 @@ onUnmounted(() => {
 
 .quick-info h4 {
   margin: 0 0 2px 0;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
   color: #0f172a;
   display: flex;
@@ -1465,7 +1452,7 @@ onUnmounted(() => {
 
 .quick-info p {
   margin: 0;
-  font-size: 11px;
+  font-size: 16px;
   color: #94a3b8;
   white-space: nowrap;
   overflow: hidden;
