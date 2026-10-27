@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
@@ -12,6 +13,8 @@ import yb3 from '@/assets/other/Group 62.png'
 // 上半区 驿路法务通 数据
 const yiluColumns = ref<any[]>([])
 
+const { locale } = useI18n()
+
 const yiluHeader = ref<any>({})
 const intlHeader = ref<any>({})
 const intlCards = ref<any[]>([])
@@ -21,12 +24,13 @@ const fetchCloudLegal = async () => {
     const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'cloud_legal',
       platform: 'portal',
-      userType: ''
+      userType: '',
+      lang: locale.value || 'zh'
     })
     if (res.code === 0 && res.data && res.data.cloud_legal) {
       const list = res.data.cloud_legal
 
-      const yilu = list.find((item: any) => item.name === '霍尔果斯驿路国际法务区')
+      const yilu = list.find((item: any) => item.id === 22932 || item.name === '霍尔果斯驿路国际法务区') || list[0]
       if (yilu) {
         yiluHeader.value = yilu
         if (yilu.children && yilu.children.length > 0) {
@@ -168,6 +172,10 @@ const submitAppointment = async () => {
     alert('提交失败，请重试')
   }
 }
+
+watch(locale, () => {
+  fetchCloudLegal()
+})
 
 onMounted(() => {
   fetchCloudLegal()

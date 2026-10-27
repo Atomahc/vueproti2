@@ -5,7 +5,8 @@ import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
 
 
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 
 import sq1 from '@/assets/other/Frame 59.png'
@@ -36,12 +37,15 @@ const defaultIcons = [
 const defaultBgs = [sq4, sq3, sq2, sq1, sq5, sq6]
 const themes = ['red', 'orange', 'blue', 'cyan', 'green', 'purple']
 
+const { locale } = useI18n()
+
 const fetchPublicOpinion = async () => {
   try {
     const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'public_opinion',
       platform: 'portal',
-      userType: ''
+      userType: '',
+      lang: locale.value || 'zh'
     })
     if (res.code === 0 && res.data && res.data.public_opinion) {
       appealsList.value = res.data.public_opinion.map((item: any, index: number) => ({
@@ -56,6 +60,10 @@ const fetchPublicOpinion = async () => {
     console.error('Failed to fetch public opinion data:', e)
   }
 }
+
+watch(locale, () => {
+  fetchPublicOpinion()
+})
 
 const showModal = ref(false)
 const submitting = ref(false)

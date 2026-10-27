@@ -1,11 +1,13 @@
 <script setup lang="ts">
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
 
+const { locale } = useI18n()
 const foreignServices = ref<any>({ children: [] })
 const portCloudItems = ref<any>({ children: [] })
 const passServices = ref<any>({ children: [] })
@@ -18,7 +20,8 @@ const fetchCrossBorder = async () => {
     const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'cross_border',
       platform: 'portal',
-      userType: ''
+      userType: '',
+      lang: locale.value || 'zh'
     })
     if (res.code === 0 && res.data && res.data.cross_border) {
       const list = res.data.cross_border
@@ -59,6 +62,10 @@ const showIntroModal = () => {
     linkDesc: '本平台以可信数字身份为核心底座，覆盖全场景口岸服务，助力提升口岸运营效率、规范市场秩序、带动边民增收、促进产业集聚，实现政府监管精准化、企业服务一体化、群众办事便捷化，为霍尔果斯高质量发展提供数字化支撑。'
   }
 }
+
+watch(locale, () => {
+  fetchCrossBorder()
+})
 
 onMounted(() => {
   fetchCrossBorder()

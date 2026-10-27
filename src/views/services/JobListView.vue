@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
@@ -23,24 +24,31 @@ const modalVisible = ref(false)
 const laodaoInfo = ref<any>({})
 const zhongyaInfo = ref<any>({})
 
+const { locale } = useI18n()
+
 const fetchConvenience = async () => {
   try {
     const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'convenience',
       platform: 'portal',
-      userType: ''
+      userType: '',
+      lang: locale.value || 'zh'
     })
     if (res.code === 0 && res.data && res.data.convenience) {
       const list = res.data.convenience
-      const ld = list.find((item: any) => item.name === '劳道智工')
+      const ld = list.find((item: any) => item.name === '劳道智工' || item.name?.includes('劳道')) || list[0]
       if (ld) laodaoInfo.value = ld
-      const zy = list.find((item: any) => item.name?.includes('中亚职通桥'))
+      const zy = list.find((item: any) => item.name?.includes('中亚职通桥') || item.name?.includes('中亚')) || list[1]
       if (zy) zhongyaInfo.value = zy
     }
   } catch(e) {
     console.error('Failed to fetch convenience services', e)
   }
 }
+
+watch(locale, () => {
+  fetchConvenience()
+})
 
 const fetchList = async () => {
   loading.value = true

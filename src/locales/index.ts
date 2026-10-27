@@ -7,9 +7,19 @@ import kk from './kk'
 // 默认语言配置变量
 export const defaultLanguage = 'zh'
 
+export const getInitialLanguage = (): string => {
+  try {
+    const saved = localStorage.getItem('lang')
+    if (saved && ['zh', 'en', 'ru', 'kk'].includes(saved)) {
+      return saved
+    }
+  } catch (e) {}
+  return defaultLanguage
+}
+
 const i18n = createI18n({
   legacy: false, // 使用 Composition API 模式
-  locale: defaultLanguage,
+  locale: getInitialLanguage(),
   fallbackLocale: 'zh',
   messages: {
     zh,

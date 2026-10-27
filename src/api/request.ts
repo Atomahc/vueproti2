@@ -1,6 +1,19 @@
 /**
  * 通用请求封装 (基于 fetch)
  */
+import i18n, { defaultLanguage } from '@/locales'
+
+export const getCurrentLanguage = (): string => {
+  try {
+    return (i18n.global.locale as any).value || localStorage.getItem('lang') || defaultLanguage
+  } catch (e) {
+    try {
+      return localStorage.getItem('lang') || defaultLanguage
+    } catch {
+      return defaultLanguage
+    }
+  }
+}
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, any>
@@ -10,11 +23,19 @@ async function request<T = any>(url: string, options: RequestOptions = {}): Prom
   const { params, headers, ...restOptions } = options
   let fetchUrl = url
 
-
   // 处理 Query 参数
-  if (params) {
+  const queryParams: Record<string, any> = params ? { ...params } : {}
+
+  // /ncmanagement/class/zones-tree 接口添加 lang 参数，默认 'zh'，并同步当前选中的语言
+  if (url.includes('/ncmanagement/class/zones-tree')) {
+    if (!queryParams.lang) {
+      queryParams.lang = getCurrentLanguage() || 'zh'
+    }
+  }
+
+  if (Object.keys(queryParams).length > 0) {
     const searchParams = new URLSearchParams()
-    Object.entries(params).forEach(([key, value]) => {
+    Object.entries(queryParams).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         searchParams.append(key, String(value))
       }
@@ -26,6 +47,11 @@ async function request<T = any>(url: string, options: RequestOptions = {}): Prom
   // 统一处理 Header，添加 Token
   const customHeaders = new Headers(headers)
   const token = localStorage.getItem('access_token')
+
+  // 默认附带语言头
+  if (!customHeaders.has('Accept-Language')) {
+    customHeaders.set('Accept-Language', getCurrentLanguage() || 'zh')
+  }
   
   // 文章列表等公开接口不传 token，防止部分后端由于传递了无关 token 导致异常
   const noTokenUrls = ['/api-cas/api/get-articles']

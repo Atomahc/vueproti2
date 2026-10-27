@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
@@ -226,17 +227,20 @@ const confirmLocation = () => {
   closeMapModal()
 }
 
+const { locale } = useI18n()
+
 const fetchConvenience = async () => {
   try {
     const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'convenience',
       platform: 'portal',
-      userType: ''
+      userType: '',
+      lang: locale.value || 'zh'
     })
     if (res.code === 0 && res.data && res.data.convenience) {
       const list = res.data.convenience
       
-      const ld = list.find((item: any) => item.name === '劳道智工')
+      const ld = list.find((item: any) => item.name === '劳道智工' || item.name?.includes('劳道')) || list[0]
       if (ld) {
         laodaoInfo.value = ld
         laodaoTags.value = ld.children || []
@@ -304,6 +308,10 @@ const fetchJobs = async () => {
     console.error('Failed to fetch jobs', e)
   }
 }
+
+watch(locale, () => {
+  fetchConvenience()
+})
 
 onMounted(() => {
   fetchDicts()

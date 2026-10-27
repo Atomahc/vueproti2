@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
@@ -8,6 +9,8 @@ import TheNavBar from '../../components/TheNavBar.vue'
 
 const router = useRouter()
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX || ''
+
+const { locale } = useI18n()
 
 const cultureTags = ref<any[]>([])
 const pageTitle = ref('文旅服务')
@@ -17,11 +20,12 @@ const fetchConvenience = async () => {
     const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'convenience',
       platform: 'portal',
-      userType: ''
+      userType: '',
+      lang: locale.value || 'zh'
     })
     if (res.code === 0 && res.data && res.data.convenience) {
       const list = res.data.convenience
-      const cultureNode = list.find((item: any) => item.name === '文旅服务')
+      const cultureNode = list.find((item: any) => item.name === '文旅服务' || item.name?.includes('文旅')) || list.find((item: any) => item.children && item.children.length > 0)
       if (cultureNode) {
         pageTitle.value = cultureNode.name
         cultureTags.value = cultureNode.children || []
@@ -31,6 +35,10 @@ const fetchConvenience = async () => {
     console.error('Failed to fetch convenience services for culture', e)
   }
 }
+
+watch(locale, () => {
+  fetchConvenience()
+})
 
 onMounted(() => {
   fetchConvenience()

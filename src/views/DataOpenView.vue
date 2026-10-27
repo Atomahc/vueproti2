@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
@@ -113,6 +114,8 @@ const dashboardData: Record<string, { title: string; options: { label: string; i
   }
 }
 
+const { locale } = useI18n()
+
 const handleMenuClick = (menuId: string) => {
   activeMenu.value = menuId
   activeSubIndex.value = 0
@@ -123,17 +126,18 @@ const fetchDataOpen = async () => {
     const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'data_open',
       platform: 'portal',
-      userType: ''
+      userType: '',
+      lang: locale.value || 'zh'
     })
     if (res.code === 0 && res.data && res.data.data_open) {
       const list = res.data.data_open
       
-      const stat = list.find((item: any) => item.name === '统计数据查阅')
+      const stat = list.find((item: any) => item.id === 22994 || item.name === '统计数据查阅' || item.name?.includes('统计')) || list[0]
       if (stat) {
         statSection.value = stat
       }
 
-      const vis = list.find((item: any) => item.name === '数据可视化看板')
+      const vis = list.find((item: any) => item.id === 22995 || item.name === '数据可视化看板' || item.name?.includes('看板')) || list[1]
       if (vis) {
         visSection.value = vis
       }
@@ -142,6 +146,11 @@ const fetchDataOpen = async () => {
     console.error('Failed to fetch data open:', e)
   }
 }
+
+// 切换语言时同步刷新数据公开接口
+watch(locale, () => {
+  fetchDataOpen()
+})
 
 const handleNavigate = (url: string) => {
   if (url) {

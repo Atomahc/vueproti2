@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import { getSupplyDemandList } from '@/api/supplyDemand'
 import TheHeader from '../../components/TheHeader.vue'
@@ -24,12 +25,15 @@ const enterpriseBsCategories = ref<any[]>([])
 const defaultColors = ['#00c4cc', '#1890ff', '#2f54eb', '#52c41a', '#fa8c16', '#fa541c']
 const defaultBgColors = ['#e6fcfc', '#e6f7ff', '#f0f5ff', '#f6ffed', '#fff7e6', '#fff2e8']
 
+const { locale } = useI18n()
+
 const fetchGovServices = async () => {
   try {
     const res: any = await http.get('/prod-api/ncmanagement/class/zones-tree', {
       zoneType: 'gov_service',
       platform: 'portal',
-      userType: ''
+      userType: '',
+      lang: locale.value || 'zh'
     })
     
     if (res.code === 0 && res.data && res.data.gov_service) {
@@ -176,6 +180,10 @@ const fetchSupplyDemand = async () => {
     console.error('Fetch supply demand failed', error)
   }
 }
+
+watch(locale, () => {
+  fetchGovServices()
+})
 
 onMounted(() => {
   fetchGovServices()

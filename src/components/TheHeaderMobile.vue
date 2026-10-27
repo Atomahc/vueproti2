@@ -108,6 +108,9 @@ const toggleLangDropdown = () => {
 }
 const changeLanguage = (lang: string) => {
   locale.value = lang
+  try {
+    localStorage.setItem('lang', lang)
+  } catch (e) {}
   showLangDropdown.value = false
 }
 
