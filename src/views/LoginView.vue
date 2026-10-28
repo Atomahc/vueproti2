@@ -1,24 +1,23 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 const isLoading = ref(false)
-const loginText = ref('SSO 授权登录')
 
 // 1. 第一步：向后端请求 SSO 授权页面 URL 并跳转
 const handleSSOLogin = async () => {
   isLoading.value = true
-  loginText.value = '正在跳转...'
 
   try {
     const res: any = await http.get('/prod-api/member/auth/sso/url?client=portal')
     const ssoUrl = res.url || res.data?.url
-    console.log('SSO 登录地址:', ssoUrl)
     if (!ssoUrl) {
-      throw new Error('获取 SSO 登录地址失败')
+      throw new Error('SSO URL error')
     }
 
     // 解析出 state 保存到本地，用于回调防篡改校验
@@ -26,21 +25,20 @@ const handleSSOLogin = async () => {
     const state = urlObj.searchParams.get('state')
 
     if (!state) {
-      throw new Error('SSO state 无效')
+      throw new Error('SSO state error')
     }
 
     sessionStorage.setItem('sso_state', state)
     window.location.href = ssoUrl
 
   } catch (err: any) {
-    alert(err.message || '网络请求错误')
+    alert(err.message || 'Error')
     resetState()
   }
 }
 
 const resetState = () => {
   isLoading.value = false
-  loginText.value = 'SSO 授权登录'
   router.replace('/login')
 }
 </script>
@@ -80,8 +78,8 @@ const resetState = () => {
             />
           </svg>
         </div>
-        <h1>系统登录</h1>
-        <p>统一身份认证平台 (SSO)</p>
+        <h1>{{ t('login.title') }}</h1>
+        <p>{{ t('login.ssoLogin') }} (SSO)</p>
       </div>
 
       <div class="login-content">
@@ -92,7 +90,7 @@ const resetState = () => {
             @click="handleSSOLogin"
             :disabled="isLoading"
           >
-            <span class="btn-text" v-if="!isLoading">{{ loginText }}</span>
+            <span class="btn-text" v-if="!isLoading">{{ t('login.ssoAuthLogin') }}</span>
             <span class="loader" v-else></span>
           </button>
 
@@ -107,33 +105,33 @@ const resetState = () => {
             >
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            企业级安全认证，无需记忆密码
+            {{ t('login.enterpriseSecurity') }}
           </p>
         </div>
 
         <div class="divider">
-          <span>其他方式</span>
+          <span>{{ t('login.otherWays') }}</span>
         </div>
 
         <form class="regular-login" @submit.prevent>
           <div class="input-group">
             <input type="text" id="username" placeholder=" " required />
-            <label for="username">用户名</label>
+            <label for="username">{{ t('login.username') }}</label>
           </div>
           <div class="input-group">
             <input type="password" id="password" placeholder=" " required />
-            <label for="password">密码</label>
+            <label for="password">{{ t('login.password') }}</label>
           </div>
 
           <div class="form-actions">
             <label class="remember-me">
               <input type="checkbox" />
-              <span>自动登录</span>
+              <span>{{ t('login.autoLogin') }}</span>
             </label>
-            <a href="#" class="forgot-pwd">忘记密码？</a>
+            <a href="#" class="forgot-pwd">{{ t('login.forgotPwd') }}</a>
           </div>
 
-          <button type="submit" class="primary-btn">普通登录</button>
+          <button type="submit" class="primary-btn">{{ t('login.normalLogin') }}</button>
         </form>
       </div>
     </div>

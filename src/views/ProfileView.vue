@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
@@ -10,6 +11,7 @@ import MyFawuView from './MyFawuView.vue'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 const userInfo = ref<any>({})
 
 const currentMenu = ref(route.query.tab ? String(route.query.tab) : 'profile')
@@ -54,10 +56,11 @@ const switchMenu = (menu: string) => {
 }
 
 const getUserTypeName = (type: string) => {
-  if (type === 'foreigner') return '境外人员'
-  if (type === 'citizen') return '个人'
-  if (type === 'enterprise') return '企业'
-  if (type === 'gov') return '政务'
+  if (type === 'foreigner') return t('profile.foreign')
+  if (type === 'citizen') return t('profile.personal')
+  if (type === 'enterprise') return t('profile.enterprise')
+  if (type === 'gov') return t('profile.gov')
+  return type || '-'
 }
 </script>
 
@@ -73,34 +76,34 @@ const getUserTypeName = (type: string) => {
         <div class="sidebar">
           <div class="user-card">
             <img :src="userInfo.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'" class="avatar" alt="avatar" />
-            <h3 class="username">{{ userInfo.nickName || userInfo.name || userInfo.username || userInfo.realName || '用户' }}</h3>
-            <p class="phone">{{ userInfo.phone || userInfo.mobile || '暂无手机号' }}</p>
+            <h3 class="username">{{ userInfo.nickName || userInfo.name || userInfo.username || userInfo.realName || t('header.user') }}</h3>
+            <p class="phone">{{ userInfo.phone || userInfo.mobile || t('profile.noPhone') }}</p>
           </div>
           
           <nav class="profile-nav">
             <a href="javascript:void(0)" :class="['nav-item', { active: currentMenu === 'profile' }]" @click="switchMenu('profile')">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-              我的资料
+              {{ t('profile.myInfo') }}
             </a>
             <a href="javascript:void(0)" :class="['nav-item', { active: currentMenu === 'direct' }]" @click="switchMenu('direct')">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              诉求工单
+              {{ t('profile.myTickets') }}
             </a>
             <a href="javascript:void(0)" :class="['nav-item', { active: currentMenu === 'snapshot' }]" @click="switchMenu('snapshot')">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-              我的随手拍
+              {{ t('profile.mySnap') }}
             </a>
             <a href="javascript:void(0)" :class="['nav-item', { active: currentMenu === 'consult' }]" @click="switchMenu('consult')">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-              我的咨询
+              {{ t('profile.myConsult') }}
             </a>
             <a href="javascript:void(0)" :class="['nav-item', { active: currentMenu === 'appointment' }]" @click="switchMenu('appointment')">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              我的预约
+              {{ t('profile.myAppointment') }}
             </a>
             <a href="javascript:void(0)" class="nav-item logout" @click="handleLogout">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-              退出登陆
+              {{ t('profile.logout') }}
             </a>
           </nav>
         </div>
@@ -109,38 +112,38 @@ const getUserTypeName = (type: string) => {
         <div class="content-area">
           <div v-if="currentMenu === 'profile'">
             <div class="content-header">
-              <h2>我的资料</h2>
+              <h2>{{ t('profile.myInfo') }}</h2>
             </div>
             
             <div class="info-list">
               <div class="info-item">
-                <span class="label">头像</span>
+                <span class="label">{{ t('profile.avatar') }}</span>
                 <div class="value">
                   <img :src="userInfo.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'" class="info-avatar" alt="avatar" />
                 </div>
               </div>
               <div class="info-item">
-                <span class="label">用户名</span>
+                <span class="label">{{ t('profile.username') }}</span>
                 <span class="value">{{ userInfo.username || userInfo.name || '-' }}</span>
               </div>
               <div class="info-item">
-                <span class="label">姓名/昵称</span>
+                <span class="label">{{ t('profile.nameNickname') }}</span>
                 <span class="value">{{ userInfo.realName || userInfo.nickName || userInfo.memberName || '-' }}</span>
               </div>
               <div class="info-item">
-                <span class="label">用户身份</span>
+                <span class="label">{{ t('profile.identity') }}</span>
                 <span class="value">{{ getUserTypeName(userInfo.userType) }}</span>
               </div>
               <div class="info-item">
-                <span class="label">手机号码</span>
+                <span class="label">{{ t('profile.phone') }}</span>
                 <span class="value">{{ userInfo.phone || userInfo.mobile || '-' }}</span>
               </div>
               <div class="info-item">
-                <span class="label">电子邮箱</span>
+                <span class="label">{{ t('profile.email') }}</span>
                 <span class="value">{{ userInfo.email || '-' }}</span>
               </div>
               <div class="info-item" v-if="userInfo.idCard">
-                <span class="label">身份证号</span>
+                <span class="label">{{ t('profile.idCard') }}</span>
                 <span class="value">{{ userInfo.idCard.replace(/^(.{4})(.*)(.{4})$/, '$1**********$3') }}</span>
               </div>
             </div>

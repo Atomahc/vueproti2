@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { http } from '@/api/request'
+import { useI18n } from 'vue-i18n'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
 import TheNavBar from '../components/TheNavBar.vue'
+
+const { t } = useI18n()
 
 const props = defineProps({
   asComponent: { type: Boolean, default: false },
@@ -105,33 +108,33 @@ onMounted(() => {
     <main :class="['main-content', { 'component-main': asComponent }]">
       <TheNavBar v-if="!asComponent" activeId="" />
       <div :class="['content-container', { 'component-container': asComponent }]">
-        <h2 v-if="!asComponent">我的工单</h2>
+        <h2 v-if="!asComponent">{{ t('tickets.title') }}</h2>
         
         <div class="tabs-header">
-          <button :class="['tab-btn', { active: activeTab === 'snapshot' }]" @click="handleTabSwitch('snapshot')">随手拍</button>
-          <button :class="['tab-btn', { active: activeTab === 'direct' }]" @click="handleTabSwitch('direct')">诉求直通车</button>
+          <button :class="['tab-btn', { active: activeTab === 'snapshot' }]" @click="handleTabSwitch('snapshot')">{{ t('tickets.snapshot') }}</button>
+          <button :class="['tab-btn', { active: activeTab === 'direct' }]" @click="handleTabSwitch('direct')">{{ t('tickets.directAppeals') }}</button>
         </div>
 
         <div class="ticket-list" v-if="!loading">
           <div v-for="item in list" :key="item.id" class="ticket-card" @click="openDetail(item.id)">
             <div class="ticket-header">
-              <span class="ticket-title">{{ item.title || '无标题' }}</span>
-              <span :class="['status-badge', `status-${item.status}`]">{{ item.statusName || '未知状态' }}</span>
+              <span class="ticket-title">{{ item.title || t('fawu.noTitle') }}</span>
+              <span :class="['status-badge', `status-${item.status}`]">{{ item.statusName || t('tickets.unknownStatus') }}</span>
             </div>
             <div class="ticket-body">
-              <span class="ticket-type">类型：{{ activeTab === 'snapshot' ? (item.reportTypeName || item.reportType || '未知') : (item.typeName || '未知') }}</span>
-              <span class="ticket-time">提交时间：{{ item.createTime }}</span>
+              <span class="ticket-type">{{ t('tickets.typeLabel') }}{{ activeTab === 'snapshot' ? (item.reportTypeName || item.reportType || t('fawu.unknown')) : (item.typeName || t('fawu.unknown')) }}</span>
+              <span class="ticket-time">{{ t('tickets.submitTimeLabel') }}{{ item.createTime }}</span>
             </div>
           </div>
           
-          <div v-if="list.length === 0" class="empty-state">暂无工单记录</div>
+          <div v-if="list.length === 0" class="empty-state">{{ t('tickets.noTickets') }}</div>
         </div>
-        <div v-else class="loading-state">加载中...</div>
+        <div v-else class="loading-state">{{ t('common.loading') }}</div>
 
         <div class="pagination" v-if="total > 0 && !loading">
-          <button :disabled="currentPage === 1" @click="prevPage">上一页</button>
+          <button :disabled="currentPage === 1" @click="prevPage">{{ t('common.prevPage') }}</button>
           <span>{{ currentPage }} / {{ Math.ceil(total / pageSize) }}</span>
-          <button :disabled="currentPage * pageSize >= total" @click="nextPage">下一页</button>
+          <button :disabled="currentPage * pageSize >= total" @click="nextPage">{{ t('common.nextPage') }}</button>
         </div>
       </div>
     </main>
@@ -142,47 +145,47 @@ onMounted(() => {
       <div class="modal-content">
         <button class="modal-close-btn" @click="closeDetail">×</button>
         <div v-if="detailData" class="detail-container">
-          <h2 class="detail-title">{{ detailData.title || '工单详情' }}</h2>
+          <h2 class="detail-title">{{ detailData.title || t('tickets.ticketDetail') }}</h2>
           <div class="detail-meta">
-            <span><strong>状态：</strong><span :class="['status-badge', `status-${detailData.status}`]">{{ detailData.statusName || '未知状态' }}</span></span>
-            <span v-if="activeTab === 'snapshot'"><strong>上报类型：</strong>{{ detailData.reportTypeName || detailData.reportType }}</span>
-            <span v-else><strong>诉求类型：</strong>{{ detailData.typeName }}</span>
-            <span><strong>提交时间：</strong>{{ detailData.createTime }}</span>
+            <span><strong>{{ t('fawu.statusLabel') }}</strong><span :class="['status-badge', `status-${detailData.status}`]">{{ detailData.statusName || t('tickets.unknownStatus') }}</span></span>
+            <span v-if="activeTab === 'snapshot'"><strong>{{ t('tickets.reportTypeLabel') }}</strong>{{ detailData.reportTypeName || detailData.reportType }}</span>
+            <span v-else><strong>{{ t('tickets.appealTypeLabel') }}</strong>{{ detailData.typeName }}</span>
+            <span><strong>{{ t('tickets.submitTimeLabel') }}</strong>{{ detailData.createTime }}</span>
           </div>
           
           <div class="detail-section">
-            <h3>工单内容</h3>
-            <p>{{ detailData.content || '无详细描述' }}</p>
+            <h3>{{ t('tickets.ticketContent') }}</h3>
+            <p>{{ detailData.content || t('fawu.noDetailDesc') }}</p>
           </div>
 
           <div class="detail-section" v-if="detailData.imageUrls && detailData.imageUrls !== '[]' && detailData.imageUrls !== ''">
-            <h3>附加图片</h3>
+            <h3>{{ t('tickets.attachedImages') }}</h3>
             <div class="image-gallery">
               <img v-for="(img, idx) in getImages(detailData.imageUrls)" :key="idx" :src="getImageUrl(img)" class="detail-img" />
             </div>
           </div>
 
           <div class="detail-section" v-if="detailData.address">
-            <h3>相关地址</h3>
+            <h3>{{ t('tickets.relatedAddress') }}</h3>
             <p>{{ detailData.address }}</p>
           </div>
 
           <div class="detail-section" v-if="detailData.deptName">
-            <h3>处理部门</h3>
+            <h3>{{ t('tickets.handlingDept') }}</h3>
             <p>{{ detailData.deptName }}</p>
           </div>
 
           <div class="detail-section" v-if="detailData.closeTime">
-            <h3>办结时间</h3>
+            <h3>{{ t('tickets.closeTime') }}</h3>
             <p>{{ detailData.closeTime }}</p>
           </div>
 
           <div class="detail-section" v-if="detailData.cancelReason">
-            <h3>撤销原因</h3>
+            <h3>{{ t('tickets.cancelReason') }}</h3>
             <p>{{ detailData.cancelReason }}</p>
           </div>
         </div>
-        <div v-else class="loading-state">加载中...</div>
+        <div v-else class="loading-state">{{ t('common.loading') }}</div>
       </div>
     </div>
   </div>

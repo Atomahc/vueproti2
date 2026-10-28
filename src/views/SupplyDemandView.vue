@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { triggerSSOLogin } from '@/api/request'
 import { 
   getSupplyDemandList, 
@@ -16,6 +17,7 @@ import TheHeader from '@/components/TheHeader.vue'
 import TheFooter from '@/components/TheFooter.vue'
 import TheNavBar from '@/components/TheNavBar.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 
 const isLoggedIn = ref(!!localStorage.getItem('access_token'))
@@ -175,18 +177,18 @@ const handleEditClick = (item: any) => {
 }
 
 const handleDeleteClick = async (id: number | string) => {
-  if (!confirm('确定要删除这条信息吗？')) return
+  if (!confirm(t('supplyDemand.confirmDelete'))) return
   try {
     const res: any = await deleteMySupplyDemand(id)
     if (res.code === 0) {
-      alert('删除成功')
+      alert(t('supplyDemand.deleteSuccess'))
       fetchList()
     } else {
-      alert(res.msg || '删除失败')
+      alert(res.msg || t('supplyDemand.deleteSuccess'))
     }
   } catch(err) {
     console.error(err)
-    alert('删除失败')
+    alert(t('supplyDemand.deleteSuccess'))
   }
 }
 
@@ -196,7 +198,7 @@ const closePublishModal = () => {
 
 const submitPublish = async () => {
   if (!publishForm.value.title || !publishForm.value.contactName || !publishForm.value.contactPhone) {
-    alert('请填写完整必填信息')
+    alert(t('supplyDemand.fillRequired'))
     return
   }
   try {
@@ -208,15 +210,15 @@ const submitPublish = async () => {
     }
     
     if (res.code === 0) {
-      alert(isEditing.value ? '修改成功' : '发布成功')
+      alert(isEditing.value ? t('supplyDemand.updateSuccess') : t('supplyDemand.publishSuccess'))
       showPublishModal.value = false
       fetchList()
     } else {
-      alert(res.msg || '操作失败')
+      alert(res.msg || t('services.submitFailed'))
     }
   } catch (err) {
     console.error('操作失败', err)
-    alert('操作成功 (Mock)')
+    alert(t('supplyDemand.publishSuccess'))
     showPublishModal.value = false
     fetchList()
   }
@@ -229,7 +231,7 @@ const openDetail = async (id: number) => {
       detailData.value = res.data
       showDetailModal.value = true
     } else {
-      alert(res.msg || '获取详情失败')
+      alert(res.msg || t('services.loadServiceFailed'))
     }
   } catch (err) {
     console.error(err)
@@ -245,10 +247,10 @@ const closeDetailModal = () => {
 
 const getTypeLabel = (type: string) => {
   if (!typeDict.value.length) {
-    return type === 'supply' ? '供应' : (type === 'demand' ? '需求' : type)
+    return type === 'supply' ? t('supplyDemand.supply') : (type === 'demand' ? t('supplyDemand.demand') : type)
   }
   const dict = typeDict.value.find(d => d.dictValue === type)
-  return dict ? dict.dictLabel : (type === 'supply' ? '供应' : '需求')
+  return dict ? dict.dictLabel : (type === 'supply' ? t('supplyDemand.supply') : t('supplyDemand.demand'))
 }
 
 const getCategoryLabel = (cat: string) => {
@@ -271,41 +273,41 @@ const getTypeColor = (type: string) => {
       <div class="hero-box">
         <div class="filter-bar">
            <div class="filter-item">
-              <input type="text" v-model="queryParams.title" placeholder="输入标题搜索" class="form-control filter-input" @keyup.enter="handleSearch" />
+              <input type="text" v-model="queryParams.title" :placeholder="t('supplyDemand.searchTitlePlaceholder')" class="form-control filter-input" @keyup.enter="handleSearch" />
            </div>
            <div class="filter-item">
               <select v-model="queryParams.type" class="form-control" @change="handleSearch">
-                 <option value="">所有类型</option>
+                 <option value="">{{ t('supplyDemand.allTypes') }}</option>
                  <option v-for="d in typeDict" :key="d.dictValue" :value="d.dictValue">{{ d.dictLabel }}</option>
-                 <option value="supply" v-if="!typeDict.length">供应</option>
-                 <option value="demand" v-if="!typeDict.length">需求</option>
+                 <option value="supply" v-if="!typeDict.length">{{ t('supplyDemand.supply') }}</option>
+                 <option value="demand" v-if="!typeDict.length">{{ t('supplyDemand.demand') }}</option>
               </select>
            </div>
            <div class="filter-item">
               <select v-model="queryParams.category" class="form-control" @change="handleSearch">
-                 <option value="">所有分类</option>
+                 <option value="">{{ t('supplyDemand.allCategories') }}</option>
                  <option v-for="d in categoryDict" :key="d.dictValue" :value="d.dictValue">{{ d.dictLabel }}</option>
               </select>
            </div>
-           <button class="btn btn-primary search-btn" @click="handleSearch">搜索</button>
+           <button class="btn btn-primary search-btn" @click="handleSearch">{{ t('common.search') }}</button>
         </div>
         <div class="tabs-container">
           <div class="tabs">
             <div class="tab-item" :class="{ active: currentTab === 'all' }" @click="switchTab('all')">
-              供需市场
+              {{ t('supplyDemand.market') }}
             </div>
             <div class="tab-item" :class="{ active: currentTab === 'my' }" @click="switchTab('my')">
-              我发布的
+              {{ t('supplyDemand.myPublish') }}
             </div>
           </div>
           <div class="action-bar">
-            <button class="btn btn-primary" @click="handlePublishClick">发布供需</button>
+            <button class="btn btn-primary" @click="handlePublishClick">{{ t('supplyDemand.publishBtn') }}</button>
           </div>
         </div>
 
         <div class="list-container">
-          <div v-if="loading" class="loading-state">加载中...</div>
-          <div v-else-if="dataList.length === 0" class="empty-state">暂无供需数据</div>
+          <div v-if="loading" class="loading-state">{{ t('common.loading') }}</div>
+          <div v-else-if="dataList.length === 0" class="empty-state">{{ t('supplyDemand.noData') }}</div>
           <div v-else class="data-wrapper">
              <div class="data-grid">
                <div class="data-card" v-for="item in dataList" :key="item.id" @click="openDetail(item.id)">
@@ -316,22 +318,22 @@ const getTypeColor = (type: string) => {
                    <h3 class="title" :title="item.title">{{ item.title }}</h3>
                  </div>
                  <div class="card-body">
-                   <p class="content-preview">{{ item.content || '暂无详细描述...' }}</p>
+                   <p class="content-preview">{{ item.content || t('supplyDemand.noDesc') }}</p>
                    <div class="meta-info">
                      <div class="meta-item">
-                       <strong>联系人:</strong> {{ item.contactName }}
+                       <strong>{{ t('supplyDemand.contactPerson') }}:</strong> {{ item.contactName }}
                      </div>
                      <div class="meta-item" v-if="item.category">
-                       <strong>分类:</strong> {{ getCategoryLabel(item.category) }}
+                       <strong>{{ t('supplyDemand.category') }}:</strong> {{ getCategoryLabel(item.category) }}
                      </div>
                    </div>
                  </div>
                  <div class="card-footer">
                    <span class="date">{{ item.createTime || item.updateTime }}</span>
-                   <span class="view-count" v-if="currentTab !== 'my'">浏览: {{ item.viewCount || 0 }}</span>
+                   <span class="view-count" v-if="currentTab !== 'my'">{{ t('supplyDemand.views') }}: {{ item.viewCount || 0 }}</span>
                    <div class="card-actions-inline" v-if="currentTab === 'my'" @click.stop>
-                      <button class="btn-text text-primary" @click="handleEditClick(item)">编辑</button>
-                      <button class="btn-text text-danger" @click="handleDeleteClick(item.id)">删除</button>
+                      <button class="btn-text text-primary" @click="handleEditClick(item)">{{ t('supplyDemand.edit') }}</button>
+                      <button class="btn-text text-danger" @click="handleDeleteClick(item.id)">{{ t('supplyDemand.delete') }}</button>
                    </div>
                  </div>
                </div>
@@ -339,9 +341,9 @@ const getTypeColor = (type: string) => {
              
              <!-- 分页控制 -->
              <div class="pagination" v-if="total > 0">
-                <button class="btn btn-default" :disabled="queryParams.page === 1" @click="handlePageChange(-1)">上一页</button>
+                <button class="btn btn-default" :disabled="queryParams.page === 1" @click="handlePageChange(-1)">{{ t('common.prevPage') }}</button>
                 <span class="page-info">{{ queryParams.page }} / {{ Math.ceil(total / queryParams.limit) }}</span>
-                <button class="btn btn-default" :disabled="queryParams.page * queryParams.limit >= total" @click="handlePageChange(1)">下一页</button>
+                <button class="btn btn-default" :disabled="queryParams.page * queryParams.limit >= total" @click="handlePageChange(1)">{{ t('common.nextPage') }}</button>
              </div>
           </div>
         </div>
@@ -364,22 +366,22 @@ const getTypeColor = (type: string) => {
         </div>
         <div class="modal-body detail-body">
           <div class="detail-meta">
-             <div class="meta-tag" v-if="detailData.category">分类: {{ getCategoryLabel(detailData.category) }}</div>
-             <div class="meta-tag">发布时间: {{ detailData.createTime }}</div>
-             <div class="meta-tag">浏览次数: {{ detailData.viewCount || 0 }}</div>
+             <div class="meta-tag" v-if="detailData.category">{{ t('supplyDemand.category') }}: {{ getCategoryLabel(detailData.category) }}</div>
+             <div class="meta-tag">{{ t('supplyDemand.publishTime') }}: {{ detailData.createTime }}</div>
+             <div class="meta-tag">{{ t('supplyDemand.viewsCount') }}: {{ detailData.viewCount || 0 }}</div>
           </div>
           <div class="detail-content-box">
-             <h4 class="section-title">详细说明</h4>
-             <div class="detail-content">{{ detailData.content || '无' }}</div>
+             <h4 class="section-title">{{ t('supplyDemand.detailDesc') }}</h4>
+             <div class="detail-content">{{ detailData.content || t('supplyDemand.noDesc') }}</div>
           </div>
           <div class="contact-card">
-             <h4 class="section-title">联系方式</h4>
+             <h4 class="section-title">{{ t('supplyDemand.contactInfo') }}</h4>
              <div class="contact-info">
                 <div class="contact-item">
-                   <span class="label">联系人：</span> <span class="value">{{ detailData.contactName }}</span>
+                   <span class="label">{{ t('supplyDemand.contactPerson') }}：</span> <span class="value">{{ detailData.contactName }}</span>
                 </div>
                 <div class="contact-item">
-                   <span class="label">电话：</span> <span class="value phone-value">{{ detailData.contactPhone }}</span>
+                   <span class="label">{{ t('services.phone') }}：</span> <span class="value phone-value">{{ detailData.contactPhone }}</span>
                 </div>
              </div>
           </div>
@@ -391,49 +393,49 @@ const getTypeColor = (type: string) => {
     <div v-if="showPublishModal" class="modal-overlay" @click.self="closePublishModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>{{ isEditing ? '修改供需信息' : '发布供需信息' }}</h3>
+          <h3>{{ isEditing ? t('supplyDemand.editModalTitle') : t('supplyDemand.publishModalTitle') }}</h3>
           <button class="close-btn" @click="closePublishModal">×</button>
         </div>
         <div class="modal-body">
           <div class="form-row">
              <div class="form-group flex-1">
-               <label>信息类型 <span class="required">*</span></label>
+               <label>{{ t('supplyDemand.infoType') }} <span class="required">*</span></label>
                <select v-model="publishForm.type" class="form-control">
                  <option v-for="d in typeDict" :key="d.dictValue" :value="d.dictValue">{{ d.dictLabel }}</option>
-                 <option value="supply" v-if="!typeDict.length">提供供应</option>
-                 <option value="demand" v-if="!typeDict.length">寻找需求</option>
+                 <option value="supply" v-if="!typeDict.length">{{ t('supplyDemand.provideSupply') }}</option>
+                 <option value="demand" v-if="!typeDict.length">{{ t('supplyDemand.findDemand') }}</option>
                </select>
              </div>
              <div class="form-group flex-1">
-               <label>信息分类</label>
+               <label>{{ t('supplyDemand.infoCategory') }}</label>
                <select v-model="publishForm.category" class="form-control">
-                 <option value="">请选择分类</option>
+                 <option value="">{{ t('supplyDemand.selectCategory') }}</option>
                  <option v-for="d in categoryDict" :key="d.dictValue" :value="d.dictValue">{{ d.dictLabel }}</option>
                </select>
              </div>
           </div>
           <div class="form-group">
-            <label>标题 <span class="required">*</span></label>
-            <input type="text" v-model="publishForm.title" class="form-control" placeholder="请输入标题（最多50字）" maxlength="50" />
+            <label>{{ t('supplyDemand.titleLabel') }} <span class="required">*</span></label>
+            <input type="text" v-model="publishForm.title" class="form-control" :placeholder="t('supplyDemand.titlePlaceholder')" maxlength="50" />
           </div>
           <div class="form-group">
-            <label>内容描述</label>
-            <textarea v-model="publishForm.content" class="form-control" rows="5" placeholder="请输入详细的供需说明..."></textarea>
+            <label>{{ t('supplyDemand.descLabel') }}</label>
+            <textarea v-model="publishForm.content" class="form-control" rows="5" :placeholder="t('supplyDemand.descPlaceholder')"></textarea>
           </div>
           <div class="form-row">
              <div class="form-group flex-1">
-               <label>联系人 <span class="required">*</span></label>
-               <input type="text" v-model="publishForm.contactName" class="form-control" placeholder="请输入联系人姓名" />
+               <label>{{ t('supplyDemand.contactPerson') }} <span class="required">*</span></label>
+               <input type="text" v-model="publishForm.contactName" class="form-control" :placeholder="t('supplyDemand.contactNamePlaceholder')" />
              </div>
              <div class="form-group flex-1">
-               <label>联系电话 <span class="required">*</span></label>
-               <input type="text" v-model="publishForm.contactPhone" class="form-control" placeholder="请输入联系电话" />
+               <label>{{ t('supplyDemand.contactPhone') }} <span class="required">*</span></label>
+               <input type="text" v-model="publishForm.contactPhone" class="form-control" :placeholder="t('supplyDemand.contactPhonePlaceholder')" />
              </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-default" @click="closePublishModal">取消</button>
-          <button class="btn btn-primary" @click="submitPublish">{{ isEditing ? '保存修改' : '确认发布' }}</button>
+          <button class="btn btn-default" @click="closePublishModal">{{ t('common.cancel') }}</button>
+          <button class="btn btn-primary" @click="submitPublish">{{ isEditing ? t('supplyDemand.saveChanges') : t('supplyDemand.confirmPublish') }}</button>
         </div>
       </div>
     </div>

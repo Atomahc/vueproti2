@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
 import TheNavBar from '../components/TheNavBar.vue'
+
+const { t } = useI18n()
 
 const handleSelectChange = (event: Event) => {
   const target = event.target as HTMLSelectElement
@@ -22,7 +25,7 @@ const handleSelectChange = (event: Event) => {
 
       <div class="hero-box">
         <div class="page-header">
-          <h2 class="page-title">站群导航</h2>
+          <h2 class="page-title">{{ t('siteGroup.title') }}</h2>
         </div>
 
         <div class="border1 p10 links-section">
@@ -32,7 +35,7 @@ const handleSelectChange = (event: Event) => {
                 <td align="center">
                   <span class="titlestyle1452"></span> <a id="hu35"></a>
                   <select name="su35" class="selectstyle1452 custom-select" @change="handleSelectChange">
-                    <option value="">-- 国家部委网站 --</option>
+                    <option value="">{{ t('siteGroup.nationalMinistries') }}</option>
                     <option value="https://www.gov.cn/">中国政府网</option>
                     <option value="https://www.fmprc.gov.cn/web/">外交部</option>
                     <option value="http://www.mod.gov.cn/">国防部</option>
@@ -83,7 +86,7 @@ const handleSelectChange = (event: Event) => {
                 <td align="center">
                   <span class="titlestyle1453"></span> <a id="hu36"></a>
                   <select name="su36" class="selectstyle1453 custom-select" @change="handleSelectChange">
-                    <option value="">-- 各省市政府网站 --</option>
+                    <option value="">{{ t('siteGroup.provincialGov') }}</option>
                     <option value="http://www.beijing.gov.cn/">北京</option>
                     <option value="http://www.tj.gov.cn/">天津</option>
                     <option value="http://www.hebei.gov.cn/">河北</option>
@@ -127,7 +130,7 @@ const handleSelectChange = (event: Event) => {
                 <td align="center">
                   <span class="titlestyle1467"></span> <a id="hu37"></a>
                   <select name="su37" class="selectstyle1467 custom-select" @change="handleSelectChange">
-                    <option value="">-- 新疆地州市政府网站 --</option>
+                    <option value="">{{ t('siteGroup.xinjiangPrefectures') }}</option>
                     <option value="http://www.wlmq.gov.cn/">乌鲁木齐市</option>
                     <option value="http://www.xjyl.gov.cn/">伊犁哈萨克自治州</option>
                     <option value="http://www.xjtc.gov.cn/">塔城地区</option>
@@ -154,7 +157,7 @@ const handleSelectChange = (event: Event) => {
                 <td align="center">
                   <span class="titlestyle1468"></span> <a id="hu38"></a>
                   <select name="su38" class="selectstyle1468 custom-select" @change="handleSelectChange">
-                    <option value="">-- 其他网站 --</option>
+                    <option value="">{{ t('siteGroup.otherSites') }}</option>
                     <option value="http://www.ce.cn/">中国经济网</option>
                     <option value="http://www.china.com.cn/">中国网</option>
                     <option value="http://www.xinhuanet.com/">新华网</option>

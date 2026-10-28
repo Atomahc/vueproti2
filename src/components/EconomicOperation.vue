@@ -4,9 +4,9 @@
     <div class="top-indicators">
       <div class="indicator-card" v-for="(item, index) in topIndicators" :key="index">
         <div class="ind-title">{{ item.title }}</div>
-        <div class="ind-value">{{ item.value }}<span>亿元</span></div>
+        <div class="ind-value">{{ item.value }}<span>{{ t('dataOpen.yiYuan') }}</span></div>
         <div :class="['ind-trend', item.trend > 0 ? 'up' : 'down']">
-          {{ item.trend > 0 ? '▲' : '▼' }} 同比 {{ item.trend > 0 ? '+' : '' }}{{ item.trend }}%
+          {{ item.trend > 0 ? '▲' : '▼' }} {{ t('dataOpen.compareYoY') }} {{ item.trend > 0 ? '+' : '' }}{{ item.trend }}%
         </div>
         <div class="ind-line" :style="{ background: item.color }"></div>
       </div>
@@ -15,11 +15,11 @@
     <!-- 中间图表行1 -->
     <div class="charts-row">
       <div class="chart-card">
-        <div class="chart-title">地区生产总值三产结构</div>
+        <div class="chart-title">{{ t('dataOpen.gdpStructure') }}</div>
         <v-chart class="chart" :option="pieOption" autoresize />
       </div>
       <div class="chart-card">
-        <div class="chart-title">主要指标同比增速对比</div>
+        <div class="chart-title">{{ t('dataOpen.majorIndicatorsGrowth') }}</div>
         <v-chart class="chart" :option="barOption1" autoresize />
       </div>
     </div>
@@ -27,11 +27,11 @@
     <!-- 中间图表行2 -->
     <div class="charts-row">
       <div class="chart-card">
-        <div class="chart-title">主要指标本期与同期对比</div>
+        <div class="chart-title">{{ t('dataOpen.majorIndicatorsPeriod') }}</div>
         <v-chart class="chart" :option="barOption2" autoresize />
       </div>
       <div class="chart-card">
-        <div class="chart-title">营利性服务业细分行业营业收入 (1-5月)</div>
+        <div class="chart-title">{{ t('dataOpen.forProfitServiceRevenue') }}</div>
         <v-chart class="chart" :option="barOption3" autoresize />
       </div>
     </div>
@@ -40,10 +40,10 @@
     <div class="bottom-indicators">
       <div class="indicator-card" v-for="(item, index) in bottomIndicators" :key="index">
         <div class="ind-title">{{ item.title }}</div>
-        <div class="ind-value">{{ item.value }}<span>亿元</span></div>
-        <div class="ind-compare">同期 {{ item.compare }}亿元</div>
+        <div class="ind-value">{{ item.value }}<span>{{ t('dataOpen.yiYuan') }}</span></div>
+        <div class="ind-compare">{{ t('dataOpen.samePeriod') }} {{ item.compare }}{{ t('dataOpen.yiYuan') }}</div>
         <div :class="['ind-trend', item.trend > 0 ? 'up' : 'down']">
-          {{ item.trend > 0 ? '▲' : '▼' }} 同比 {{ item.trend > 0 ? '+' : '' }}{{ item.trend }}%
+          {{ item.trend > 0 ? '▲' : '▼' }} {{ t('dataOpen.compareYoY') }} {{ item.trend > 0 ? '+' : '' }}{{ item.trend }}%
         </div>
         <div class="ind-line-left" :style="{ background: item.color }"></div>
       </div>
@@ -52,7 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { use, graphic } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { PieChart, BarChart } from 'echarts/charts'
@@ -64,6 +65,8 @@ import {
 } from 'echarts/components'
 import VChart from 'vue-echarts'
 
+const { t } = useI18n()
+
 use([
   CanvasRenderer,
   PieChart,
@@ -74,26 +77,26 @@ use([
   GridComponent,
 ])
 
-const topIndicators = [
-  { title: '地区生产总值', value: '122.02', trend: 5.4, color: '#4bc0c0' },
-  { title: '规上工业增加值', value: '27.61', trend: 20.1, color: '#36a2eb' },
-  { title: '固定资产投资额', value: '19.68', trend: -20.0, color: '#ff6384' },
-  { title: '社会消费品零售总额', value: '2.61', trend: -9.4, color: '#ff9f40' },
-]
+const topIndicators = computed(() => [
+  { title: t('dataOpen.gdp'), value: '122.02', trend: 5.4, color: '#4bc0c0' },
+  { title: t('dataOpen.industrialAddedValue'), value: '27.61', trend: 20.1, color: '#36a2eb' },
+  { title: t('dataOpen.fixedAssetInvest'), value: '19.68', trend: -20.0, color: '#ff6384' },
+  { title: t('dataOpen.socialConsumerRetail'), value: '2.61', trend: -9.4, color: '#ff9f40' },
+])
 
-const bottomIndicators = [
-  { title: '金融存款余额', value: '148.33', compare: '135.93', trend: 9.1, color: '#4bc0c0' },
-  { title: '金融贷款余额', value: '134.34', compare: '86.02', trend: 56.2, color: '#36a2eb' },
-  { title: '外贸进出口\n(申报数)', value: '689.44', compare: '678.30', trend: 1.6, color: '#ff6384' },
-  { title: '外贸进出口\n(结关数)', value: '631.81', compare: '678.30', trend: -6.9, color: '#ff9f40' },
-]
+const bottomIndicators = computed(() => [
+  { title: t('dataOpen.financialDeposit'), value: '148.33', compare: '135.93', trend: 9.1, color: '#4bc0c0' },
+  { title: t('dataOpen.financialLoan'), value: '134.34', compare: '86.02', trend: 56.2, color: '#36a2eb' },
+  { title: t('dataOpen.foreignTradeDeclared'), value: '689.44', compare: '678.30', trend: 1.6, color: '#ff6384' },
+  { title: t('dataOpen.foreignTradeCustoms'), value: '631.81', compare: '678.30', trend: -6.9, color: '#ff9f40' },
+])
 
-const pieOption = ref({
+const pieOption = computed(() => ({
   tooltip: { trigger: 'item' },
   legend: { orient: 'vertical', left: 'left' },
   series: [
     {
-      name: '三产结构',
+      name: t('dataOpen.gdpStructure'),
       type: 'pie',
       radius: ['40%', '70%'],
       avoidLabelOverlap: false,
@@ -102,27 +105,46 @@ const pieOption = ref({
         borderColor: '#fff',
         borderWidth: 2
       },
-      label: { show: true, formatter: '{b}\n{c}亿元\n{d}%' },
+      label: { show: true, formatter: `{b}\n{c}${t('dataOpen.yiYuan')}\n{d}%` },
       data: [
-        { value: 6.71, name: '第一产业', itemStyle: { color: '#ff9f40' } },
-        { value: 24.95, name: '第二产业', itemStyle: { color: '#4bc0c0' } },
-        { value: 90.35, name: '第三产业', itemStyle: { color: '#ff6384' } },
+        { value: 6.71, name: t('dataOpen.primaryIndustry'), itemStyle: { color: '#ff9f40' } },
+        { value: 24.95, name: t('dataOpen.secondaryIndustry'), itemStyle: { color: '#4bc0c0' } },
+        { value: 90.35, name: t('dataOpen.tertiaryIndustry'), itemStyle: { color: '#ff6384' } },
       ],
     },
   ],
-})
+}))
 
-const barOption1 = ref({
+const barOption1 = computed(() => ({
   tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
   grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
   xAxis: { type: 'value' },
   yAxis: {
     type: 'category',
-    data: ['建筑业总产值', '限上零售业销售额', '固定资产投资额', '外贸进出口(结关)', '住宿业营业额', '交通运输仓储邮政', '营利性服务业营收', '地区生产总值', '一般公共预算收入', '金融存款余额', '农林牧渔业总产值', '规上工业增加值', '多式联运和运输代理', '餐饮业营业额', '规上工业总产值', '房地产销售面积', '金融贷款余额', '房地产销售额'].reverse()
+    data: [
+      t('dataOpen.constOutputValue'),
+      t('dataOpen.retailSalesAboveLimit'),
+      t('dataOpen.fixedAssetInvest'),
+      t('dataOpen.foreignTradeCustoms'),
+      t('dataOpen.accommodationRevenue'),
+      t('dataOpen.transportStoragePost'),
+      t('dataOpen.forProfitServiceRevenue'),
+      t('dataOpen.gdp'),
+      t('dataOpen.generalBudgetRevenue'),
+      t('dataOpen.financialDeposit'),
+      t('dataOpen.agriForestAnimalFishery'),
+      t('dataOpen.industrialAddedValue'),
+      t('dataOpen.multimodalTransportAgency'),
+      t('dataOpen.cateringRevenue'),
+      t('dataOpen.industrialGrossOutput'),
+      t('dataOpen.realEstateArea'),
+      t('dataOpen.financialLoan'),
+      t('dataOpen.realEstateSales')
+    ].reverse()
   },
   series: [
     {
-      name: '同比增速(%)',
+      name: t('dataOpen.yoyGrowth'),
       type: 'bar',
       label: { show: true, position: 'right' },
       data: [-41.2, -40.1, -20.0, -6.9, -1.2, -0.3, 0.3, 5.4, 6.1, 9.1, 15.8, 20.1, 21.0, 31.5, 41.1, 44.1, 56.2, 56.8].reverse(),
@@ -131,40 +153,58 @@ const barOption1 = ref({
       }
     }
   ]
-})
+}))
 
-const barOption2 = ref({
+const barOption2 = computed(() => ({
   tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
  
   grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-  xAxis: { type: 'category', data: ['地区生产总值', '规上工业总产值', '规上工业增加值', '营利性服务业营收', '限上批发业销售额', '一般公共预算收入'] },
-  yAxis: { type: 'value', name: '金额(亿元)' },
+  xAxis: {
+    type: 'category',
+    data: [
+      t('dataOpen.gdp'),
+      t('dataOpen.industrialGrossOutput'),
+      t('dataOpen.industrialAddedValue'),
+      t('dataOpen.forProfitServiceRevenue'),
+      t('dataOpen.wholesaleSalesAboveLimit'),
+      t('dataOpen.generalBudgetRevenue')
+    ]
+  },
+  yAxis: { type: 'value', name: t('dataOpen.amountWithUnit') },
   series: [
     {
-      name: '1-6月',
+      name: t('dataOpen.currentPeriod'),
       type: 'bar',
       data: [122.0, 140.5, 27.6, 54.5, 134.5, 18.8],
       itemStyle: { color: '#36a2eb' }
     },
     {
-      name: '去年同期',
+      name: t('dataOpen.samePeriodLastYear'),
       type: 'bar',
       data: [116.0, 99.6, 20.6, 54.4, 161.6, 17.7],
       itemStyle: { color: '#99a3a4' }
     }
   ]
-})
+}))
 
-const barOption3 = ref({
+const barOption3 = computed(() => ({
   tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
   grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-  xAxis: { type: 'category', data: ['信息传输软件\n和信息技术服务业', '租赁和商务服务业', '科学研究和技术服务业', '文化体育和娱乐业'] },
-  yAxis: { type: 'value', name: '营业收入(亿元)' },
+  xAxis: {
+    type: 'category',
+    data: [
+      t('dataOpen.infoSoftwareTech'),
+      t('dataOpen.leasingBusinessServices'),
+      t('dataOpen.sciResearchTechServices'),
+      t('dataOpen.cultureSportsEntertainment')
+    ]
+  },
+  yAxis: { type: 'value', name: t('dataOpen.revenueWithUnit') },
   series: [
     {
-      name: '营业收入',
+      name: t('dataOpen.revenue'),
       type: 'bar',
-      label: { show: true, position: 'top', formatter: '{c}亿元' },
+      label: { show: true, position: 'top', formatter: `{c}${t('dataOpen.yiYuan')}` },
       data: [
         { value: 27.25, itemStyle: { color: '#e74c3c' } },
         { value: 15.21, itemStyle: { color: '#e67e22' } },
@@ -173,7 +213,7 @@ const barOption3 = ref({
       ]
     }
   ]
-})
+}))
 </script>
 
 <style scoped>

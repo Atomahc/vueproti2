@@ -1,17 +1,30 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
 
-const newsList = [
-  '关于放宽境外人员入境限制的最新通知',
-  '霍尔果斯口岸通关便利化措施十条',
-  '外籍人员在霍医疗保障指南',
-  '2026年夏季霍尔果斯国际文化旅游节开幕'
-]
+const { t } = useI18n()
 
-const transportLinks = ['网约车服务引导', '城市客运信息', '购票引导', '交通指南']
-const squares = ['乐游霍尔果斯', '乐食霍尔果斯', '乐购霍尔果斯', '霍尔果斯特色']
+const newsList = computed(() => [
+  t('foreign.news1'),
+  t('foreign.news2'),
+  t('foreign.news3'),
+  t('foreign.news4')
+])
+
+const transportLinks = computed(() => [
+  t('foreign.rideHailing'),
+  t('foreign.urbanTransit'),
+  t('foreign.ticketingGuide'),
+  t('foreign.trafficGuide')
+])
+const squares = computed(() => [
+  t('foreign.tourKhorgos'),
+  t('foreign.eatKhorgos'),
+  t('foreign.shopKhorgos'),
+  t('foreign.specialKhorgos')
+])
 </script>
 
 <template>
@@ -22,12 +35,12 @@ const squares = ['乐游霍尔果斯', '乐食霍尔果斯', '乐购霍尔果斯
     <section class="welcome-banner textured-bg">
       <div class="container banner-content">
         <div class="welcome-msg">
-          <h1>Welcome to Khorgos</h1>
-          <p>Welcome, we wish you a pleasant stay in Khorgos.</p>
+          <h1>{{ t('foreign.welcomeTitle') }}</h1>
+          <p>{{ t('foreign.welcomeDesc') }}</p>
         </div>
         <div class="weather-info">
           <div class="temp">24°C</div>
-          <div class="city">Khorgos, China</div>
+          <div class="city">{{ t('foreign.tempCity') }}</div>
         </div>
       </div>
     </section>
@@ -37,20 +50,20 @@ const squares = ['乐游霍尔果斯', '乐食霍尔果斯', '乐购霍尔果斯
       <section class="top-section">
         <div class="carousel-box">
           <div class="placeholder-img textured-bg">
-            <span>轮播展示 / Gallery</span>
+            <span>{{ t('foreign.gallery') }}</span>
           </div>
         </div>
         <div class="invest-box">
-          <h3>霍尔果斯招商<br><small>Investment in Khorgos</small></h3>
-          <p>Explore business opportunities in the heart of Eurasia.</p>
-          <button class="more-btn">Learn More</button>
+          <h3>{{ t('foreign.investment') }}</h3>
+          <p>{{ t('foreign.investmentDesc') }}</p>
+          <button class="more-btn">{{ t('foreign.learnMore') }}</button>
         </div>
       </section>
 
       <!-- Middle Section: Policy and Lifestyle -->
       <section class="middle-section">
         <div class="policy-box">
-          <h2 class="section-title">优惠政策 / Policies</h2>
+          <h2 class="section-title">{{ t('foreign.policies') }}</h2>
           <ul class="policy-list">
             <li v-for="item in newsList" :key="item">{{ item }}</li>
           </ul>
@@ -71,10 +84,10 @@ const squares = ['乐游霍尔果斯', '乐食霍尔果斯', '乐购霍尔果斯
         </aside>
         <div class="map-area">
           <div class="map-search">
-            <input type="text" placeholder="搜索地点 / Search Location" />
+            <input type="text" :placeholder="t('foreign.searchLocation')" />
           </div>
           <div class="map-placeholder">
-            <span>地图展示区域 / Map Area</span>
+            <span>{{ t('foreign.mapArea') }}</span>
           </div>
         </div>
       </section>
@@ -82,15 +95,15 @@ const squares = ['乐游霍尔果斯', '乐食霍尔果斯', '乐购霍尔果斯
       <!-- Feedback Section -->
       <section class="feedback-section">
         <div class="feedback-left">
-          <h3>意见建议 / Suggestions</h3>
-          <textarea placeholder="Please enter your suggestions..."></textarea>
+          <h3>{{ t('foreign.suggestions') }}</h3>
+          <textarea :placeholder="t('foreign.suggestionsPlaceholder')"></textarea>
         </div>
         <div class="feedback-right">
           <div class="contact-info">
-            <p><strong>服务热线 / Hotline:</strong> 0999-XXXXXXX</p>
-            <p><strong>联系方式 / Contact:</strong> khorgos_service@example.com</p>
+            <p><strong>{{ t('foreign.hotline') }}</strong> 0999-XXXXXXX</p>
+            <p><strong>{{ t('foreign.contact') }}</strong> khorgos_service@example.com</p>
           </div>
-          <button class="submit-btn">提交 / Submit</button>
+          <button class="submit-btn">{{ t('foreign.submit') }}</button>
         </div>
       </section>
     </main>

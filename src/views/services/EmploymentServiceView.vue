@@ -37,7 +37,7 @@ const defaultIcons = [
 const defaultBgs = [sq4, sq3, sq2, sq1, sq5, sq6]
 const themes = ['red', 'orange', 'blue', 'cyan', 'green', 'purple']
 
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 
 const fetchPublicOpinion = async () => {
   try {
@@ -90,14 +90,14 @@ const handleNavigate = (card: any) => {
 
 const submitForm = async () => {
   if (!formData.value.title || !formData.value.content || !formData.value.contactName || !formData.value.contactPhone) {
-    alert('请填写完整信息')
+    alert(t('appeals.fillCompleteInfo'))
     return
   }
   submitting.value = true
   try {
     const res: any = await http.post('/prod-api/portal/complaint/direct/create', null, { params: formData.value })
     if (res.code === 0 || String(res.code) === '0') {
-      alert('提交成功')
+      alert(t('appeals.submitSuccess'))
       showModal.value = false
       formData.value = {
         type: 1,
@@ -110,10 +110,10 @@ const submitForm = async () => {
         urgency: 1
       }
     } else {
-      alert('提交失败: ' + res.msg)
+      alert(t('appeals.submitFailed') + ': ' + res.msg)
     }
   } catch (e: any) {
-    alert('提交出错: ' + (e.message || '未知错误'))
+    alert(t('appeals.submitError') + ': ' + (e.message || t('common.unknownError')))
   } finally {
     submitting.value = false
   }
@@ -139,64 +139,64 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
         <div class="left-form-section" style="flex: 0 0 350px;">
           <div style=" border-radius: 4px; overflow: hidden;padding:20px 20px 0px; height: 100%;">
             <div class="form-header" style=" padding: 5px 10px; background:linear-gradient(90deg, rgba(0, 180, 120, 0.5) 0%, rgba(255, 255, 255, 0) 100%), rgba(255, 255, 255, 0);">
-              <h3 style="margin: 0; font-size: 16px; color: #047857; font-weight: 600;">诉求直通车</h3>
+              <h3 style="margin: 0; font-size: 16px; color: #047857; font-weight: 600;">{{ t('appeals.directCar') }}</h3>
             </div>
             <form @submit.prevent="submitForm" class="complaint-form" style="padding: 20px 0px 0px;">
               
               <div class="row-group" style="display: flex; gap: 10px; margin-bottom: 12px;">
                 <div style="flex: 1; display: flex; align-items: center; background: white; padding: 0 10px; border-radius: 4px;">
-                  <span style="color: #64748b; font-size: 13px; white-space: nowrap;">诉求类型：</span>
+                  <span style="color: #64748b; font-size: 13px; white-space: nowrap;">{{ t('appeals.appealType') }}</span>
                   <select v-model.number="formData.type" required style="border: none; outline: none; flex: 1; padding: 10px 0; background: transparent; font-size: 13px; color: #334155; appearance: none;">
-                    <option value="1">企业诉求</option>
-                    <option value="2">群众建议</option>
-                    <option value="3">问题反映</option>
+                    <option value="1">{{ t('appeals.enterpriseAppeal') }}</option>
+                    <option value="2">{{ t('appeals.publicSuggestion') }}</option>
+                    <option value="3">{{ t('appeals.problemReport') }}</option>
                   </select>
                   <span style="color: #cbd5e1; font-size: 12px; pointer-events: none;">▼</span>
                 </div>
                 
                 <div style="flex: 1; display: flex; align-items: center; background: white; padding: 0 10px; border-radius: 4px;">
-                  <span style="color: #64748b; font-size: 13px; white-space: nowrap;">紧急程度：</span>
+                  <span style="color: #64748b; font-size: 13px; white-space: nowrap;">{{ t('appeals.urgency') }}</span>
                   <select v-model.number="formData.urgency" style="border: none; outline: none; flex: 1; padding: 10px 0; background: transparent; font-size: 13px; color: #334155; appearance: none;">
-                    <option value="1">普通</option>
-                    <option value="2">紧急</option>
-                    <option value="3">特急</option>
+                    <option value="1">{{ t('appeals.normal') }}</option>
+                    <option value="2">{{ t('appeals.urgent') }}</option>
+                    <option value="3">{{ t('appeals.extraUrgent') }}</option>
                   </select>
                   <span style="color: #cbd5e1; font-size: 12px; pointer-events: none;">▼</span>
                 </div>
               </div>
               
               <div style="display: flex; align-items: center; background: white; padding: 0 10px; border-radius: 4px; margin-bottom: 12px;">
-                <span style="color: #64748b; font-size: 13px; white-space: nowrap;">标题：</span>
-                <input type="text" v-model="formData.title" placeholder="请输入标题" required style="border: none; outline: none; flex: 1; padding: 10px 0; background: transparent; font-size: 13px; color: #334155;" />
+                <span style="color: #64748b; font-size: 13px; white-space: nowrap;">{{ t('appeals.titleLabel') }}</span>
+                <input type="text" v-model="formData.title" :placeholder="t('appeals.titlePlaceholder')" required style="border: none; outline: none; flex: 1; padding: 10px 0; background: transparent; font-size: 13px; color: #334155;" />
               </div>
 
               <div style="margin-bottom: 12px;">
-                <textarea v-model="formData.content" rows="6" placeholder="请输入诉求详情内容..." required style="width: 100%; height:280px; border: none; outline: none; padding: 12px; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box; resize: none;"></textarea>
+                <textarea v-model="formData.content" rows="6" :placeholder="t('appeals.contentPlaceholder')" required style="width: 100%; height:280px; border: none; outline: none; padding: 12px; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box; resize: none;"></textarea>
               </div>
 
               <div class="row-group" style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <div style="flex: 1;">
-                  <input type="text" v-model="formData.contactName" placeholder="姓名" required style="width: 100%; border: none; outline: none; padding: 10px 12px; background: #eee; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box;" />
+                  <input type="text" v-model="formData.contactName" :placeholder="t('appeals.contactNamePlaceholder')" required style="width: 100%; border: none; outline: none; padding: 10px 12px; background: #eee; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box;" />
                 </div>
                 <div style="flex: 1.5;">
-                  <input type="text" v-model="formData.contactPhone" placeholder="联系电话" required style="width: 100%; border: none; outline: none; padding: 10px 12px; background: #eee; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box;" />
+                  <input type="text" v-model="formData.contactPhone" :placeholder="t('appeals.contactPhonePlaceholder')" required style="width: 100%; border: none; outline: none; padding: 10px 12px; background: #eee; border-radius: 4px; font-size: 13px; color: #334155; box-sizing: border-box;" />
                 </div>
                 <div style="flex: 1.5; display: flex; align-items: center; background: #eee; padding: 0 10px; border-radius: 4px;">
                   <select v-model="formData.community" style="border: none; outline: none; flex: 1; padding: 10px 0; background: transparent; font-size: 13px; color: #334155; appearance: none;">
-                    <option value="none">所属社区</option>
-                    <option value="cooperation_zone">合作区</option>
-                    <option value="kalasu">卡拉苏</option>
-                    <option value="silu">丝路</option>
-                    <option value="suolun">索伦</option>
-                    <option value="yingtarr">英塔尔</option>
-                    <option value="hongqiao">红桥</option>
+                    <option value="none">{{ t('appeals.selectCommunity') }}</option>
+                    <option value="cooperation_zone">{{ t('appeals.cooperation_zone') }}</option>
+                    <option value="kalasu">{{ t('appeals.kalasu') }}</option>
+                    <option value="silu">{{ t('appeals.silu') }}</option>
+                    <option value="suolun">{{ t('appeals.suolun') }}</option>
+                    <option value="yingtarr">{{ t('appeals.yingtarr') }}</option>
+                    <option value="hongqiao">{{ t('appeals.hongqiao') }}</option>
                   </select>
                   <span style="color: #94a3b8; font-size: 12px; pointer-events: none;">▼</span>
                 </div>
               </div>
 
               <button type="submit" :disabled="submitting" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.2s;">
-                {{ submitting ? '提交中...' : '立即提交' }}
+                {{ submitting ? t('appeals.submitting') : t('appeals.submitNow') }}
               </button>
             </form>
           </div>
@@ -220,7 +220,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                 </div>
               </div>
               <button class="view-btn" :class="'btn-' + card.theme">
-                {{ card.name === '诉求直通车' ? '发起工单' : '立即查看' }} →
+                {{ card.name === '诉求直通车' ? t('appeals.startTicket') : t('appeals.viewNow') }} →
               </button>
             </div>
           </div>
@@ -233,7 +233,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               </svg>
             </div>
             <div class="banner-text">
-              <strong>诉求办理公示：</strong> 本月共受理诉求 <strong>0</strong> 件，办结率 <strong>0%</strong> ，平均响应时长 <strong>0小时</strong>
+              <strong>{{ t('appeals.publicityTitle') }}：</strong> {{ t('appeals.publicityStats') }}
             </div>
           </div>
 

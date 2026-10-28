@@ -9,10 +9,28 @@ import TheNavBar from '../components/TheNavBar.vue'
 
 const router = useRouter()
 const route = useRoute()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const activeCategory = ref((route.query.tab as string) || '')
 const loading = ref(false)
+
+const categoryTitle = computed(() => {
+  if (!activeCategory.value || activeCategory.value === '全部') {
+    return t('news.newsTitle')
+  }
+  const categoryMap: Record<string, string> = {
+    '政策解读': t('news.policyInterpret'),
+    '政策推送': t('news.policyPush'),
+    '新闻资讯': t('news.newsTitle'),
+    '重大活动': t('news.majorEvents'),
+    '通知公告': t('news.noticeAnnounce'),
+    '城市形象': t('news.cityImage'),
+    '图文宣传': t('news.photoPromo'),
+    '营商环境监测': t('news.businessEnv'),
+    '统计公报': t('news.statsBulletin')
+  }
+  return categoryMap[activeCategory.value] || activeCategory.value
+})
 
 // 当前页的新闻
 const paginatedNews = ref<any[]>([])
@@ -104,13 +122,13 @@ const goToDetail = (news: any) => {
       <div class="hero-box">
         <!-- 页面标题 -->
         <div class="page-header">
-          <h2 class="page-title">{{ activeCategory && activeCategory !== '全部' ? activeCategory : '新闻资讯' }}</h2>
+          <h2 class="page-title">{{ categoryTitle }}</h2>
         </div>
 
         <!-- 新闻常规列表 -->
         <section class="news-list-section">
           <div v-if="loading" class="loading-state">
-            数据加载中...
+            {{ t('news.loading') }}
           </div>
           <div v-else-if="paginatedNews.length > 0" class="news-list-container">
             <ul class="simple-news-list">
@@ -129,7 +147,7 @@ const goToDetail = (news: any) => {
             </ul>
           </div>
           <div v-else class="no-data">
-            暂无相关内容
+            {{ t('news.noData') }}
           </div>
 
           <!-- 分页器 -->
@@ -139,7 +157,7 @@ const goToDetail = (news: any) => {
               :disabled="currentPage === 1"
               @click="goToPage(currentPage - 1)"
             >
-              上一页
+              {{ t('news.prevPage') }}
             </button>
             
             <div class="page-numbers">
@@ -159,7 +177,7 @@ const goToDetail = (news: any) => {
               :disabled="currentPage === totalPages"
               @click="goToPage(currentPage + 1)"
             >
-              下一页
+              {{ t('news.nextPage') }}
             </button>
           </div>
         </section>

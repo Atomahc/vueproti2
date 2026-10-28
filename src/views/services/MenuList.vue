@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '@/components/TheHeader.vue'
 import TheFooter from '@/components/TheFooter.vue'
@@ -8,6 +9,7 @@ import TheNavBar from '@/components/TheNavBar.vue'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const formsList = ref<any[]>([])
 const navList = ref<any[]>([])
 const loading = ref(true)
@@ -85,7 +87,7 @@ const fetchServiceList = async (id?: string) => {
     }
   } catch (e: any) {
     console.error('Failed to fetch menu list:', e)
-    errorMessage.value = e?.message || '加载服务列表失败，请稍后重试'
+    errorMessage.value = e?.message || t('services.loadServiceFailed')
   } finally {
     loading.value = false
   }
@@ -135,7 +137,7 @@ onMounted(() => {
             <!-- 菜单分类列表 (桌面端左侧边栏，移动端/微信端顶部横向滑动分类栏) -->
             <div class="sidebar">
               <div class="sidebar-title">
-                <span>服务菜单</span>
+                <span>{{ t('services.serviceMenu') }}</span>
                 <span v-if="navList.length > 0" class="sidebar-count">（{{ navList.length }}）</span>
               </div>
               <ul class="nav-menu">
@@ -154,14 +156,14 @@ onMounted(() => {
             <div class="main-list">
               <div v-if="loading" class="loading">
                 <div class="loading-spinner"></div>
-                <span>加载中...</span>
+                <span>{{ t('services.loadingList') }}</span>
               </div>
               <div v-else-if="errorMessage" class="empty error-box">
                 <p>{{ errorMessage }}</p>
-                <button class="retry-btn" @click="fetchServiceList(currentId)">重新加载</button>
+                <button class="retry-btn" @click="fetchServiceList(currentId)">{{ t('services.retry') }}</button>
               </div>
               <div v-else-if="formsList.length === 0" class="empty">
-                <p>暂无相关表单</p>
+                <p>{{ t('services.noForms') }}</p>
               </div>
               <div v-else class="list-grid">
                 <div
@@ -171,9 +173,9 @@ onMounted(() => {
                   @click="goToForm(item.reid)"
                 >
                   <div class="card-left">
-                    <h3 class="card-title">{{ item.title || '未知表单' }}</h3>
+                    <h3 class="card-title">{{ item.title || t('services.unknownForm') }}</h3>
                     <p class="card-desc" v-if="item.par?.business">
-                      <span class="label">受理单位：</span>{{ item.par.business }}
+                      <span class="label">{{ t('services.handlingUnit') }}</span>{{ item.par.business }}
                     </p>
                     <p class="card-desc tag" v-if="item.customtags">{{ item.customtags }}</p>
                   </div>

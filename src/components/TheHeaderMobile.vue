@@ -39,7 +39,7 @@ const toggleDropdown = () => {
 }
 
 const userInfo = ref({
-  name: '用户',
+  name: '',
   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
 })
 
@@ -51,14 +51,22 @@ const updateDateTime = () => {
   const year = now.getFullYear()
   const month = now.getMonth() + 1
   const date = now.getDate()
-  const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
-  const day = days[now.getDay()]
+  const weekdays = [
+    t('common.weekdays.sun'),
+    t('common.weekdays.mon'),
+    t('common.weekdays.tue'),
+    t('common.weekdays.wed'),
+    t('common.weekdays.thu'),
+    t('common.weekdays.fri'),
+    t('common.weekdays.sat')
+  ]
+  const day = weekdays[now.getDay()]
   
   const h = String(now.getHours()).padStart(2, '0')
   const m = String(now.getMinutes()).padStart(2, '0')
   const s = String(now.getSeconds()).padStart(2, '0')
   
-  currentDateTime.value = `${year}年${month}月${date}日 ${day} ${h}:${m}:${s}`
+  currentDateTime.value = `${year}-${String(month).padStart(2, '0')}-${String(date).padStart(2, '0')} ${day} ${h}:${m}:${s}`
 }
 
 onMounted(async () => {
@@ -168,9 +176,9 @@ const handleLogout = () => {
     
     <!-- Dropdown for mobile user -->
     <div v-if="showDropdown && isLoggedIn" class="mobile-dropdown-menu">
-      <div class="mobile-user-name">{{ userInfo.name }}</div>
-      <router-link to="/profile" class="mobile-menu-item">个人中心</router-link>
-      <router-link to="/my-tickets" class="mobile-menu-item">我的工单</router-link>
+      <div class="mobile-user-name">{{ userInfo.name || t('header.user') }}</div>
+      <router-link to="/profile" class="mobile-menu-item">{{ t('header.profile') }}</router-link>
+      <router-link to="/my-tickets" class="mobile-menu-item">{{ t('header.myTickets') }}</router-link>
       <router-link to="/certify?type=enterprise" class="mobile-menu-item">{{ t('header.enterpriseCert') }}</router-link>
       <router-link to="/certify?type=gov" class="mobile-menu-item">{{ t('header.govCert') }}</router-link>
       <a href="#" class="mobile-menu-item logout" @click.prevent="handleLogout">{{ t('header.logout') }}</a>
@@ -180,7 +188,7 @@ const handleLogout = () => {
     <div class="mobile-drawer-overlay" v-if="showMobileMenu" @click="showMobileMenu = false"></div>
     <div class="mobile-drawer" :class="{ 'drawer-open': showMobileMenu }">
       <div class="drawer-header">
-        <h2 class="drawer-title">导航菜单</h2>
+        <h2 class="drawer-title">{{ t('header.menu') }}</h2>
         <svg @click="showMobileMenu = false" class="close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -188,13 +196,13 @@ const handleLogout = () => {
       </div>
       <div class="drawer-content">
         <div class="drawer-section">
-          <h3 class="section-title">服务大厅</h3>
+          <h3 class="section-title">{{ t('header.serviceHall') }}</h3>
           <router-link v-for="item in navTabs" :key="item.id" :to="item.path" class="drawer-nav-item" @click="showMobileMenu = false">
             {{ item.name }}
           </router-link>
         </div>
         <div class="drawer-section">
-          <h3 class="section-title">语言切换</h3>
+          <h3 class="section-title">{{ t('header.language') }}</h3>
           <div class="lang-options">
             <span :class="{active: locale === 'zh'}" @click="changeLanguage('zh'); showMobileMenu=false">中文</span>
             <span :class="{active: locale === 'ru'}" @click="changeLanguage('ru'); showMobileMenu=false">Русский</span>

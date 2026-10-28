@@ -1,24 +1,26 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 
 onMounted(async () => {
   const code = route.query.code as string
   const state = route.query.state as string
 
   if (!code || !state) {
-    alert('缺少授权参数，请重新发起登录')
+    alert(t('login.missingParams'))
     router.replace('/')
     return
   }
 
   const savedState = sessionStorage.getItem('sso_state')
   if (state !== savedState) {
-    alert('状态校验失败，可能存在安全风险，请重新发起登录')
+    alert(t('login.stateInvalid'))
     sessionStorage.removeItem('sso_state')
     router.replace('/')
     return
@@ -40,11 +42,11 @@ onMounted(async () => {
         router.replace('/')
       }, 500)
     } else {
-      throw new Error(res.message || res.data?.message || '获取 Token 失败')
+      throw new Error(res.message || res.data?.message || t('login.getTokenFailed'))
     }
   } catch (error: any) {
     console.error('SSO 回调处理失败:', error)
-    alert('SSO 登录失败: ' + (error.message || '未知错误'))
+    alert(t('login.loginFailed') + ': ' + (error.message || t('common.unknownError')))
     router.replace('/')
   }
 })
@@ -59,8 +61,8 @@ onMounted(async () => {
     
     <div class="loader-box">
       <div class="spinner"></div>
-      <h2>正在登录...</h2>
-      <p>请稍候，正在通过统一身份验证</p>
+      <h2>{{ t('login.loggingIn') }}</h2>
+      <p>{{ t('login.loggingInDesc') }}</p>
     </div>
   </div>
 </template>

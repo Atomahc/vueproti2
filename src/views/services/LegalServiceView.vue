@@ -13,7 +13,7 @@ import yb3 from '@/assets/other/Group 62.png'
 // 上半区 驿路法务通 数据
 const yiluColumns = ref<any[]>([])
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const yiluHeader = ref<any>({})
 const intlHeader = ref<any>({})
@@ -53,10 +53,10 @@ const fetchCloudLegal = async () => {
               if (child.code === 'lawyer_firm') {
                 const arr: any[] = []
                 if (child.data.lawFirms && child.data.lawFirms.length > 0) {
-                  arr.push(...child.data.lawFirms.map((f: any) => ({ left: f.name, right: f.specialty || '律所' })))
+                  arr.push(...child.data.lawFirms.map((f: any) => ({ left: f.name, right: f.specialty || t('services.lawFirms') })))
                 }
                 if (child.data.lawyers && child.data.lawyers.length > 0) {
-                  arr.push(...child.data.lawyers.map((l: any) => ({ left: l.name, right: l.title || '律师' })))
+                  arr.push(...child.data.lawyers.map((l: any) => ({ left: l.name, right: l.title || t('services.lawyers') })))
                 }
                 col.items = arr.slice(0, 3)
               } else if (child.code === 'case' && Array.isArray(child.data)) {
@@ -142,7 +142,7 @@ const handleLawyerChange = () => {
 
 const submitAppointment = async () => {
   if (!appointmentForm.value.userName || !appointmentForm.value.contact || !appointmentForm.value.lawyerId) {
-    alert('请填写姓名、联系方式并选择预约律师')
+    alert(t('services.fillAppointInfo'))
     return
   }
   
@@ -160,16 +160,16 @@ const submitAppointment = async () => {
   try {
     const res: any = await http.post('/prod-api/fawu/appointment', payload)
     if (res.code === 0 || res.code === '0' || res.status === 'ok') {
-      alert('预约提交成功！')
+      alert(t('services.appointSuccess'))
       appointmentForm.value = {
         userName: '', contact: '', serviceType: serviceTypeList.value[0]?.dictValue || '', lawyerId: '', lawyerName: '', appointDateTime: '', appointDate: '', appointTime: '', description: ''
       }
     } else {
-      alert('提交失败：' + (res.msg || '未知错误'))
+      alert(t('services.submitFailed') + '：' + (res.msg || t('common.unknownError')))
     }
   } catch (err) {
     console.error('Appointment submit error', err)
-    alert('提交失败，请重试')
+    alert(t('services.submitFailedRetry'))
   }
 }
 
@@ -200,10 +200,10 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
         <div class="legal-block">
           <div class="block-header" style="justify-content: space-between;">
             <div class="header-text">
-              <h2>{{ yiluHeader.name || '云上法务 让每一次法律求助都有清晰路径' }}</h2>
-              <p>{{ yiluHeader.remark || '基础法律服务 · 普惠便民' }}</p>
+              <h2>{{ yiluHeader.name || t('services.cloudLegalDesc') }}</h2>
+              <p>{{ yiluHeader.remark || t('services.basicLegalService') }}</p>
             </div>
-            <a href="https://sz.xjhegs.gov.cn:3003/fawu" target="_blank" style="color: #fff; font-size: 14px; text-decoration: none; cursor: pointer;">查看更多 &gt;</a>
+            <a href="https://sz.xjhegs.gov.cn:3003/fawu" target="_blank" style="color: #fff; font-size: 14px; text-decoration: none; cursor: pointer;">{{ t('common.more') }} &gt;</a>
           </div>
           <div class="middle-flex-row" style="display: flex; justify-content: space-between; align-items: stretch; gap: 24px;">
             <div class="intl-grid">
@@ -225,26 +225,26 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3
                   style="margin: 0; font-size: 16px; color: #0f172a; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-                  <span style="width: 4px; height: 14px; background: #3b82f6; "></span> 律师预约
+                  <span style="width: 4px; height: 14px; background: #3b82f6; "></span> {{ t('services.lawyerAppoint') }}
                 </h3>
               </div>
 
               <div class="form-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1;">
-                <input v-model="appointmentForm.userName" type="text" placeholder="姓名" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box;" />
-                <input v-model="appointmentForm.contact" type="text" placeholder="手机号" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box;" />
+                <input v-model="appointmentForm.userName" type="text" :placeholder="t('services.name')" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box;" />
+                <input v-model="appointmentForm.contact" type="text" :placeholder="t('services.phone')" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box;" />
                 
                 <select v-model="appointmentForm.lawyerId" @change="handleLawyerChange" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; color: #475569;">
-                  <option value="" disabled>选择律师</option>
+                  <option value="" disabled>{{ t('services.chooseLawyer') }}</option>
                   <option v-for="lawyer in lawyerList" :key="lawyer.id" :value="lawyer.id">{{ lawyer.name }}</option>
                 </select>
 
                 <select v-model="appointmentForm.serviceType" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; color: #475569;">
-                  <option v-if="serviceTypeList.length === 0" value="">服务类型...</option>
+                  <option v-if="serviceTypeList.length === 0" value="">{{ t('services.serviceType') }}</option>
                   <option v-for="type in serviceTypeList" :key="type.dictValue" :value="type.dictValue">{{ type.dictLabel }}</option>
                 </select>
-                <input v-model="appointmentForm.appointDate" type="date" title="预约日期" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; color: #475569;" />
+                <input v-model="appointmentForm.appointDate" type="date" :title="t('services.appointDate')" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; color: #475569;" />
                 <select v-model="appointmentForm.appointTime" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; color: #475569;">
-                  <option value="" disabled>选择时间</option>
+                  <option value="" disabled>{{ t('services.chooseTime') }}</option>
                   <option value="09:00:00">09:00</option>
                   <option value="09:30:00">09:30</option>
                   <option value="10:00:00">10:00</option>
@@ -263,12 +263,12 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                   <option value="18:00:00">18:00</option>
                 </select>
                 
-                <textarea v-model="appointmentForm.description" placeholder="简述您遇到的法律问题..." rows="2" style="grid-column: span 3; width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; resize: none;"></textarea>
+                <textarea v-model="appointmentForm.description" :placeholder="t('services.describeLegal')" rows="2" style="grid-column: span 3; width: 100%; padding: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.9);  font-size: 13px; outline: none; box-sizing: border-box; resize: none;"></textarea>
               </div>
 
               <button @click="submitAppointment"
                 style="margin-top: 12px; width: 100%; padding: 10px; background: linear-gradient(90deg, #2563eb, #3b82f6); color: white; border: none;  font-size: 14px; font-weight: 500; cursor: pointer;  transition: transform 0.2s;">
-                一键提交预约
+                {{ t('services.submitAppoint') }}
               </button>
             </div>
           </div>
@@ -291,7 +291,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               </div>
               <div class="col-list">
                 <div v-if="!col.items || col.items.length === 0" class="empty-list">
-                  <span style="color: #94a3b8; font-size: 13px;">暂无数据</span>
+                  <span style="color: #94a3b8; font-size: 13px;">{{ t('common.noData') }}</span>
                 </div>
                 <div v-for="(item, i) in col.items" :key="i" class="list-item">
                   <span class="dot"></span>

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, reactive, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const currentTab = ref('enterprise')
@@ -57,25 +59,25 @@ const validateEnterprise = () => {
   let isValid = true
 
   if (!enterpriseForm.enterpriseName.trim()) {
-    errors.enterpriseName = '请输入企业名称'
+    errors.enterpriseName = t('certify.errEnterpriseName')
     isValid = false
   }
 
   if (!enterpriseForm.creditCode.trim()) {
-    errors.creditCode = '请输入统一社会信用代码'
+    errors.creditCode = t('certify.errCreditCode')
     isValid = false
   } else if (!rules.creditCode.test(enterpriseForm.creditCode)) {
-    errors.creditCode = '请输入有效的18位信用代码'
+    errors.creditCode = t('certify.errCreditCodeValid')
     isValid = false
   }
 
   if (!enterpriseForm.legalPersonName.trim()) {
-    errors.legalPersonName = '请输入法定代表人姓名'
+    errors.legalPersonName = t('certify.errLegalPerson')
     isValid = false
   }
 
   if (enterpriseForm.contactPhone.trim() && !rules.phone.test(enterpriseForm.contactPhone)) {
-    errors.contactPhone = '请输入有效的手机号码'
+    errors.contactPhone = t('certify.errPhone')
     isValid = false
   }
 
@@ -94,10 +96,10 @@ const submitEnterprise = async () => {
       memberName: "API Placeholder",
       status: 0
     })
-    alert('企业认证申请提交成功！')
+    alert(t('certify.enterpriseSuccess'))
     Object.keys(enterpriseForm).forEach(key => (enterpriseForm as any)[key] = '')
   } catch (err: any) {
-    alert('提交失败: ' + err.message)
+    alert(t('certify.submitFailed') + ': ' + err.message)
   } finally {
     isSubmitting.value = false
   }
@@ -117,25 +119,25 @@ const validateGov = () => {
   let isValid = true
 
   if (!govForm.realName.trim()) {
-    errors.realName = '请输入真实姓名'
+    errors.realName = t('certify.errRealName')
     isValid = false
   }
 
   if (!govForm.idCard.trim()) {
-    errors.idCard = '请输入身份证号'
+    errors.idCard = t('certify.errIdCard')
     isValid = false
   } else if (!rules.idCard.test(govForm.idCard)) {
-    errors.idCard = '请输入有效的身份证号'
+    errors.idCard = t('certify.errIdCardValid')
     isValid = false
   }
 
   if (!govForm.department.trim()) {
-    errors.department = '请输入所属部门'
+    errors.department = t('certify.errDepartment')
     isValid = false
   }
 
   if (govForm.contactPhone.trim() && !rules.phone.test(govForm.contactPhone)) {
-    errors.contactPhone = '请输入有效的手机号码'
+    errors.contactPhone = t('certify.errPhone')
     isValid = false
   }
 
@@ -155,10 +157,10 @@ const submitGov = async () => {
       departmentId: 0,
       status: 0
     })
-    alert('机关认证申请提交成功！')
+    alert(t('certify.govSuccess'))
     Object.keys(govForm).forEach(key => (govForm as any)[key] = '')
   } catch (err: any) {
-    alert('提交失败: ' + err.message)
+    alert(t('certify.submitFailed') + ': ' + err.message)
   } finally {
     isSubmitting.value = false
   }
@@ -168,8 +170,8 @@ const submitGov = async () => {
 <template>
   <div class="certify-page">
     <div class="certify-header">
-      <h1>实名认证服务中心</h1>
-      <p>为您提供专业、安全、高效的身份核验服务</p>
+      <h1>{{ t('certify.title') }}</h1>
+      <p>{{ t('certify.subtitle') }}</p>
     </div>
 
     <div class="certify-container">
@@ -181,8 +183,8 @@ const submitGov = async () => {
         >
           <div class="tab-icon">🏢</div>
           <div class="tab-text">
-            <h3>企业认证</h3>
-            <span>适用于企业、个体工商户</span>
+            <h3>{{ t('certify.enterpriseCert') }}</h3>
+            <span>{{ t('certify.enterpriseDesc') }}</span>
           </div>
         </button>
         <button 
@@ -192,8 +194,8 @@ const submitGov = async () => {
         >
           <div class="tab-icon">🏛️</div>
           <div class="tab-text">
-            <h3>机关认证</h3>
-            <span>适用于政府机关、事业单位</span>
+            <h3>{{ t('certify.govCert') }}</h3>
+            <span>{{ t('certify.govDesc') }}</span>
           </div>
         </button>
       </div>
@@ -202,91 +204,91 @@ const submitGov = async () => {
         <!-- 企业认证表单 -->
         <transition name="fade" mode="out-in">
           <form v-if="currentTab === 'enterprise'" @submit.prevent="submitEnterprise" class="certify-form" key="enterprise">
-            <h2 class="form-title">填写企业主体信息</h2>
+            <h2 class="form-title">{{ t('certify.enterpriseSubjectInfo') }}</h2>
             
             <div class="form-grid">
               <div class="input-group" :class="{ 'has-error': errors.enterpriseName }">
-                <label>企业名称 <span class="required">*</span></label>
-                <input v-model="enterpriseForm.enterpriseName" type="text" placeholder="请输入与营业执照一致的名称" @input="errors.enterpriseName = ''" />
+                <label>{{ t('certify.enterpriseName') }} <span class="required">*</span></label>
+                <input v-model="enterpriseForm.enterpriseName" type="text" :placeholder="t('certify.enterpriseNamePlaceholder')" @input="errors.enterpriseName = ''" />
                 <span v-if="errors.enterpriseName" class="error-msg">{{ errors.enterpriseName }}</span>
               </div>
               
               <div class="input-group" :class="{ 'has-error': errors.creditCode }">
-                <label>统一社会信用代码 <span class="required">*</span></label>
-                <input v-model="enterpriseForm.creditCode" type="text" placeholder="18位信用代码" @input="errors.creditCode = ''" />
+                <label>{{ t('certify.creditCode') }} <span class="required">*</span></label>
+                <input v-model="enterpriseForm.creditCode" type="text" :placeholder="t('certify.creditCodePlaceholder')" @input="errors.creditCode = ''" />
                 <span v-if="errors.creditCode" class="error-msg">{{ errors.creditCode }}</span>
               </div>
 
               <div class="input-group" :class="{ 'has-error': errors.legalPersonName }">
-                <label>法定代表人姓名 <span class="required">*</span></label>
-                <input v-model="enterpriseForm.legalPersonName" type="text" placeholder="请输入法定代表人姓名" @input="errors.legalPersonName = ''" />
+                <label>{{ t('certify.legalPersonName') }} <span class="required">*</span></label>
+                <input v-model="enterpriseForm.legalPersonName" type="text" :placeholder="t('certify.legalPersonPlaceholder')" @input="errors.legalPersonName = ''" />
                 <span v-if="errors.legalPersonName" class="error-msg">{{ errors.legalPersonName }}</span>
               </div>
 
               <div class="input-group" :class="{ 'has-error': errors.contactPhone }">
-                <label>联系电话</label>
-                <input v-model="enterpriseForm.contactPhone" type="tel" placeholder="请输入经办人手机号码" @input="errors.contactPhone = ''" />
+                <label>{{ t('certify.contactPhone') }}</label>
+                <input v-model="enterpriseForm.contactPhone" type="tel" :placeholder="t('certify.contactPhonePlaceholder')" @input="errors.contactPhone = ''" />
                 <span v-if="errors.contactPhone" class="error-msg">{{ errors.contactPhone }}</span>
               </div>
 
               <div class="input-group full-width">
-                <label>企业注册地址</label>
-                <input v-model="enterpriseForm.address" type="text" placeholder="请输入详细的企业注册地址" />
+                <label>{{ t('certify.regAddress') }}</label>
+                <input v-model="enterpriseForm.address" type="text" :placeholder="t('certify.regAddressPlaceholder')" />
               </div>
 
               <div class="input-group full-width">
-                <label>经营范围</label>
-                <textarea v-model="enterpriseForm.businessScope" placeholder="请简要描述您的经营范围" rows="3"></textarea>
+                <label>{{ t('certify.businessScope') }}</label>
+                <textarea v-model="enterpriseForm.businessScope" :placeholder="t('certify.businessScopePlaceholder')" rows="3"></textarea>
               </div>
             </div>
 
             <div class="submit-action">
               <button type="submit" class="primary-btn" :disabled="isSubmitting">
-                <span v-if="!isSubmitting">提交企业认证申请</span>
-                <span v-else>提交中...</span>
+                <span v-if="!isSubmitting">{{ t('certify.submitEnterpriseApp') }}</span>
+                <span v-else>{{ t('certify.submitting') }}</span>
               </button>
             </div>
           </form>
 
           <!-- 机关认证表单 -->
           <form v-else-if="currentTab === 'gov'" @submit.prevent="submitGov" class="certify-form" key="gov">
-            <h2 class="form-title">填写机关机构信息</h2>
+            <h2 class="form-title">{{ t('certify.govSubjectInfo') }}</h2>
             
             <div class="form-grid">
               <div class="input-group" :class="{ 'has-error': errors.realName }">
-                <label>真实姓名 <span class="required">*</span></label>
-                <input v-model="govForm.realName" type="text" placeholder="请输入申请人真实姓名" @input="errors.realName = ''" />
+                <label>{{ t('certify.realName') }} <span class="required">*</span></label>
+                <input v-model="govForm.realName" type="text" :placeholder="t('certify.realNamePlaceholder')" @input="errors.realName = ''" />
                 <span v-if="errors.realName" class="error-msg">{{ errors.realName }}</span>
               </div>
               
               <div class="input-group" :class="{ 'has-error': errors.idCard }">
-                <label>身份证号 <span class="required">*</span></label>
-                <input v-model="govForm.idCard" type="text" placeholder="请输入18位身份证号" @input="errors.idCard = ''" />
+                <label>{{ t('certify.idCard') }} <span class="required">*</span></label>
+                <input v-model="govForm.idCard" type="text" :placeholder="t('certify.idCardPlaceholder')" @input="errors.idCard = ''" />
                 <span v-if="errors.idCard" class="error-msg">{{ errors.idCard }}</span>
               </div>
 
               <div class="input-group" :class="{ 'has-error': errors.department }">
-                <label>所属部门 <span class="required">*</span></label>
-                <input v-model="govForm.department" type="text" placeholder="请输入您所在的部门名称" @input="errors.department = ''" />
+                <label>{{ t('certify.department') }} <span class="required">*</span></label>
+                <input v-model="govForm.department" type="text" :placeholder="t('certify.departmentPlaceholder')" @input="errors.department = ''" />
                 <span v-if="errors.department" class="error-msg">{{ errors.department }}</span>
               </div>
 
               <div class="input-group">
-                <label>职务名称</label>
-                <input v-model="govForm.position" type="text" placeholder="请输入您的职务" />
+                <label>{{ t('certify.position') }}</label>
+                <input v-model="govForm.position" type="text" :placeholder="t('certify.positionPlaceholder')" />
               </div>
 
               <div class="input-group full-width" :class="{ 'has-error': errors.contactPhone }">
-                <label>联系电话</label>
-                <input v-model="govForm.contactPhone" type="tel" placeholder="请输入手机号码" @input="errors.contactPhone = ''" />
+                <label>{{ t('certify.contactPhone') }}</label>
+                <input v-model="govForm.contactPhone" type="tel" :placeholder="t('certify.phonePlaceholderGov')" @input="errors.contactPhone = ''" />
                 <span v-if="errors.contactPhone" class="error-msg">{{ errors.contactPhone }}</span>
               </div>
             </div>
 
             <div class="submit-action">
               <button type="submit" class="primary-btn" :disabled="isSubmitting">
-                <span v-if="!isSubmitting">提交机关认证申请</span>
-                <span v-else>提交中...</span>
+                <span v-if="!isSubmitting">{{ t('certify.submitGovApp') }}</span>
+                <span v-else>{{ t('certify.submitting') }}</span>
               </button>
             </div>
           </form>

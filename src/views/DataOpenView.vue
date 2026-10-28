@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
@@ -15,28 +15,28 @@ import gg3 from '@/assets/other/gg3.png'
 import gg4 from '@/assets/other/gg4.png'
 
 const router = useRouter()
-
+const { t, locale } = useI18n()
 
 const statSection = ref<any>({ children: [] })
 const visSection = ref<any>({ children: [] })
 
-const statCardsBackup = [
-  { name: '统计公报', remark: '年度/季度', bg: gg1 },
-  { name: '统计年鉴', remark: '历年汇编', bg: gg2 },
-  { name: '调查数据', remark: '专项调查', bg: gg3 }
-]
+const statCardsBackup = computed(() => [
+  { name: t('news.statsBulletin'), remark: t('dataOpen.annualQuarterly'), bg: gg1 },
+  { name: t('dataOpen.statYearbook'), remark: t('dataOpen.historicalComp'), bg: gg2 },
+  { name: t('dataOpen.surveyData'), remark: t('dataOpen.specialSurvey'), bg: gg3 }
+])
 
-const visCardsBackup: any[] = [
-  { name: 'GDP累计同比增速', number: '5.4', unit: '%', progress: 82 },
-  { name: '口岸过货量', number: '3,856', unit: '万吨', progress: 65 },
-  { name: '规上工业增加值增速', number: '5.28', unit: '%', progress: 82 }
-]
+const visCardsBackup = computed(() => [
+  { name: t('dataOpen.gdp'), number: '5.4', unit: '%', progress: 82 },
+  { name: t('dataOpen.portTradeData'), number: '3,856', unit: t('dataOpen.tenThousandTons'), progress: 65 },
+  { name: t('dataOpen.industrialAddedValue'), number: '5.28', unit: '%', progress: 82 }
+])
 
-const dashboardMenu = ref([
-  { id: 'gdp', label: '地区生产总值', iconPath: 'M3 12h4v8H3zm7-6h4v14h-4zm7 4h4v10h-4z' },
-  { id: 'primary', label: '第一产业', iconPath: 'M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z' },
-  { id: 'secondary', label: '第二产业', iconPath: 'M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10z' },
-  { id: 'tertiary', label: '第三产业', iconPath: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' }
+const dashboardMenu = computed(() => [
+  { id: 'gdp', label: t('dataOpen.gdp'), iconPath: 'M3 12h4v8H3zm7-6h4v14h-4zm7 4h4v10h-4z' },
+  { id: 'primary', label: t('dataOpen.primaryIndustry'), iconPath: 'M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z' },
+  { id: 'secondary', label: t('dataOpen.secondaryIndustry'), iconPath: 'M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10z' },
+  { id: 'tertiary', label: t('dataOpen.tertiaryIndustry'), iconPath: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' }
 ])
 const activeMenu = ref('gdp')
 const activeSubIndex = ref(0)
@@ -113,8 +113,6 @@ const dashboardData: Record<string, { title: string; options: { label: string; i
     ]
   }
 }
-
-const { locale } = useI18n()
 
 const handleMenuClick = (menuId: string) => {
   activeMenu.value = menuId

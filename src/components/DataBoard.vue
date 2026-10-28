@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick, shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import EconomicOperation from './EconomicOperation.vue'
+
+const { t, locale } = useI18n()
 
 const activeTab = ref('economy') // 'trade' or 'governance' or 'economy'
 
@@ -20,24 +23,24 @@ const initTradeChart = () => {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     legend: { show: true, right: '4%', top: 0 },
     grid: { left: '3%', right: '4%', bottom: '3%', top:'18%', containLabel: true },
-    xAxis: { type: 'category', data: ['重车', '商品车'] },
+    xAxis: { type: 'category', data: [t('dataOpen.heavyTruck'), t('dataOpen.commercialCar')] },
     yAxis: { type: 'value' },
     series: [
       { 
-        name: '放行数量', 
+        name: t('dataOpen.clearanceCount'), 
         type: 'bar', 
         barWidth: 30, 
         data: [38928, 22731], 
         itemStyle: { color: '#2563eb' },
-        label: { show: true, position: 'top', color: '#2563eb', formatter: (params) => params.value.toLocaleString() }
+        label: { show: true, position: 'top', color: '#2563eb', formatter: (params: any) => params.value.toLocaleString() }
       },
       { 
-        name: '预约数量', 
+        name: t('dataOpen.appointmentCount'), 
         type: 'bar', 
         barWidth: 30, 
         data: [38928, 22731], 
         itemStyle: { color: '#93c5fd' },
-        label: { show: true, position: 'top', color: '#93c5fd', formatter: (params) => params.value.toLocaleString() }
+        label: { show: true, position: 'top', color: '#93c5fd', formatter: (params: any) => params.value.toLocaleString() }
       }
     ]
   }
@@ -53,7 +56,7 @@ const initGovCharts = () => {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     grid: { left: '3%', right: '10%', bottom: '3%',  top:'3%', containLabel: true },
     xAxis: { type: 'value' },
-    yAxis: { type: 'category', data: ['市容环境', '地下管网', '交通设施', '公共设施', '园林绿化'] },
+    yAxis: { type: 'category', data: [t('dataOpen.cityEnv'), t('dataOpen.undergroundPipes'), t('dataOpen.trafficFacilities'), t('dataOpen.publicFacilities'), t('dataOpen.landscaping')] },
     series: [
       {
         type: 'bar',
@@ -71,7 +74,7 @@ const initGovCharts = () => {
     legend: { orient: 'vertical', right: 0, top: 'middle' },
     series: [
       {
-        name: '资产类别',
+        name: t('dataOpen.assetCategory'),
         type: 'pie',
         radius: ['40%', '70%'],
         center: ['40%', '50%'],
@@ -83,17 +86,22 @@ const initGovCharts = () => {
         },
         label: { show: true, formatter: '{d}%' },
         data: [
-          { value: 6632, name: '地下管网', itemStyle: { color: '#00709a' } },
-          { value: 5698, name: '市容环境', itemStyle: { color: '#00a3d3' } },
-          { value: 4463, name: '交通设施', itemStyle: { color: '#14c5e3' } },
-          { value: 4435, name: '公共设施', itemStyle: { color: '#56ddf3' } },
-          { value: 4125, name: '园林绿化', itemStyle: { color: '#a0efff' } }
+          { value: 6632, name: t('dataOpen.undergroundPipes'), itemStyle: { color: '#00709a' } },
+          { value: 5698, name: t('dataOpen.cityEnv'), itemStyle: { color: '#00a3d3' } },
+          { value: 4463, name: t('dataOpen.trafficFacilities'), itemStyle: { color: '#14c5e3' } },
+          { value: 4435, name: t('dataOpen.publicFacilities'), itemStyle: { color: '#56ddf3' } },
+          { value: 4125, name: t('dataOpen.landscaping'), itemStyle: { color: '#a0efff' } }
         ]
       }
     ]
   }
   govPieChart.setOption(pieOption)
 }
+
+watch(locale, () => {
+  if (activeTab.value === 'trade') initTradeChart()
+  if (activeTab.value === 'governance') initGovCharts()
+})
 
 const switchTab = (tab: string) => {
   activeTab.value = tab
@@ -125,13 +133,13 @@ onMounted(() => {
     <div class="board-header">
       <div class="tabs">
         <div class="tab" :class="{ active: activeTab === 'economy' }" @click="switchTab('economy')">
-          <div class="tab-indicator"></div>经济运行情况
+          <div class="tab-indicator"></div>{{ t('dataOpen.economyRun') }}
         </div>
         <div class="tab" :class="{ active: activeTab === 'trade' }" @click="switchTab('trade')">
-          <div class="tab-indicator"></div>口岸贸易数据
+          <div class="tab-indicator"></div>{{ t('dataOpen.portTradeData') }}
         </div>
         <div class="tab" :class="{ active: activeTab === 'governance' }" @click="switchTab('governance')">
-          <div class="tab-indicator"></div>城市治理数据
+          <div class="tab-indicator"></div>{{ t('dataOpen.cityGovernanceData') }}
         </div>
       
       </div>
@@ -142,43 +150,43 @@ onMounted(() => {
       <div v-show="activeTab === 'trade'" class="tab-panel">
         <div class="cards-grid-4">
           <div class="data-card">
-             <div class="card-label">铁路货运总量</div>
-             <div class="card-value"><span class="num text-blue">67,873</span>万吨</div>
+             <div class="card-label">{{ t('dataOpen.railFreightTotal') }}</div>
+             <div class="card-value"><span class="num text-blue">67,873</span>{{ t('dataOpen.tenThousandTons') }}</div>
           </div>
           <div class="data-card">
-             <div class="card-label">铁路班列数</div>
-             <div class="card-value"><span class="num text-blue">873</span>列</div>
+             <div class="card-label">{{ t('dataOpen.railTrains') }}</div>
+             <div class="card-value"><span class="num text-blue">873</span>{{ t('dataOpen.trainUnit') }}</div>
           </div>
           <div class="data-card">
-             <div class="card-label">铁路换装量</div>
-             <div class="card-value"><span class="num text-blue">873</span>亿元</div>
+             <div class="card-label">{{ t('dataOpen.railTransshipment') }}</div>
+             <div class="card-value"><span class="num text-blue">873</span>{{ t('dataOpen.yiYuan') }}</div>
           </div>
           <div class="data-card">
-             <div class="card-label">车辆通关数</div>
-             <div class="card-value"><span class="num text-blue">1,873</span>辆</div>
+             <div class="card-label">{{ t('dataOpen.vehicleClearance') }}</div>
+             <div class="card-value"><span class="num text-blue">1,873</span>{{ t('dataOpen.vehicleUnit') }}</div>
           </div>
         </div>
         <div class="cards-grid-4" style="margin-top: 15px;">
           <div class="data-card">
-             <div class="card-label">重车放行数量</div>
-             <div class="card-value"><span class="num text-blue">38,928</span>辆</div>
+             <div class="card-label">{{ t('dataOpen.heavyTruckClearance') }}</div>
+             <div class="card-value"><span class="num text-blue">38,928</span>{{ t('dataOpen.vehicleUnit') }}</div>
           </div>
           <div class="data-card">
-             <div class="card-label">商品车放行数量</div>
-             <div class="card-value"><span class="num text-blue">22,731</span>辆</div>
+             <div class="card-label">{{ t('dataOpen.commercialCarClearance') }}</div>
+             <div class="card-value"><span class="num text-blue">22,731</span>{{ t('dataOpen.vehicleUnit') }}</div>
           </div>
           <div class="data-card">
-             <div class="card-label">重车预约数量</div>
-             <div class="card-value"><span class="num text-blue">38,928</span>辆</div>
+             <div class="card-label">{{ t('dataOpen.heavyTruckAppoint') }}</div>
+             <div class="card-value"><span class="num text-blue">38,928</span>{{ t('dataOpen.vehicleUnit') }}</div>
           </div>
           <div class="data-card">
-             <div class="card-label">商品车预约数量</div>
-             <div class="card-value"><span class="num text-blue">22,731</span>辆</div>
+             <div class="card-label">{{ t('dataOpen.commercialCarAppoint') }}</div>
+             <div class="card-value"><span class="num text-blue">22,731</span>{{ t('dataOpen.vehicleUnit') }}</div>
           </div>
         </div>
         
         <div class="chart-container" style="margin-top: 10px;">
-           <div class="chart-title">车辆放行与预约数量对比</div>
+           <div class="chart-title">{{ t('dataOpen.truckCompare') }}</div>
            <div ref="tradeChartRef" style="height: 150px; width: 100%;"></div>
         </div>
       </div>
@@ -187,26 +195,26 @@ onMounted(() => {
       <div v-show="activeTab === 'governance'" class="tab-panel">
         <div class="cards-grid-3">
           <div class="data-card">
-             <div class="card-label">当月新增案件数</div>
-             <div class="card-value"><span class="num text-cyan">352</span>件</div>
+             <div class="card-label">{{ t('dataOpen.monthlyNewCases') }}</div>
+             <div class="card-value"><span class="num text-cyan">352</span>{{ t('dataOpen.caseUnit') }}</div>
           </div>
           <div class="data-card">
-             <div class="card-label">资产部件总数</div>
-             <div class="card-value"><span class="num text-cyan">25,353</span>项</div>
+             <div class="card-label">{{ t('dataOpen.assetPartsTotal') }}</div>
+             <div class="card-value"><span class="num text-cyan">25,353</span>{{ t('dataOpen.itemUnit') }}</div>
           </div>
           <div class="data-card">
-             <div class="card-label">设施类别数</div>
-             <div class="card-value"><span class="num text-cyan">5</span>类</div>
+             <div class="card-label">{{ t('dataOpen.facilityCategories') }}</div>
+             <div class="card-value"><span class="num text-cyan">5</span>{{ t('dataOpen.categoryUnit') }}</div>
           </div>
         </div>
         
         <div class="gov-charts-grid" style="margin-top: 20px; display: flex; gap: 20px;">
            <div class="chart-container" style="flex: 1;">
-              <div class="chart-title">城市资产部件分布</div>
+              <div class="chart-title">{{ t('dataOpen.cityAssetDist') }}</div>
               <div ref="govBarChartRef" style="height: 232px; width: 100%;"></div>
            </div>
            <div class="chart-container" style="flex: 1;">
-              <div class="chart-title">资产类别占比</div>
+              <div class="chart-title">{{ t('dataOpen.assetCategoryShare') }}</div>
               <div ref="govPieChartRef" style="height: 232px; width: 100%;"></div>
            </div>
         </div>

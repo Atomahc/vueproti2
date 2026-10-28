@@ -2,9 +2,12 @@
 import { ref, onMounted, watch } from 'vue'
 import { http } from '@/api/request'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
 import TheNavBar from '../components/TheNavBar.vue'
+
+const { t } = useI18n()
 
 const props = defineProps({
   asComponent: { type: Boolean, default: false },
@@ -87,20 +90,20 @@ const closeDetail = () => {
 
 const getConsultStatusName = (status: number) => {
   switch(status) {
-    case 0: return '待接单'
-    case 1: return '进行中'
-    case 2: return '已结束'
-    default: return '未知'
+    case 0: return t('fawu.pendingAccept')
+    case 1: return t('fawu.inProgress')
+    case 2: return t('fawu.ended')
+    default: return t('fawu.unknown')
   }
 }
 
 const getAppointmentStatusName = (status: number) => {
   switch(status) {
-    case 0: return '待确认'
-    case 1: return '已确认'
-    case 2: return '已完成'
-    case 3: return '已拒绝'
-    default: return '未知'
+    case 0: return t('fawu.pendingConfirm')
+    case 1: return t('fawu.confirmed')
+    case 2: return t('fawu.completed')
+    case 3: return t('fawu.rejected')
+    default: return t('fawu.unknown')
   }
 }
 
@@ -115,39 +118,39 @@ onMounted(() => {
     <main :class="['main-content', { 'component-main': asComponent }]">
       <TheNavBar v-if="!asComponent" activeId="" />
       <div :class="['content-container', { 'component-container': asComponent }]">
-        <h2 v-if="!asComponent">法务服务记录</h2>
+        <h2 v-if="!asComponent">{{ t('fawu.title') }}</h2>
         
         <div class="tabs-header">
-          <button :class="['tab-btn', { active: activeTab === 'consult' }]" @click="handleTabSwitch('consult')">我的咨询</button>
-          <button :class="['tab-btn', { active: activeTab === 'appointment' }]" @click="handleTabSwitch('appointment')">我的预约</button>
+          <button :class="['tab-btn', { active: activeTab === 'consult' }]" @click="handleTabSwitch('consult')">{{ t('fawu.myConsult') }}</button>
+          <button :class="['tab-btn', { active: activeTab === 'appointment' }]" @click="handleTabSwitch('appointment')">{{ t('fawu.myAppointment') }}</button>
         </div>
 
         <div class="ticket-list" v-if="!loading">
           <div v-for="item in list" :key="item.id" class="ticket-card" @click="openDetail(item)">
             <div class="ticket-header">
-              <span class="ticket-title">{{ item.title || item.serviceType || '无标题' }}</span>
+              <span class="ticket-title">{{ item.title || item.serviceType || t('fawu.noTitle') }}</span>
               <span :class="['status-badge', `status-${item.status}`]">
                 {{ activeTab === 'consult' ? getConsultStatusName(item.status) : getAppointmentStatusName(item.status) }}
               </span>
             </div>
             <div class="ticket-body">
               <span class="ticket-type">
-                {{ activeTab === 'consult' ? `律师：${item.lawyerName || '暂未接单'}` : `预约律师：${item.lawyerName || '未知'}` }}
+                {{ activeTab === 'consult' ? `${t('fawu.lawyerLabel')}${item.lawyerName || t('fawu.notAccepted')}` : `${t('fawu.appointLawyerLabel')}${item.lawyerName || t('fawu.unknown')}` }}
               </span>
               <span class="ticket-time">
-                {{ activeTab === 'consult' ? `发起时间：${item.createTime}` : `预约时间：${item.appointDate} ${item.appointTime}` }}
+                {{ activeTab === 'consult' ? `${t('fawu.createTimeLabel')}${item.createTime}` : `${t('fawu.appointTimeLabel')}${item.appointDate} ${item.appointTime}` }}
               </span>
             </div>
           </div>
           
-          <div v-if="list.length === 0" class="empty-state">暂无记录</div>
+          <div v-if="list.length === 0" class="empty-state">{{ t('fawu.noRecords') }}</div>
         </div>
-        <div v-else class="loading-state">加载中...</div>
+        <div v-else class="loading-state">{{ t('common.loading') }}</div>
 
         <div class="pagination" v-if="total > 0 && !loading">
-          <button :disabled="currentPage === 1" @click="prevPage">上一页</button>
+          <button :disabled="currentPage === 1" @click="prevPage">{{ t('common.prevPage') }}</button>
           <span>{{ currentPage }} / {{ Math.ceil(total / pageSize) }}</span>
-          <button :disabled="currentPage * pageSize >= total" @click="nextPage">下一页</button>
+          <button :disabled="currentPage * pageSize >= total" @click="nextPage">{{ t('common.nextPage') }}</button>
         </div>
       </div>
     </main>
@@ -158,32 +161,32 @@ onMounted(() => {
       <div class="modal-content">
         <button class="modal-close-btn" @click="closeDetail">×</button>
         <div v-if="detailData" class="detail-container">
-          <h2 class="detail-title">{{ detailData.title || detailData.serviceType || '详情' }}</h2>
+          <h2 class="detail-title">{{ detailData.title || detailData.serviceType || t('fawu.detailTitle') }}</h2>
           <div class="detail-meta">
-            <span><strong>状态：</strong>
+            <span><strong>{{ t('fawu.statusLabel') }}</strong>
               <span :class="['status-badge', `status-${detailData.status}`]">
                 {{ activeTab === 'consult' ? getConsultStatusName(detailData.status) : getAppointmentStatusName(detailData.status) }}
               </span>
             </span>
-            <span v-if="activeTab === 'consult'"><strong>律师：</strong>{{ detailData.lawyerName || '暂未接单' }}</span>
-            <span v-else><strong>预约律师：</strong>{{ detailData.lawyerName || '未知' }}</span>
+            <span v-if="activeTab === 'consult'"><strong>{{ t('fawu.lawyerLabel') }}</strong>{{ detailData.lawyerName || t('fawu.notAccepted') }}</span>
+            <span v-else><strong>{{ t('fawu.appointLawyerLabel') }}</strong>{{ detailData.lawyerName || t('fawu.unknown') }}</span>
             
-            <span v-if="activeTab === 'consult'"><strong>发起时间：</strong>{{ detailData.createTime }}</span>
-            <span v-else><strong>预约时间：</strong>{{ detailData.appointDate }} {{ detailData.appointTime }}</span>
+            <span v-if="activeTab === 'consult'"><strong>{{ t('fawu.createTimeLabel') }}</strong>{{ detailData.createTime }}</span>
+            <span v-else><strong>{{ t('fawu.appointTimeLabel') }}</strong>{{ detailData.appointDate }} {{ detailData.appointTime }}</span>
           </div>
           
           <div class="detail-section">
-            <h3>{{ activeTab === 'consult' ? '问题描述' : '服务说明' }}</h3>
-            <p>{{ detailData.description || '无详细描述' }}</p>
+            <h3>{{ activeTab === 'consult' ? t('fawu.problemDesc') : t('fawu.serviceDesc') }}</h3>
+            <p>{{ detailData.description || t('fawu.noDetailDesc') }}</p>
           </div>
 
           <div class="detail-section" v-if="detailData.contact">
-            <h3>联系方式</h3>
+            <h3>{{ t('fawu.contactLabel') }}</h3>
             <p>{{ detailData.contact }}</p>
           </div>
 
           <div class="detail-section" v-if="activeTab === 'appointment' && detailData.rejectReason">
-            <h3>拒绝原因</h3>
+            <h3>{{ t('fawu.rejectReason') }}</h3>
             <p>{{ detailData.rejectReason }}</p>
           </div>
           

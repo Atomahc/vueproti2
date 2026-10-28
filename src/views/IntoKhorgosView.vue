@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
@@ -6,6 +7,8 @@ import 'swiper/css'
 import 'swiper/css/effect-coverflow'
 import 'swiper/css/pagination'
 import { EffectCoverflow, Pagination, Autoplay } from 'swiper/modules'
+
+const { t } = useI18n()
 
 const modules = [EffectCoverflow, Pagination, Autoplay]
 
@@ -63,9 +66,9 @@ const cultureList = [
             <img src="https://picsum.photos/600/400?random=10" alt="霍尔果斯概览" />
           </div>
           <div class="overview-text">
-            <h2 class="section-title-left">霍尔果斯概览</h2>
+            <h2 class="section-title-left">{{ t('into.overview') }}</h2>
             <p>
-              霍尔果斯市。隶属于中华人民共和国新疆维吾尔自治区伊犁哈萨克自治州，地处中国西部边境，与哈萨克斯坦接壤，西东接内陆省市，是321国道、连霍高速公路的终点。距伊犁州府伊宁市90千米，距新疆维吾尔自治区首府乌鲁木齐市670千米，距中亚中心城市哈萨克斯坦首都阿拉木图378千米，对外覆盖半径3000千米以内的区域是中亚地区人口稠密区。经计发、达成和市场中心。截至2024年，霍尔果斯辖5个街道、1个民族乡、2个兵团团场，霍尔果斯市域面积1900.55平方千米。截至2010年来，霍尔果斯市户籍人口65227人。
+              {{ t('into.overviewDesc') }}
             </p>
             <div class="come-to-khorgos">COME TO KHORGOS</div>
           </div>
@@ -76,7 +79,7 @@ const cultureList = [
     <!-- Cultural Heritage -->
     <section class="section culture-section">
       <div class="container">
-        <h2 class="section-title">文化非遗</h2>
+        <h2 class="section-title">{{ t('into.cultureHeritage') }}</h2>
         <swiper
           :effect="'coverflow'"
           :grabCursor="true"
@@ -116,7 +119,7 @@ const cultureList = [
       <div class="container">
         <div class="policy-grid">
           <div class="policy-column">
-            <h2 class="column-title">优惠政策</h2>
+            <h2 class="column-title">{{ t('into.preferentialPolicies') }}</h2>
             <div class="policy-item" v-for="(item, index) in policyList" :key="index">
               <h3>{{ item.title }}</h3>
               <span class="date">{{ item.date }}</span>
@@ -124,7 +127,7 @@ const cultureList = [
             </div>
           </div>
           <div class="policy-column">
-            <h2 class="column-title">营销环境监测</h2>
+            <h2 class="column-title">{{ t('into.businessEnvMonitoring') }}</h2>
             <div class="policy-item" v-for="(item, index) in policyList" :key="index">
               <h3>{{ item.title }}</h3>
               <span class="date">{{ item.date }}</span>
@@ -138,7 +141,7 @@ const cultureList = [
     <!-- Investment Map Placeholder -->
     <section class="section investment-section">
       <div class="container">
-        <h2 class="section-title">投资霍尔果斯</h2>
+        <h2 class="section-title">{{ t('into.investKhorgos') }}</h2>
         <div class="map-container">
           <img
             src="https://picsum.photos/1200/500?random=30"
@@ -155,15 +158,15 @@ const cultureList = [
         <div class="cta-grid">
           <div class="cta-card blue-cta">
             <div class="cta-content">
-              <h3>投资指南与成本</h3>
-              <router-link to="#" class="cta-link">立即查看 ></router-link>
+              <h3>{{ t('into.investGuideCost') }}</h3>
+              <router-link to="#" class="cta-link">{{ t('into.viewNow') }}</router-link>
             </div>
             <img src="https://picsum.photos/400/200?random=40" alt="Investment Guide" />
           </div>
           <div class="cta-card cyan-cta">
             <div class="cta-content">
-              <h3>招商项目</h3>
-              <router-link to="#" class="cta-link">立即查看 ></router-link>
+              <h3>{{ t('into.investProjects') }}</h3>
+              <router-link to="#" class="cta-link">{{ t('into.viewNow') }}</router-link>
             </div>
             <img src="https://picsum.photos/400/200?random=41" alt="Investment Projects" />
           </div>

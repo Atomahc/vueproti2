@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { onMounted, onUnmounted, computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const showBackButton = computed(() => {
   return route.path !== '/' && !route.path.startsWith('/login')
@@ -97,7 +99,7 @@ onMounted(() => {
   <div class="global-app-container">
     <!-- 全局占满全屏背景图 -->
     <div class="global-bg-wrapper">
-      <img src="@/assets/img/indexbg.png" alt="背景图" class="global-bg-img" />
+      <img src="@/assets/img/indexbg.png" alt="background" class="global-bg-img" />
     </div>
     <div class="app-main-view">
       <RouterView />
@@ -106,12 +108,12 @@ onMounted(() => {
     <!-- 全局悬浮按钮组 -->
     <div class="global-floating-group">
             <!-- 悬浮返回按钮 -->
-      <div v-if="showBackButton" class="global-floating-btn global-back-btn" @click="goBack" title="返回">
+      <div v-if="showBackButton" class="global-floating-btn global-back-btn" @click="goBack" :title="t('common.back')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
-        <span>返回</span>
+        <span>{{ t('common.back') }}</span>
       </div>
 
 
@@ -121,7 +123,7 @@ onMounted(() => {
         v-if="showAiButton"
         class="global-floating-btn global-ai-btn"
         :class="{ active: isAiChatOpen }"
-        title="智能问答"
+        :title="t('common.aiChat')"
         @click="toggleAiChat"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -132,7 +134,7 @@ onMounted(() => {
           <path d="M15 13v2"></path>
           <path d="M9 13v2"></path>
         </svg>
-        <span>智能问答</span>
+        <span>{{ t('common.aiChat') }}</span>
       </div>
     </div>
 
@@ -152,9 +154,9 @@ onMounted(() => {
             <path d="M15 13v2"></path>
             <path d="M9 13v2"></path>
           </svg>
-          <span>智能问答</span>
+          <span>{{ t('common.aiChat') }}</span>
         </div>
-        <button type="button" class="ai-chat-close-btn" @click="closeAiChat" title="关闭">
+        <button type="button" class="ai-chat-close-btn" @click="closeAiChat" :title="t('common.close')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -167,7 +169,7 @@ onMounted(() => {
           style="width: 100%; height: 100%;"
           frameborder="0"
           allow="microphone"
-          title="智能问答"
+          :title="t('common.aiChat')"
         ></iframe>
       </div>
     </div>

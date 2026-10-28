@@ -7,7 +7,7 @@ import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const foreignServices = ref<any>({ children: [] })
 const portCloudItems = ref<any>({ children: [] })
 const passServices = ref<any>({ children: [] })
@@ -45,7 +45,7 @@ const handleNavigate = (url: string) => {
 }
 
 const handleCoopClick = () => {
-  alert('敬请期待等待系统接入')
+  alert(t('services.comingSoon'))
 }
 
 const handleCloudClick = (item: any) => {
@@ -58,8 +58,8 @@ const closeModal = () => {
 
 const showIntroModal = () => {
   activeModal.value = {
-    name: '口岸云集平台',
-    linkDesc: '本平台以可信数字身份为核心底座，覆盖全场景口岸服务，助力提升口岸运营效率、规范市场秩序、带动边民增收、促进产业集聚，实现政府监管精准化、企业服务一体化、群众办事便捷化，为霍尔果斯高质量发展提供数字化支撑。'
+    name: t('services.portYunjiPlatform'),
+    linkDesc: t('services.portYunjiPlatformDesc')
   }
 }
 
@@ -88,7 +88,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
           <div class="cross-card yellow-tint-card" v-if="foreignServices.id">
             <div class="card-title-header">
               <div class="title-with-square yellow">
-                <img :src="foreignServices.icon ? (foreignServices.icon.startsWith('http') ? foreignServices.icon : minioPrefix + foreignServices.icon) : ''" alt="境外人员便利化服务">
+                <img :src="foreignServices.icon ? (foreignServices.icon.startsWith('http') ? foreignServices.icon : minioPrefix + foreignServices.icon) : ''" :alt="foreignServices.name || ''">
               </div>
               <div>
                 <h3>{{ foreignServices.name }}</h3>
@@ -144,8 +144,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
             <div class="accordion-container" @mouseleave="activeIndex = 0">
               <div v-for="(item, i) in cultureBase.children" :key="i" 
                    class="accordion-item" 
-                   :class="{ active: activeIndex === i }"
-                   @mouseenter="activeIndex = i"
+                   :class="{ active: activeIndex === Number(i) }"
+                   @mouseenter="activeIndex = Number(i)"
                    @click="handleNavigate(item.url)">
                 <img class="acc-bg" :class="{ 'has-banner': !!item.bannerImage }" :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
                 <img class="acc-banner" v-if="item.bannerImage" :src="item.bannerImage ? (item.bannerImage.startsWith('http') ? item.bannerImage : minioPrefix + item.bannerImage) : ''" :alt="item.name" />
@@ -172,8 +172,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                 </div>
               </div>
               <div style="display: flex; gap: 10px;">
-                <button class="action-btn" @click="handleNavigate('https://ca.kouanyun.com/home/index.html')">进入平台</button>
-                <button class="action-btn" @click="showIntroModal">平台简介</button>
+                <button class="action-btn" @click="handleNavigate('https://ca.kouanyun.com/home/index.html')">{{ t('services.enterPlatform') }}</button>
+                <button class="action-btn" @click="showIntroModal">{{ t('services.platformIntro') }}</button>
               </div>
             </div>
 
@@ -224,9 +224,9 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
       <div class="modal-content">
         <button class="modal-close-btn" @click="closeModal">&times;</button>
         <div class="modal-header">
-          <h2 class="modal-title">{{ activeModal.name }}简介</h2>
+          <h2 class="modal-title">{{ activeModal.name }}{{ t('services.intro') }}</h2>
         </div>
-        <p class="modal-desc">{{ activeModal.linkDesc || '暂无简介' }}</p>
+        <p class="modal-desc">{{ activeModal.linkDesc || t('services.noIntro') }}</p>
       </div>
     </div>
 

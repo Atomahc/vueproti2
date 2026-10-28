@@ -4,6 +4,8 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
+
+const { locale, t } = useI18n()
 import TheHeader from '../../components/TheHeader.vue'
 import TheFooter from '../../components/TheFooter.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
@@ -56,7 +58,7 @@ const handleImageUpload = (e: any) => {
   const file = e.target.files[0]
   if (!file) return
   if (uploadedImages.value.length >= 9) {
-    alert('最多只能上传9张图片')
+    alert(t('services.maxImagesLimit'))
     return
   }
   const reader = new FileReader()
@@ -74,23 +76,23 @@ const removeImage = (index: number) => {
 
 const submitSnapshotForm = async () => {
   if (!snapshotForm.value.content || !snapshotForm.value.contactName || !snapshotForm.value.contactPhone || !snapshotForm.value.address) {
-    alert('请填写完整信息')
+    alert(t('services.fillCompleteInfo'))
     return
   }
   snapshotSubmitting.value = true
   try {
     const res: any = await http.post('/prod-api/portal/complaint/snapshot/create', null, { params: snapshotForm.value })
     if (res.code === 0 || String(res.code) === '0') {
-      alert('提交成功')
+      alert(t('services.submitSuccess'))
       uploadedImages.value = []
       snapshotForm.value = {
         reportType: reportTypes.value[0]?.id || '', content: '', imageUrls: '[]', longitude: '', latitude: '', address: '', community: communities.value[0]?.id || '', contactName: '', contactPhone: ''
       }
     } else {
-      alert('提交失败: ' + res.msg)
+      alert(t('services.submitFailed') + ': ' + res.msg)
     }
   } catch (e: any) {
-    alert('提交出错: ' + (e.message || '未知错误'))
+    alert(t('services.submitError') + ': ' + (e.message || t('common.unknownError')))
   } finally {
     snapshotSubmitting.value = false
   }
@@ -139,7 +141,7 @@ const closeMapModal = () => {
 
 const initMap = () => {
   if (typeof (window as any).AMap === 'undefined') {
-    alert('高德地图加载失败，请刷新重试')
+    alert(t('services.mapLoadFailed'))
     return
   }
   const AMap = (window as any).AMap
@@ -216,7 +218,7 @@ const setMapMarker = (lng: number, lat: number) => {
 
 const confirmLocation = () => {
   if (!tempLocation.value.lng || !tempLocation.value.lat) {
-    alert('请在地图上点击选择一个位置')
+    alert(t('services.selectLocationPrompt'))
     return
   }
   snapshotForm.value.longitude = tempLocation.value.lng
@@ -226,8 +228,6 @@ const confirmLocation = () => {
   }
   closeMapModal()
 }
-
-const { locale } = useI18n()
 
 const fetchConvenience = async () => {
   try {
@@ -342,8 +342,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                   </svg>
                 </div>
                 <div>
-                  <h2>城市治理 · 随手拍</h2>
-                  <p class="subtitle">发现一分派一处置一反馈闭环</p>
+                  <h2>{{ t('services.cityGovernance') }}</h2>
+                  <p class="subtitle">{{ t('services.governanceLoop') }}</p>
                 </div>
               </div>
             </div>
@@ -351,20 +351,20 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
             <div class="shoot-body">
               <div class="row-group">
                 <div class="col" style="margin-right: 10px;">
-                  <label class="form-label">上报类型</label>
+                  <label class="form-label">{{ t('services.reportType') }}</label>
                   <select class="shoot-input" v-model="snapshotForm.reportType">
                     <option v-for="item in reportTypes" :key="item.id" :value="item.id">{{ item.dictLabel }}</option>
                   </select>
                 </div>
                 <div class="col">
-                  <label class="form-label">所属社区</label>
+                  <label class="form-label">{{ t('services.community') }}</label>
                   <select class="shoot-input" v-model="snapshotForm.community">
                     <option v-for="item in communities" :key="item.id" :value="item.id">{{ item.dictLabel }}</option>
                   </select>
                 </div>
               </div>
 
-              <label class="form-label" style="margin-top: 10px;">问题描述</label>
+              <label class="form-label" style="margin-top: 10px;">{{ t('services.issueDesc') }}</label>
               <div class="textarea-with-upload">
                 <div class="upload-container">
                   <div v-for="(img, index) in uploadedImages" :key="index" class="upload-item">
@@ -372,39 +372,39 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                     <button type="button" class="btn-remove-img" @click="removeImage(index)">×</button>
                   </div>
                   <div class="upload-btn" v-if="uploadedImages.length < 9">
-                    <span>+ 图片</span>
+                    <span>{{ t('services.addImage') }}</span>
                     <input type="file" accept="image/*" @change="handleImageUpload" />
                   </div>
                 </div>
                 <textarea
                   v-model="snapshotForm.content"
-                  placeholder="请输入问题描述..."
+                  :placeholder="t('services.descPlaceholder')"
                   class="shoot-textarea-inner"
                 ></textarea>
               </div>
 
               <div class="row-group" style="margin-top: 10px;">
                 <div class="col" style="margin-right: 10px;">
-                  <label class="form-label">姓名</label>
-                  <input type="text" class="shoot-input" v-model="snapshotForm.contactName" placeholder="姓名" />
+                  <label class="form-label">{{ t('services.name') }}</label>
+                  <input type="text" class="shoot-input" v-model="snapshotForm.contactName" :placeholder="t('services.name')" />
                 </div>
                 <div class="col">
-                  <label class="form-label">联系电话</label>
-                  <input type="text" class="shoot-input" v-model="snapshotForm.contactPhone" placeholder="电话" />
+                  <label class="form-label">{{ t('services.phone') }}</label>
+                  <input type="text" class="shoot-input" v-model="snapshotForm.contactPhone" :placeholder="t('services.phone')" />
                 </div>
               </div>
               
-              <label class="form-label" style="margin-top: 10px;">地址</label>
+              <label class="form-label" style="margin-top: 10px;">{{ t('services.address') }}</label>
               <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-                <input type="text" class="shoot-input" v-model="snapshotForm.address" placeholder="请输入地址" style="margin-bottom: 0;" />
+                <input type="text" class="shoot-input" v-model="snapshotForm.address" :placeholder="t('services.addressPlaceholder')" style="margin-bottom: 0;" />
                 <button type="button" class="btn-location" @click="openMapModal">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  定位
+                  {{ t('services.locate') }}
                 </button>
               </div>
 
               <button class="submit-btn green" @click="submitSnapshotForm" :disabled="snapshotSubmitting">
-                {{ snapshotSubmitting ? '提交中...' : '立即上传' }}
+                {{ snapshotSubmitting ? t('services.submitting') : t('services.uploadNow') }}
               </button>
             </div>
           </div>
@@ -414,7 +414,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
           <!-- 4. 社区便民 -->
           <div class="bm-card blue-tint-card">
             <div class="card-header-flex">
-              <h2>社区便民</h2>
+              <h2>{{ t('services.communityConvenience') }}</h2>
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
             <div class="services-icon-grid">
@@ -433,7 +433,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
           <!-- 5. 生活服务 -->
           <div class="bm-card pur-tint-card">
             <div class="card-header-flex">
-              <h2>生活服务</h2>
+              <h2>{{ t('services.lifeService') }}</h2>
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
             <div class="services-icon-grid">
@@ -458,7 +458,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                     <path d="M12 14l9-5-9-5-9 5 9 5z" />
                   </svg>
                 </div>
-                <h2>{{ laodaoInfo.name ? laodaoInfo.name : '劳道智工' }} · <span>短期工</span></h2>
+                <h2>{{ laodaoInfo.name ? laodaoInfo.name : t('jobs.laodao') }} · <span>{{ t('services.shortTermJob') }}</span></h2>
               </div>
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
@@ -470,7 +470,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                     <span class="job-title" style="font-size: 15px;">{{ job.positionName }}</span>
                     <span class="job-salary" style="font-size: 14px;" v-if="job.salaryShow">{{ job.salaryShow }}</span>
                     <span class="job-salary" style="font-size: 14px;" v-else-if="job.salaryMin != null">{{ job.salaryMin }}K-{{ job.salaryMax }}K</span>
-                    <span class="job-salary" style="font-size: 14px;" v-else>面议</span>
+                    <span class="job-salary" style="font-size: 14px;" v-else>{{ t('services.negotiable') }}</span>
                   </div>
                   <div class="job-item-tags" style="margin: 6px 0; display: flex; gap: 6px; flex-wrap: wrap;">
                     <span v-for="(tag, tIdx) in [job.districtName, job.experienceLabel, ...(job.welfareBenefits || [])].filter(Boolean).slice(0, 2)" :key="tIdx" style="background: #f0fdfa; border: 1px solid #ccfbf1; color: #0d9488; font-size: 11px; padding: 2px 6px; border-radius: 4px;">{{ tag }}</span>
@@ -478,15 +478,15 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                   <div class="job-item-footer" style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-top: 8px;">
                     <span style="display: flex; align-items: center; gap: 4px;width: 100px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
                       <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                      {{ job.workAddress || '地址不详' }}
+                      {{ job.workAddress || t('services.addressUnknown') }}
                     </span>
                     <span>{{ (job.publishTimeStr || job.createTimeStr || '').split(' ')[0] }}</span>
                   </div>
                 </div>
               </div>
               <div class="hot-job-banner" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">
-                <span>热门职务 <strong>*{{ hotJobsCount }}</strong></span>
-                <a href="javascript:void(0)" class="view-link">查看 &rarr;</a>
+                <span>{{ t('services.hotJobs') }} <strong>*{{ hotJobsCount }}</strong></span>
+                <a href="javascript:void(0)" class="view-link">{{ t('common.view') }} &rarr;</a>
               </div>
             </div>
           </div>
@@ -501,7 +501,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                     <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
                   </svg>
                 </div>
-                <h2>{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : '中亚职通桥' }} · <span>长期工</span></h2>
+                <h2>{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : t('jobs.zhongya') }} · <span>{{ t('services.longTermJob') }}</span></h2>
               </div>
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
@@ -513,7 +513,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                     <span class="job-title" style="font-size: 15px;">{{ job.title }}</span>
                     <span class="job-salary" style="font-size: 14px;" v-if="job.salaryShow">{{ job.salaryShow }}</span>
                     <span class="job-salary" style="font-size: 14px;" v-else-if="job.minSalary != null">{{ job.minSalary }}-{{ job.maxSalary }}</span>
-                    <span class="job-salary" style="font-size: 14px;" v-else>面议</span>
+                    <span class="job-salary" style="font-size: 14px;" v-else>{{ t('services.negotiable') }}</span>
                   </div>
                   <div class="job-item-tags" style="margin: 6px 0; display: flex; gap: 6px; flex-wrap: wrap;">
                     <span v-for="(tag, tIdx) in [job.city, job.experienceLabel, job.educationLabel].filter(Boolean).slice(0, 2)" :key="tIdx" style="background: #fef3c7; border: 1px solid #fde68a; color: #d97706; font-size: 11px; padding: 2px 6px; border-radius: 4px;">{{ tag }}</span>
@@ -521,14 +521,14 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                   <div class="job-item-footer" style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-top: 8px;">
                     <span style="display: flex; align-items: center; gap: 4px;">
                       <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                      {{ job.workLocation || job.city || '地址不详' }}
+                      {{ job.workLocation || job.city || t('services.addressUnknown') }}
                     </span>
                     <span>{{ (job.createDate || '').split(' ')[0] }}</span>
                   </div>
                 </div>
               </div>
               <button class="yellow-action-btn" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
-                找人才/找工作 <span class="sub-link">职位列表 &rarr;</span>
+                {{ t('services.findTalentJob') }} <span class="sub-link">{{ t('services.jobList') }} &rarr;</span>
               </button>
             </div>
           </div>
@@ -542,8 +542,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                 </svg>
               </div>
               <div class="text-info">
-                <h3>{{ bc.name.replace('(霍尔果斯云)', '') }} <span class="sub" v-if="bc.name.includes('(霍尔果斯云)')">(霍尔果斯云)</span> &rarr;</h3>
-                <p>{{ bc.remark || '暂无描述' }}</p>
+                <h3>{{ bc.name.replace('(霍尔果斯云)', '') }} <span class="sub" v-if="bc.name.includes('(霍尔果斯云)')">({{ t('services.khorgosCloud') }})</span> &rarr;</h3>
+                <p>{{ bc.remark || t('common.noDesc') }}</p>
               </div>
             </div>
           </div>
@@ -570,11 +570,11 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <path d="M12 14l9-5-9-5-9 5 9 5z" />
             </svg>
           </div>
-          <h2 class="modal-title">{{ activeModal.name ? activeModal.name.split('·')[0] : '' }}简介</h2>
+          <h2 class="modal-title">{{ activeModal.name ? activeModal.name.split('·')[0] : '' }}{{ t('services.intro') }}</h2>
         </div>
-        <p class="modal-desc">{{ activeModal.linkDesc || '暂无简介' }}</p>
+        <p class="modal-desc">{{ activeModal.linkDesc || t('services.noIntro') }}</p>
         <div class="modal-qrcode-section" :class="{ 'green-bg': activeModal.name?.includes('劳道'), 'yellow-bg': activeModal.name?.includes('中亚') }">
-          <div class="qrcode-title">请扫描下方二维码进入小程序</div>
+          <div class="qrcode-title">{{ t('services.scanQrCode') }}</div>
           <div class="qrcode-wrapper">
             <img v-if="activeModal.qrcode" :src="activeModal.qrcode.startsWith('http') ? activeModal.qrcode : minioPrefix + activeModal.qrcode" alt="QR Code" class="qrcode-img" />
             <!-- Fallback QR code images if no dynamic one -->
@@ -593,13 +593,13 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
           </svg>
         </button>
         <div class="modal-header">
-          <h2 class="modal-title">选择位置</h2>
+          <h2 class="modal-title">{{ t('services.selectLocation') }}</h2>
         </div>
         <div id="amap-container" style="width: 100%; height: 400px; border-radius: 4px; border: 1px solid #cbd5e1; margin-top: 10px;"></div>
         <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
           <span style="flex: 1; align-self: center; font-size: 13px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ tempLocation.address }}</span>
-          <button class="action-btn" style="background-color: #94a3b8;" @click="closeMapModal">取消</button>
-          <button class="action-btn" style="background-color: #10b981;" @click="confirmLocation">确定</button>
+          <button class="action-btn" style="background-color: #94a3b8;" @click="closeMapModal">{{ t('common.cancel') }}</button>
+          <button class="action-btn" style="background-color: #10b981;" @click="confirmLocation">{{ t('common.confirm') }}</button>
         </div>
       </div>
     </div>

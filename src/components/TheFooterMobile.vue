@@ -1,9 +1,15 @@
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+</script>
+
 <template>
   <footer class="mobile-footer-wrapper">
     <div class="mobile-banner-inner">
-      <span class="banner-text">主办：霍尔果斯市人民政府办公室</span>
-      <span class="banner-text links">关于我们 | 版权保护 | 隐私声明 | 联系我们</span>
-      <span class="banner-text brand">数字霍尔果斯 · 全域统一综合服务门户</span>
+      <span class="banner-text">{{ t('footer.organizer') }}</span>
+      <span class="banner-text links">{{ t('footer.aboutUs') }} | {{ t('footer.copyright') }} | {{ t('footer.privacy') }} | {{ t('footer.contactUs') }}</span>
+      <span class="banner-text brand">{{ t('footer.portalTitle') }}</span>
     </div>
   </footer>
 </template>

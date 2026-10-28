@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
@@ -10,10 +10,11 @@ import TheNavBar from '../../components/TheNavBar.vue'
 const router = useRouter()
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX || ''
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const cultureTags = ref<any[]>([])
-const pageTitle = ref('文旅服务')
+const cultureNodeTitle = ref('')
+const pageTitle = computed(() => cultureNodeTitle.value || t('services.cultureTourismService'))
 
 const fetchConvenience = async () => {
   try {
@@ -27,7 +28,7 @@ const fetchConvenience = async () => {
       const list = res.data.convenience
       const cultureNode = list.find((item: any) => item.name === '文旅服务' || item.name?.includes('文旅')) || list.find((item: any) => item.children && item.children.length > 0)
       if (cultureNode) {
-        pageTitle.value = cultureNode.name
+        cultureNodeTitle.value = cultureNode.name
         cultureTags.value = cultureNode.children || []
       }
     }
@@ -82,7 +83,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
             </div>
             <div class="text-info">
               <h3>{{ tag.name }}</h3>
-              <span class="sub-link" v-if="tag.url">立即前往 &rarr;</span>
+              <span class="sub-link" v-if="tag.url">{{ t('common.goToImmediately') }} &rarr;</span>
             </div>
           </div>
         </div>

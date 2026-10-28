@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '@/components/TheHeader.vue'
 import TheNavBar from '../../components/TheNavBar.vue'
 import TheFooter from '@/components/TheFooter.vue'
+
+const { t } = useI18n()
 
 const courses = ref<any[]>([])
 const loading = ref(true)
@@ -47,8 +50,8 @@ onMounted(() => {
 
       <div style="display: flex; gap: 20px; flex: 1; height: 100%;">
         <div class="content-box" style="flex: 1; min-width: 0;">
-        <div v-if="loading" class="loading">加载中...</div>
-        <div v-else-if="courses.length === 0" class="empty">暂无课程</div>
+        <div v-if="loading" class="loading">{{ t('youth.loading') }}</div>
+        <div v-else-if="courses.length === 0" class="empty">{{ t('youth.noCourses') }}</div>
         <div v-else class="course-grid">
           <div v-for="course in courses" :key="course.id" class="course-card" @click="openModal(course)">
             <div class="course-img-wrapper">
@@ -66,7 +69,7 @@ onMounted(() => {
                   <div class="progress-inner" :style="{ width: ((course.sold / course.totalQuota) * 100) + '%' }"></div>
                 </div>
                 <div class="quota-text">
-                  已报 {{ course.sold }} / 共 {{ course.totalQuota }} 人 (剩余 {{ course.remainingQuota2 }})
+                  {{ t('youth.quotaSummary', { sold: course.sold, total: course.totalQuota, remaining: course.remainingQuota2 }) }}
                 </div>
               </div>
             </div>
@@ -88,28 +91,28 @@ onMounted(() => {
         <div class="modal-body scrollable">
           <img class="detail-img" :src="activeCourse.picture || activeCourse.awardImage" />
           <div class="detail-meta">
-            <p><strong>任课老师：</strong>{{ activeCourse.teacher }}</p>
-            <p><strong>上课时间：</strong>{{ activeCourse.classTime }}</p>
-            <p><strong>课程价格：</strong>¥{{ activeCourse.price }}</p>
-            <p><strong>报名时间：</strong>{{ activeCourse.bmKssj }} 至 {{ activeCourse.bmJssj }}</p>
+            <p><strong>{{ t('youth.teacher') }}</strong>{{ activeCourse.teacher }}</p>
+            <p><strong>{{ t('youth.classTime') }}</strong>{{ activeCourse.classTime }}</p>
+            <p><strong>{{ t('youth.coursePrice') }}</strong>¥{{ activeCourse.price }}</p>
+            <p><strong>{{ t('youth.enrollTime') }}</strong>{{ activeCourse.bmKssj }} {{ t('youth.to') }} {{ activeCourse.bmJssj }}</p>
           </div>
           <div class="detail-section">
-            <h3>课程介绍</h3>
+            <h3>{{ t('youth.courseIntro') }}</h3>
             <div class="html-content" v-html="activeCourse.content"></div>
           </div>
           <div class="detail-section">
-            <h3>老师介绍</h3>
+            <h3>{{ t('youth.teacherIntro') }}</h3>
             <div class="html-content" v-html="activeCourse.teacherContent"></div>
           </div>
           <div class="detail-section">
-            <h3>报名须知</h3>
+            <h3>{{ t('youth.enrollNotice') }}</h3>
             <div class="html-content" v-html="activeCourse.notice"></div>
           </div>
           <div class="detail-section">
-            <h3>报名方式</h3>
+            <h3>{{ t('youth.enrollMethod') }}</h3>
             <div class="enrollment-tip">
-              <p class="tip-text">温馨提示：本平台仅提供课程信息展示，课程报名、缴费请扫描下方二维码，跳转公众号完成操作。</p>
-              <img class="qrcode-img" src="@/assets/other/image.jpeg" alt="报名二维码" />
+              <p class="tip-text">{{ t('youth.enrollTip') }}</p>
+              <img class="qrcode-img" src="@/assets/other/image.jpeg" :alt="t('youth.qrcodeAlt')" />
             </div>
           </div>
         </div>

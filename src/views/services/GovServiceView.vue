@@ -25,7 +25,7 @@ const enterpriseBsCategories = ref<any[]>([])
 const defaultColors = ['#00c4cc', '#1890ff', '#2f54eb', '#52c41a', '#fa8c16', '#fa541c']
 const defaultBgColors = ['#e6fcfc', '#e6f7ff', '#f0f5ff', '#f6ffed', '#fff7e6', '#fff2e8']
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const fetchGovServices = async () => {
   try {
@@ -216,19 +216,19 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               :class="['sub-tab-btn', { active: activeSubTab === 'personal' }]"
               @click="activeSubTab = 'personal'"
             >
-              个人办事
+              {{ t('services.personalAffairs') }}
             </button>
             <button
               :class="['sub-tab-btn', { active: activeSubTab === 'enterprise_bs' }]"
               @click="activeSubTab = 'enterprise_bs'"
             >
-              企业办事
+              {{ t('services.enterpriseAffairs') }}
             </button>
             <button
               :class="['sub-tab-btn', { active: activeSubTab === 'enterprise_fw' }]"
               @click="activeSubTab = 'enterprise_fw'"
             >
-              企业服务
+              {{ t('services.enterpriseService') }}
             </button>
           </div>
 
@@ -291,16 +291,16 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                   :class="['merged-tab-item', { active: activeMergedTab === 'policy' }]" 
                   @click="activeMergedTab = 'policy'"
                 >
-                  <span class="tab-title">{{ enterpriseFwData['政策匹配推荐']?.name || '政策匹配推荐' }}</span>
+                  <span class="tab-title">{{ enterpriseFwData['政策匹配推荐']?.name || t('services.policyRecommend') }}</span>
                 </div>
                 <div 
                   :class="['merged-tab-item', { active: activeMergedTab === 'business' }]" 
                   @click="activeMergedTab = 'business'"
                 >
-                  <span class="tab-title">{{ enterpriseFwData['营商环境监测']?.name || '营商环境监测' }}</span>
+                  <span class="tab-title">{{ enterpriseFwData['营商环境监测']?.name || t('services.businessMonitor') }}</span>
                 </div>
                 <div style="flex: 1; border-bottom: 1px solid #e2e8f0;"></div>
-                <span class="view-more-tab" style="border-bottom: 1px solid #e2e8f0;" @click="router.push({ path: '/news', query: { tab: activeMergedTab === 'policy' ? '政策推送' : '营商环境监测' } })">更多<span style="background:#b91c1c; color:#fff; display:inline-block; margin-left:4px; padding:0 4px; font-size:12px;">+</span></span>
+                <span class="view-more-tab" style="border-bottom: 1px solid #e2e8f0;" @click="router.push({ path: '/news', query: { tab: activeMergedTab === 'policy' ? '政策推送' : '营商环境监测' } })">{{ t('common.more') }}<span style="background:#b91c1c; color:#fff; display:inline-block; margin-left:4px; padding:0 4px; font-size:12px;">+</span></span>
               </div>
 
               <div class="merged-card-body" v-if="activeMergedTab === 'policy'">
@@ -341,17 +341,17 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                       <path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                     </svg>
                   </div>
-                  <h3>{{ enterpriseFwData['企业供需对接']?.name || '企业供需对接' }}</h3>
+                  <h3>{{ enterpriseFwData['企业供需对接']?.name || t('services.supplyDemand') }}</h3>
                 </div>
-                <span class="view-more" @click.stop="router.push('/supply-demand')" style="font-size: 13px; color: #0d9488; cursor: pointer;">更多</span>
+                <span class="view-more" @click.stop="router.push('/supply-demand')" style="font-size: 13px; color: #0d9488; cursor: pointer;">{{ t('common.more') }}</span>
               </div>
-              <p class="card-desc" style="margin-bottom: 12px;">{{ enterpriseFwData['企业供需对接']?.remark || '供需发布平台，产业链上下游资源互补与协作' }}</p>
+              <p class="card-desc" style="margin-bottom: 12px;">{{ enterpriseFwData['企业供需对接']?.remark || t('services.supplyDemandRemark') }}</p>
               
               <ul class="supply-demand-list" style="list-style: none; padding: 0; margin: 0; flex: 1;">
                 <li v-for="(item, i) in supplyDemandList" :key="i" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: #334155; border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px;">
                   <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     <span :style="{ color: item.type === 'supply' ? '#10b981' : '#f59e0b', marginRight: '4px', fontWeight: 'bold' }">
-                      [{{ item.type === 'supply' ? '供应' : '需求' }}]
+                      [{{ item.type === 'supply' ? t('services.supply') : t('services.demand') }}]
                     </span>
                     {{ item.title }}
                   </span>
@@ -374,13 +374,13 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                       <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                   </div>
-                  <h3>{{ enterpriseFwData['企业信用查询']?.name || '企业信用查询' }}</h3>
+                  <h3>{{ enterpriseFwData['企业信用查询']?.name || t('services.creditSearch') }}</h3>
                 </div>
               </div>
-              <p class="card-desc">{{ enterpriseFwData['企业信用查询']?.remark || '接入信用中国（霍尔果斯），企业信用信息一站式查询' }}</p>
+              <p class="card-desc">{{ enterpriseFwData['企业信用查询']?.remark || t('services.creditSearchRemark') }}</p>
               <div class="credit-search-group" @click.stop>
-                <input v-model="creditSearchKeyword" type="text" placeholder="请输入 法人/企业名称/营业执照" class="credit-search-input-integrated" @keyup.enter="handleCreditSearch" />
-                <button class="credit-search-btn" @click.stop="handleCreditSearch">立即搜索</button>
+                <input v-model="creditSearchKeyword" type="text" :placeholder="t('services.creditPlaceholder')" class="credit-search-input-integrated" @keyup.enter="handleCreditSearch" />
+                <button class="credit-search-btn" @click.stop="handleCreditSearch">{{ t('services.searchNow') }}</button>
               </div>
             </div>
             <!-- 招商引资服务 -->
@@ -392,7 +392,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   </div>
-                  <h3>{{ enterpriseFwData['招商引资服务']?.name || '招商引资服务' }}</h3>
+                  <h3>{{ enterpriseFwData['招商引资服务']?.name || t('services.investmentService') }}</h3>
                 </div>
                 <span class="arrow-right"><svg data-v-dac29979="" t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path data-v-dac29979="" d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
               </div>
@@ -421,19 +421,19 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                       <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h3>{{ enterpriseFwData['乐享霍尔果斯']?.name || '乐享霍尔果斯' }}</h3>
+                  <h3>{{ enterpriseFwData['乐享霍尔果斯']?.name || t('services.lexiangKhorgos') }}</h3>
                 </div>
-                <span class="view-more" @click.stop="introModalVisible = true" style="font-size: 13px; color: #ea580c; cursor: pointer; padding: 4px 10px; border: 1px solid #fdba74; border-radius: 20px; background-color: #fff7ed;">平台介绍</span>
+                <span class="view-more" @click.stop="introModalVisible = true" style="font-size: 13px; color: #ea580c; cursor: pointer; padding: 4px 10px; border: 1px solid #fdba74; border-radius: 20px; background-color: #fff7ed;">{{ t('services.platformIntro') }}</span>
               </div>
-              <p class="card-desc">{{ enterpriseFwData['乐享霍尔果斯']?.remark || '商户收款流水/到账语音提醒/资金无感结算' }}</p>
+              <p class="card-desc">{{ enterpriseFwData['乐享霍尔果斯']?.remark || t('services.lexiangRemark') }}</p>
               <div class="placeholder-box" style=" display: flex; flex-direction: column; justify-content: center; gap: 8px;">
                 <div style="font-size: 13px; color: #9a3412; display: flex; align-items: center; gap: 6px;">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                  平台服务热线: 0999-8799992
+                  {{ t('services.platformHotline') }}: 0999-8799992
                 </div>
                 <div style="font-size: 13px; color: #9a3412; display: flex; align-items: center; gap: 6px;">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                  地址: 霍尔果斯北京路人才大厦13层
+                  {{ t('services.address') }}: {{ t('services.talentBuildingAddress') }}
                 </div>
               </div>
             </div>
@@ -445,7 +445,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
       <div v-if="introModalVisible" class="qr-modal-overlay" @click="introModalVisible = false">
         <div class="qr-modal-content" @click.stop style="max-width: 800px; padding: 24px;">
           <div class="qr-modal-header" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
-            <h3 style="margin: 0; font-size: 18px; color: #0f172a;">乐享霍尔果斯平台介绍</h3>
+            <h3 style="margin: 0; font-size: 18px; color: #0f172a;">{{ t('services.lexiangIntroTitle') }}</h3>
             <button class="close-btn" @click="introModalVisible = false" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
           </div>
           <div class="qr-modal-body" style="font-size: 14px; color: #334155; line-height: 1.6;">
@@ -463,7 +463,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
             <button class="close-btn" @click="qrModalVisible = false">&times;</button>
           </div>
           <div class="qr-modal-body">
-            <img :src="currentQrImage" alt="二维码" />
+            <img :src="currentQrImage" :alt="t('services.qrCode')" />
           </div>
         </div>
       </div>

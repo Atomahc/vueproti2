@@ -14,7 +14,7 @@ import { Autoplay, EffectFade } from 'swiper/modules'
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX || 'https://sz.xjhegs.gov.cn'
 const router = useRouter()
 const route = useRoute()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 // ================= 搜索相关 =================
 const searchKeyword = ref('')
@@ -57,6 +57,33 @@ const goToBannerSlide = (index: number) => {
   }
 }
 
+const defaultBanners = computed(() => [
+  {
+    id: 'b1',
+    title: t('home.defaultBanner1Title'),
+    subtitle: t('home.defaultBanner1Sub'),
+    coverImage: ''
+  },
+  {
+    id: 'b2',
+    title: t('home.defaultBanner2Title'),
+    subtitle: t('home.defaultBanner2Sub'),
+    coverImage: ''
+  },
+  {
+    id: 'b3',
+    title: t('home.defaultBanner3Title'),
+    subtitle: t('home.defaultBanner3Sub'),
+    coverImage: ''
+  },
+  {
+    id: 'b4',
+    title: t('home.defaultBanner4Title'),
+    subtitle: t('home.defaultBanner4Sub'),
+    coverImage: ''
+  }
+])
+
 const fetchBanners = async () => {
   try {
     const res: any = await http.get('/prod-api/portal/section/page', {
@@ -71,40 +98,13 @@ const fetchBanners = async () => {
         coverImage: item.coverImage ? (item.coverImage.startsWith('http') ? item.coverImage : `${minioPrefix}${item.coverImage}`) : ''
       }))
     } else {
-      bannerList.value = defaultBanners
+      bannerList.value = defaultBanners.value
     }
   } catch (error) {
     console.error('Failed to fetch banners', error)
-    bannerList.value = defaultBanners
+    bannerList.value = defaultBanners.value
   }
 }
-
-const defaultBanners = [
-  {
-    id: 'b1',
-    title: '2026佛山-伊犁非遗醒狮及武术展演交流活动走进霍尔果斯',
-    subtitle: '非遗传承·耀武大典',
-    coverImage: ''
-  },
-  {
-    id: 'b2',
-    title: '霍尔果斯：颜值UP 美丽墙绘入画来',
-    subtitle: '宜居宜业·和美口岸',
-    coverImage: ''
-  },
-  {
-    id: 'b3',
-    title: '桃李不言 匠心致远',
-    subtitle: '弘扬工匠精神 汇聚发展合力',
-    coverImage: ''
-  },
-  {
-    id: 'b4',
-    title: '中国·霍尔果斯 向西开放桥头堡建设',
-    subtitle: '高水平对外开放高质量发展',
-    coverImage: ''
-  }
-]
 
 // ================= 新闻资讯数据 =================
 interface NewsArticle {
@@ -120,12 +120,39 @@ const policyNewsList = ref<NewsArticle[]>([])
 const yaowenNewsList = ref<NewsArticle[]>([])
 const noticeNewsList = ref<NewsArticle[]>([])
 
+const defaultPolicyNews = computed<NewsArticle[]>(() => [
+  { id: 'p1', title: t('home.defaultPolicy1'), date: '07/06' },
+  { id: 'p2', title: t('home.defaultPolicy2'), date: '07/06' }
+])
+
+const defaultYaowenNews = computed<NewsArticle[]>(() => [
+  {
+    id: 'yw1',
+    title: t('home.defaultHeadlineTitle'),
+    date: '07/06',
+    summary: t('home.defaultHeadlineSummary')
+  },
+  { id: 'yw2', title: t('home.defaultNotice2'), date: '07/06' },
+  { id: 'yw3', title: t('home.defaultNotice1'), date: '07/06' },
+  { id: 'yw4', title: t('home.defaultNotice3'), date: '07/06' },
+  { id: 'yw5', title: t('home.defaultNotice2'), date: '07/06' }
+])
+
+const defaultNoticeNews = computed<NewsArticle[]>(() => [
+  { id: 'nc1', title: t('home.defaultNotice1'), date: '07/06' },
+  { id: 'nc2', title: t('home.defaultNotice2'), date: '07/06' },
+  { id: 'nc3', title: t('home.defaultNotice3'), date: '07/06' },
+  { id: 'nc4', title: t('home.defaultNotice1'), date: '07/06' },
+  { id: 'nc5', title: t('home.defaultNotice2'), date: '07/06' },
+  { id: 'nc6', title: t('home.defaultNotice3'), date: '07/06' }
+])
+
 // 格式化日期为 MM/DD
 const formatDate = (dateStr?: string) => {
   if (!dateStr) return '07/06'
   const dateObj = new Date(dateStr)
   if (isNaN(dateObj.getTime())) {
-    const parts = dateStr.split('T')[0].split('-')
+    const parts = (dateStr.split('T')[0] || '').split('-')
     if (parts.length >= 3) {
       return `${parts[1]}/${parts[2]}`
     }
@@ -164,16 +191,10 @@ const fetchPolicyNews = async () => {
         originalData: item
       }))
     } else {
-      policyNewsList.value = [
-        { id: 'p1', title: '霍尔果斯口岸单日通关量创历史新高', date: '07/06' },
-        { id: 'p2', title: '霍尔果斯口岸单日通关量创历史新高', date: '07/06' }
-      ]
+      policyNewsList.value = defaultPolicyNews.value
     }
   } catch (e) {
-    policyNewsList.value = [
-      { id: 'p1', title: '霍尔果斯口岸单日通关量创历史新高', date: '07/06' },
-      { id: 'p2', title: '霍尔果斯口岸单日通关量创历史新高', date: '07/06' }
-    ]
+    policyNewsList.value = defaultPolicyNews.value
   }
 }
 
@@ -203,36 +224,14 @@ const fetchYaowenNews = async () => {
         id: item.name || String(item.id),
         title: item.displayName || item.title,
         date: formatDate(item.publishTime || item.createdTime),
-        summary: item.summary || (item.content ? item.content.replace(/<[^>]+>/g, '').slice(0, 60) + '...' : '霍尔果斯口岸单日通关量创新高 霍尔果斯口岸单日通关量创新高霍尔果斯...'),
+        summary: item.summary || (item.content ? item.content.replace(/<[^>]+>/g, '').slice(0, 60) + '...' : t('home.defaultHeadlineSummary')),
         originalData: item
       }))
     } else {
-      yaowenNewsList.value = [
-        {
-          id: 'yw1',
-          title: '霍尔果斯口岸\n单日通关量创新高',
-          date: '07/06',
-          summary: '霍尔果斯口岸单日通关量创新高 霍尔果斯口岸单日通关量创新高霍尔果...'
-        },
-        { id: 'yw2', title: '数字链计划一期建设成果发布', date: '07/06' },
-        { id: 'yw3', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' },
-        { id: 'yw4', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' },
-        { id: 'yw5', title: '数字链计划一期建设成果发布', date: '07/06' }
-      ]
+      yaowenNewsList.value = defaultYaowenNews.value
     }
   } catch (e) {
-    yaowenNewsList.value = [
-      {
-        id: 'yw1',
-        title: '霍尔果斯口岸\n单日通关量创新高',
-        date: '07/06',
-        summary: '霍尔果斯口岸单日通关量创新高 霍尔果斯口岸单日通关量创新高霍尔果...'
-      },
-      { id: 'yw2', title: '数字链计划一期建设成果发布', date: '07/06' },
-      { id: 'yw3', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' },
-      { id: 'yw4', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' },
-      { id: 'yw5', title: '数字链计划一期建设成果发布', date: '07/06' }
-    ]
+    yaowenNewsList.value = defaultYaowenNews.value
   }
 }
 
@@ -276,24 +275,10 @@ const fetchNoticeNews = async () => {
         originalData: item
       }))
     } else {
-      noticeNewsList.value = [
-        { id: 'nc1', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' },
-        { id: 'nc2', title: '数字链计划一期建设成果发布', date: '07/06' },
-        { id: 'nc3', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' },
-        { id: 'nc4', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' },
-        { id: 'nc5', title: '数字链计划一期建设成果发布', date: '07/06' },
-        { id: 'nc6', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' }
-      ]
+      noticeNewsList.value = defaultNoticeNews.value
     }
   } catch (e) {
-    noticeNewsList.value = [
-      { id: 'nc1', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' },
-      { id: 'nc2', title: '数字链计划一期建设成果发布', date: '07/06' },
-      { id: 'nc3', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' },
-      { id: 'nc4', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' },
-      { id: 'nc5', title: '数字链计划一期建设成果发布', date: '07/06' },
-      { id: 'nc6', title: '霍尔果斯口岸单日通关量创新高', date: '07/06' }
-    ]
+    noticeNewsList.value = defaultNoticeNews.value
   }
 }
 
@@ -317,48 +302,48 @@ const goToNewsCategory = (categoryName: string) => {
 }
 
 // ================= 右侧 5 大 VR/3D 入口及全屏弹窗 =================
-const vrList = [
+const vrList = computed(() => [
   {
     id: 'points-hall',
-    title: '霍尔果斯积分馆',
-    desc: '720°全景数字展馆',
+    title: t('home.pointsHall'),
+    desc: t('home.pointsHallDesc'),
     url: 'https://www.720yun.com/vr/843j50yfzO4',
     color: '#ff4d28',
     iconType: 'hall'
   },
   {
     id: 'vr-tour',
-    title: 'VR全景游',
-    desc: '口岸/合作中心/景区',
+    title: t('home.vrTour'),
+    desc: t('home.vrTourDesc'),
     url: 'https://www.720yun.com/t/5avkOl8758e?scene_id=50999361',
     color: '#00c5c8',
     iconType: 'vr'
   },
   {
     id: 'silu',
-    title: '丝路长卷',
-    desc: '霍尔果斯·数字城市名片',
+    title: t('home.siluScroll'),
+    desc: t('home.siluScrollDesc'),
     url: 'https://sz.xjhegs.gov.cn:3004',
     color: '#2979ff',
     iconType: 'scroll'
   },
   {
     id: '10th-anniv',
-    title: '建市十周年成果',
-    desc: '非凡十年·风鹏正举',
+    title: t('home.tenthAnniv'),
+    desc: t('home.tenthAnnivDesc'),
     url: 'https://www.720yun.com/vr/188j55kktv9',
     color: '#fa8c16',
     iconType: 'exhibition'
   },
   {
     id: 'xj-image',
-    title: '新疆形象展示平台',
-    desc: '中华文化体验馆',
+    title: t('home.xjImage'),
+    desc: t('home.xjImageDesc'),
     url: 'https://www.720yun.com/vr/e96jtOkaty0',
     color: '#389e0d',
     iconType: 'pavilion'
   }
-]
+])
 
 const showIframe = ref(false)
 const iframeUrl = ref('')
@@ -377,20 +362,20 @@ const checkAndAutoOpenSilu = () => {
     const hasAutoOpened = sessionStorage.getItem(SILU_AUTO_OPEN_KEY)
     if (forceOpen || !hasAutoOpened) {
       sessionStorage.setItem(SILU_AUTO_OPEN_KEY, '1')
-      const siluItem = vrList.find((item) => item.id === 'silu')
+      const siluItem = vrList.value.find((item) => item.id === 'silu')
       if (siluItem) {
         openIframe(siluItem)
       }
     }
   } catch (e) {
-    const siluItem = vrList.find((item) => item.id === 'silu')
+    const siluItem = vrList.value.find((item) => item.id === 'silu')
     if (siluItem) {
       openIframe(siluItem)
     }
   }
 }
 
-const openIframe = (item: typeof vrList[0]) => {
+const openIframe = (item: any) => {
   currentVrId.value = item.id
   isClosingModal.value = false
   if (closeTimer) {
@@ -494,36 +479,36 @@ interface QuickItem {
   type: 'gov' | 'corp' | 'port' | 'appeal'
 }
 
-const defaultQuickList: QuickItem[] = [
+const defaultQuickList = computed<QuickItem[]>(() => [
   {
-    title: '政务办事',
-    desc: '个人/法人一站办理',
+    title: t('home.govAffairs'),
+    desc: t('home.govAffairsDesc'),
     iconBg: '#d32f2f',
     path: '/service/government',
     type: 'gov'
   },
   {
-    title: '企业服务',
-    desc: '全生命周期服务',
+    title: t('home.corpService'),
+    desc: t('home.corpServiceDesc'),
     iconBg: '#0b5796',
     path: '/service/government',
     type: 'corp'
   },
   {
-    title: '跨境口岸',
-    desc: '通关·合作中心',
+    title: t('home.crossBorder'),
+    desc: t('home.crossBorderDesc'),
     iconBg: '#d97706',
     path: '/service/port',
     type: 'port'
   },
   {
-    title: '民意诉求',
-    desc: '12345·直通车',
+    title: t('home.publicAppeals'),
+    desc: t('home.publicAppealsDesc'),
     iconBg: '#7c3aed',
     path: '/service/employment',
     type: 'appeal'
   }
-]
+])
 
 const quickServices = ref<QuickItem[]>([])
 
@@ -531,7 +516,7 @@ const displayQuickServices = computed(() => {
   if (quickServices.value.length >= 4) {
     return quickServices.value.slice(0, 4)
   }
-  return defaultQuickList
+  return defaultQuickList.value
 })
 
 const fetchQuickServices = async () => {
@@ -545,21 +530,26 @@ const fetchQuickServices = async () => {
     if (res.code === 0 && res.data && res.data.home && res.data.home.length > 0) {
       const colors = ['#d32f2f', '#0b5796', '#d97706', '#7c3aed']
       const types: ('gov' | 'corp' | 'port' | 'appeal')[] = ['gov', 'corp', 'port', 'appeal']
-      const descs = ['个人/法人一站办理', '全生命周期服务', '通关·合作中心', '12345·直通车']
+      const descs = [
+        t('home.govAffairsDesc'),
+        t('home.corpServiceDesc'),
+        t('home.crossBorderDesc'),
+        t('home.publicAppealsDesc')
+      ]
       quickServices.value = res.data.home.map((item: any, index: number) => ({
         title: item.name,
         desc: item.remark || descs[index % descs.length],
         iconBg: colors[index % colors.length],
         type: types[index % types.length],
         icon: item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : `${minioPrefix}${item.bgImage}`) : '',
-        path: item.url || defaultQuickList[index % defaultQuickList.length].path,
+        path: item.url || defaultQuickList.value[index % defaultQuickList.value.length]?.path || '',
         isExternal: item.linkType === 'url' || item.url?.startsWith('http')
       }))
     } else {
-      quickServices.value = defaultQuickList
+      quickServices.value = defaultQuickList.value
     }
   } catch (error) {
-    quickServices.value = defaultQuickList
+    quickServices.value = defaultQuickList.value
   }
 }
 
@@ -573,6 +563,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 }
 
 watch(locale, () => {
+  fetchBanners()
   fetchPolicyNews()
   fetchYaowenNews()
   fetchNoticeNews()
@@ -606,7 +597,7 @@ onUnmounted(() => {
     <!-- 主体区域 -->
     <main class="main-content">
       <!-- 蓝色主导航栏 (与设计图一致，6项简洁文字) -->
-      <TheNavBar activeId="home"  :tabs="['home', 'gov', 'life', 'cross', 'cloud', 'appeals']" />
+      <TheNavBar activeId="home"  />
 
       <!-- 主体核心白底卡片 -->
       <div class="hero-box">
@@ -646,12 +637,12 @@ onUnmounted(() => {
               <!-- 自定义轮播控制栏 (左侧切换箭头 + 右侧指示点) -->
               <div class="banner-controls-bar">
                 <div class="banner-nav-arrows">
-                  <button class="nav-arrow-btn" @click.stop="prevBanner" title="上一张">
+                  <button class="nav-arrow-btn" @click.stop="prevBanner" :title="t('home.prev')">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                       <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                   </button>
-                  <button class="nav-arrow-btn" @click.stop="nextBanner" title="下一张">
+                  <button class="nav-arrow-btn" @click.stop="nextBanner" :title="t('home.next')">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                       <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
@@ -672,7 +663,7 @@ onUnmounted(() => {
             <div class="mobile-only-comp mobile-search-row">
               <input
                 type="text"
-                placeholder="搜索政府服务、企业信息、便民事项..."
+                :placeholder="t('header.searchPlaceholder')"
                 v-model="searchKeyword"
                 @keyup.enter="handleSearch"
                 class="mobile-search-input"
@@ -687,9 +678,9 @@ onUnmounted(() => {
 
             <!-- 政策解读栏 -->
             <div class="policy-section">
-              <div class="policy-badge" @click="goToNewsCategory('政策解读')" title="政策解读">
-                <span>政策</span>
-                <span>解读</span>
+              <div class="policy-badge" @click="goToNewsCategory('政策解读')" :title="t('news.policyInterpret')">
+                <span>{{ t('home.policyTagPolicy') }}</span>
+                <span>{{ t('home.policyTagRead') }}</span>
               </div>
               <div class="policy-list">
                 <div
@@ -711,7 +702,7 @@ onUnmounted(() => {
             <!-- 子列 1: 要闻 -->
             <div class="sub-col yaowen-col">
               <div class="news-tab-badge yaowen-badge" @click="goToNewsCategory('新闻资讯')">
-                重大活动
+                {{ t('news.majorEvents') }}
               </div>
               <div class="yaowen-featured" v-if="featuredYaowen" @click="goToArticle(featuredYaowen)">
                 <h3 class="featured-title" :title="featuredYaowen.title">{{ featuredYaowen.title }}</h3>
@@ -730,14 +721,14 @@ onUnmounted(() => {
                 </li>
               </ul>
               <div class="col-more-btn" @click="goToNewsCategory('新闻资讯')">
-                查看更多 ›
+                {{ t('home.more') }}
               </div>
             </div>
 
             <!-- 子列 2: 通知公告 -->
             <div class="sub-col notice-col">
               <div class="news-tab-badge notice-badge" @click="goToNewsCategory('通知公告')">
-                城市形象
+                {{ t('news.cityImage') }}
               </div>
               <ul class="sub-news-list notice-list">
                 <li
@@ -752,7 +743,7 @@ onUnmounted(() => {
                 </li>
               </ul>
               <div class="col-more-btn" @click="goToNewsCategory('通知公告')">
-                查看更多 ›
+                {{ t('home.more') }}
               </div>
             </div>
           </div>
@@ -804,8 +795,8 @@ onUnmounted(() => {
               <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
             </svg>
             <div class="quick-title-text">
-              <span>快捷</span>
-              <span>服务</span>
+              <span>{{ t('home.quickServiceWord1') }}</span>
+              <span>{{ t('home.quickServiceWord2') }}</span>
             </div>
           </div>
 
@@ -862,7 +853,7 @@ onUnmounted(() => {
             class="vr-close-btn" 
             :class="{ 'is-closing': isClosingModal }"
             @click="closeIframe" 
-            title="关闭"
+            :title="t('vr.close')"
             :disabled="isClosingModal"
           >×</button>
           <iframe 
@@ -1373,7 +1364,7 @@ onUnmounted(() => {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+
 }
 
 .quick-card {
@@ -1390,8 +1381,7 @@ onUnmounted(() => {
 .quick-card:hover {
   transform: translateY(-2px);
   background: #ffffff;
-  border-color: #cbd5e1;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+
 }
 
 .quick-icon-wrapper {

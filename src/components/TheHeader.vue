@@ -26,7 +26,7 @@ const toggleDropdown = () => {
 }
 
 const userInfo = ref({
-  name: '用户',
+  name: '',
   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
 })
 
@@ -38,14 +38,22 @@ const updateDateTime = () => {
   const year = now.getFullYear()
   const month = now.getMonth() + 1
   const date = now.getDate()
-  const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
-  const day = days[now.getDay()]
+  const weekdays = [
+    t('common.weekdays.sun'),
+    t('common.weekdays.mon'),
+    t('common.weekdays.tue'),
+    t('common.weekdays.wed'),
+    t('common.weekdays.thu'),
+    t('common.weekdays.fri'),
+    t('common.weekdays.sat')
+  ]
+  const day = weekdays[now.getDay()]
   
   const h = String(now.getHours()).padStart(2, '0')
   const m = String(now.getMinutes()).padStart(2, '0')
   const s = String(now.getSeconds()).padStart(2, '0')
   
-  currentDateTime.value = `${year}年${month}月${date}日 ${day} ${h}:${m}:${s}`
+  currentDateTime.value = `${year}-${String(month).padStart(2, '0')}-${String(date).padStart(2, '0')} ${day} ${h}:${m}:${s}`
 }
 
 onMounted(async () => {
@@ -166,16 +174,16 @@ import TheHeaderMobile from './TheHeaderMobile.vue'
       <div class="top-bar-inner">
         <div class="top-left">
 
-          <a href="#" class="top-link" @click.prevent="router.push('/site-group')">站群导航</a>
+          <a href="#" class="top-link" @click.prevent="router.push('/site-group')">{{ t('header.siteGroup') }}</a>
           <span class="divider">|</span>
           <a href="#" class="top-link">{{ t('header.mobile') }}</a>
           <span class="divider">|</span>
           <a href="#" class="top-link" @click.prevent="openGovPhone">{{ t('header.govPhone') }}</a>
           <span class="divider">|</span>
           <div class="user-dropdown hover-menu-left">
-            <a href="#" class="top-link" @click.prevent>请销假平台</a>
+            <a href="#" class="top-link" @click.prevent>{{ t('header.leavePlatform') }}</a>
             <div class="dropdown-content left-dropdown">
-              <img src="@/assets/other/mmexport1787650392605.jpg" alt="请销假平台" class="hover-qr-code" />
+              <img src="@/assets/other/mmexport1787650392605.jpg" :alt="t('header.leavePlatform')" class="hover-qr-code" />
             </div>
           </div>
          
@@ -185,9 +193,9 @@ import TheHeaderMobile from './TheHeaderMobile.vue'
           <span class="divider">|</span>
           <template v-if="isLoggedIn">
             <div class="user-profile user-dropdown">
-              <span class="username" @click.stop="toggleDropdown">{{ userInfo.name }}</span>
+              <span class="username" @click.stop="toggleDropdown">{{ userInfo.name || t('header.user') }}</span>
               <div class="dropdown-content" :class="{ 'show': showDropdown }" @click.stop>
-                <router-link to="/profile">个人中心</router-link>
+                <router-link to="/profile">{{ t('header.profile') }}</router-link>
                 <a href="#" class="logout-btn" @click.prevent="handleLogout">{{ t('header.logout') }}</a>
               </div>
             </div>

@@ -1,5 +1,8 @@
-<script setup>
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import TheFooterMobile from './TheFooterMobile.vue'
+
+const { t } = useI18n()
 </script>
 
 <template>
@@ -8,17 +11,17 @@ import TheFooterMobile from './TheFooterMobile.vue'
     <div class="footer-content">
       <div class="banner-inner">
         <div class="banner-left">
-          <div class="banner-text">主办：霍尔果斯市人民政府办公室 &nbsp;&nbsp; 关于我们 | 版权保护 | 隐私声明 | 联系我们</div>
-          <div class="banner-text">服务热线：0999-8795893 &nbsp;&nbsp; 地址：新疆伊犁州霍尔果斯 &nbsp;&nbsp; 新ICP备17002354号-4</div>
+          <div class="banner-text">{{ t('footer.organizer') }} &nbsp;&nbsp; {{ t('footer.aboutUs') }} | {{ t('footer.copyright') }} | {{ t('footer.privacy') }} | {{ t('footer.contactUs') }}</div>
+          <div class="banner-text">{{ t('footer.hotline') }} &nbsp;&nbsp; {{ t('footer.address') }} &nbsp;&nbsp; {{ t('footer.icp') }}</div>
         </div>
         <div class="banner-right">
-          <span class="banner-text right-text">数字霍尔果斯 · 全域统一综合服务门户</span>
+          <span class="banner-text right-text">{{ t('footer.portalTitle') }}</span>
           <div class="footer-links">
-            <span class="footer-label">友情链接：</span>
-            <a href="http://www.xjhegs.gov.cn/" target="_blank">霍尔果斯市人民政府</a>
-            <a href="http://urumqi.customs.gov.cn/" target="_blank">乌鲁木齐海关</a>
-            <a href="https://www.horgoseport.com/#/" target="_blank">云港·霍数通</a>
-            <a href="https://hegsrcjt.com/" target="_blank">霍尔果斯人才集团</a>
+            <span class="footer-label">{{ t('footer.links') }}</span>
+            <a href="http://www.xjhegs.gov.cn/" target="_blank">{{ t('footer.govSite') }}</a>
+            <a href="http://urumqi.customs.gov.cn/" target="_blank">{{ t('footer.customsSite') }}</a>
+            <a href="https://www.horgoseport.com/#/" target="_blank">{{ t('footer.portSite') }}</a>
+            <a href="https://hegsrcjt.com/" target="_blank">{{ t('footer.talentSite') }}</a>
           </div>
         </div>
       </div>

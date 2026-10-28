@@ -9,7 +9,7 @@ import TheNavBar from '../components/TheNavBar.vue'
 
 const route = useRoute()
 const router = useRouter()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const isInternal = ref(false)
 
 const articleData = ref<{ title: string; date: string; content: string } | null>(null)
@@ -23,8 +23,8 @@ const fetchArticle = async () => {
       const parsed = JSON.parse(cached)
       articleData.value = {
         title: parsed.title || parsed.displayName,
-        date: parsed.fullDate || parsed.date || parsed.publishTime || '未知',
-        content: parsed.content || '<p style="text-align:center; color:#999; margin-top: 50px;">此文章暂无内容。</p>'
+        date: parsed.fullDate || parsed.date || parsed.publishTime || t('article.unknownDate'),
+        content: parsed.content || `<p style="text-align:center; color:#999; margin-top: 50px;">${t('article.noContent')}</p>`
       }
     } catch (e) {
       console.error('解析缓存文章数据失败', e)
@@ -54,7 +54,7 @@ const fetchArticle = async () => {
       articleData.value = {
         title: data.title,
         date: dateStr,
-        content: data.content || '<p style="text-align:center; color:#999; margin-top: 50px;">此文章暂无内容。</p>'
+        content: data.content || `<p style="text-align:center; color:#999; margin-top: 50px;">${t('article.noContent')}</p>`
       }
       return // 新接口获取成功，直接返回，不再执行旧接口逻辑
     }
@@ -97,21 +97,21 @@ watch(locale, () => {
                 <line x1="8" y1="2" x2="8" y2="6"></line>
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
-              发布时间：{{ articleData.date }}
+              {{ t('article.publishTime') }}{{ articleData.date }}
             </span>
             <span class="meta-item">
               <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
-              来源：霍尔果斯发布
+              {{ t('article.source') }}{{ t('article.sourceDefault') }}
             </span>
             <span class="meta-item">
               <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
-              阅读：1,204
+              {{ t('article.views') }}1,204
             </span>
           </div>
         </header>
@@ -125,7 +125,7 @@ watch(locale, () => {
           <div class="share-actions">
           </div>
           <div class="nav-links">
-            <button class="nav-btn" @click="router.back()">返回上一页</button>
+            <button class="nav-btn" @click="router.back()">{{ t('article.back') }}</button>
           </div>
         </footer>
       </article>

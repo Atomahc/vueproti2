@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import request, { http } from '@/api/request'
 import TheHeader from '@/components/TheHeader.vue'
 import TheNavBar from '@/components/TheNavBar.vue'
 import TheFooter from '@/components/TheFooter.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
@@ -57,11 +59,11 @@ const fetchForm = async () => {
       
       // Community data
       communityList.value = [
-        { id: 26, name: '丝路社区' },
-        { id: 23, name: '卡拉苏社区' },
-        { id: 27, name: '索伦社区' },
-        { id: 57, name: '红桥社区' },
-        { id: 55, name: '英塔尔社区' },
+        { id: 26, name: t('appeals.silu') },
+        { id: 23, name: t('appeals.kalasu') },
+        { id: 27, name: t('appeals.suolun') },
+        { id: 57, name: t('appeals.hongqiao') },
+        { id: 55, name: t('appeals.yingtarr') },
       ]
       
       // Initialize form data
@@ -76,7 +78,7 @@ const fetchForm = async () => {
       formData.value['mobile'] = ''
       formData.value['communityId'] = ''
     } else {
-      alert('表单加载失败')
+      alert(t('dayu.loadFormFailed'))
     }
   } catch (error) {
     console.error('Fetch form error:', error)
@@ -99,15 +101,15 @@ const handlePluralUpload = (e: any) => {
 const submitForm = async () => {
   // basic validation
   if (!formData.value.communityId) {
-    alert('请选择社区')
+    alert(t('dayu.selectCommunityAlert'))
     return
   }
   if (!formData.value.member) {
-    alert('请填写姓名')
+    alert(t('dayu.fillNameAlert'))
     return
   }
   if (!formData.value.mobile) {
-    alert('请填写手机号')
+    alert(t('dayu.fillPhoneAlert'))
     return
   }
   
@@ -132,12 +134,12 @@ const submitForm = async () => {
     })
     
     if (validRes.status === 0 || String(validRes.status) === '0') {
-      alert(validRes.msg || '当前社区下未找到人员信息 请先在微信平台注册智慧社区')
+      alert(validRes.msg || t('dayu.personNotFound'))
       return
     }
   } catch (error) {
     console.error('Validation error:', error)
-    alert('验证人员信息异常')
+    alert(t('dayu.verifyPersonError'))
     return
   }
 
@@ -177,14 +179,14 @@ const submitForm = async () => {
     })
     
     if (res && res.status === 1) {
-      alert(res.info || '提交成功')
+      alert(res.info || t('dayu.submitSuccess'))
       router.back()
     } else {
-      alert(res.message || '提交失败')
+      alert(res.message || t('dayu.submitFailed'))
     }
   } catch (error) {
     console.error('Submit error:', error)
-    alert('提交异常')
+    alert(t('dayu.submitError'))
   }
 }
 
@@ -192,7 +194,7 @@ onMounted(() => {
   if (formId) {
     fetchForm()
   } else {
-    alert('缺少表单ID')
+    alert(t('dayu.missingFormId'))
   }
 })
 </script>
@@ -211,32 +213,32 @@ onMounted(() => {
           
           <div class="form-details" v-if="par.business || par.address || par.tel || activity.customtags || activity.content || (par.template_files && par.template_files.length)">
             <div class="detail-item" v-if="par.business">
-              <strong>受理单位：</strong><span>{{ par.business }}</span>
+              <strong>{{ t('dayu.handlingBusiness') }}</strong><span>{{ par.business }}</span>
             </div>
             
             <div class="detail-item" v-if="par.address">
-              <strong>办理地址：</strong><span>{{ par.address }}</span>
+              <strong>{{ t('dayu.handlingAddress') }}</strong><span>{{ par.address }}</span>
             </div>
             
             <div class="detail-item" v-if="par.tel">
-              <strong>联系电话：</strong><span>{{ par.tel }}</span>
+              <strong>{{ t('dayu.contactPhone') }}</strong><span>{{ par.tel }}</span>
             </div>
 
             <div class="detail-item" v-if="activity.customtags">
-              <strong>办理时限：</strong><span>{{ activity.customtags }}</span>
+              <strong>{{ t('dayu.handlingTimeLimit') }}</strong><span>{{ activity.customtags }}</span>
             </div>
 
             <div class="detail-item" v-if="par.template_files && par.template_files.length">
-              <strong>附件下载：</strong>
+              <strong>{{ t('dayu.fileDownload') }}</strong>
               <ul class="file-list">
                 <li v-for="(fileUrl, fidx) in par.template_files" :key="fidx">
-                  <a :href="fileUrl" target="_blank" class="download-link">下载附件 {{ fidx + 1 }}</a>
+                  <a :href="fileUrl" target="_blank" class="download-link">{{ t('dayu.downloadAttachment') }} {{ Number(fidx) + 1 }}</a>
                 </li>
               </ul>
             </div>
             
             <div class="detail-item" v-if="activity.content">
-              <strong>办理详情：</strong>
+              <strong>{{ t('dayu.handlingDetails') }}</strong>
               <div class="rich-content" v-html="activity.content"></div>
             </div>
           </div>
@@ -245,30 +247,30 @@ onMounted(() => {
         <div class="form-body">
           <h2 style="margin-top:0px">{{ activity.title }}</h2>
           <div class="form-group">
-            <label class="required">所属社区</label>
+            <label class="required">{{ t('dayu.community') }}</label>
             <select v-model="formData.communityId" class="form-input">
-              <option value="">请选择社区</option>
+              <option value="">{{ t('dayu.selectCommunity') }}</option>
               <option v-for="com in communityList" :key="com.id" :value="com.id">{{ com.name }}</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="required">姓名</label>
-            <input type="text" v-model="formData.member" placeholder="请输入您的姓名" class="form-input" />
+            <label class="required">{{ t('dayu.name') }}</label>
+            <input type="text" v-model="formData.member" :placeholder="t('dayu.namePlaceholder')" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="required">手机</label>
-            <input type="text" v-model="formData.mobile" placeholder="请输入您的手机号" class="form-input" />
+            <label class="required">{{ t('dayu.phone') }}</label>
+            <input type="text" v-model="formData.mobile" :placeholder="t('dayu.phonePlaceholder')" class="form-input" />
           </div>
           
           <div v-for="field in fields" :key="field.refid" class="form-group">
             <label :class="{ required: field.essential == 1 }">{{ field.title }}</label>
             
             <template v-if="field.type === 'text'">
-              <input type="text" v-model="formData['field_' + field.refid]" :placeholder="field.description || '请输入'" class="form-input" />
+              <input type="text" v-model="formData['field_' + field.refid]" :placeholder="field.description || t('dayu.inputPrompt')" class="form-input" />
             </template>
             
             <template v-else-if="field.type === 'textarea'">
-              <textarea v-model="formData['field_' + field.refid]" :placeholder="field.description || '请输入'" class="form-textarea"></textarea>
+              <textarea v-model="formData['field_' + field.refid]" :placeholder="field.description || t('dayu.inputPrompt')" class="form-textarea"></textarea>
             </template>
             
             <template v-else-if="field.type === 'radio'">
@@ -281,7 +283,7 @@ onMounted(() => {
             
             <template v-else-if="field.type === 'select'">
               <select v-model="formData['field_' + field.refid]" class="form-input">
-                <option value="">请选择</option>
+                <option value="">{{ t('dayu.selectPrompt') }}</option>
                 <option v-for="(opt, idx) in (Array.isArray(field.options) ? field.options : (field.options || field.value || '').split(','))" :key="idx" :value="opt">{{ opt }}</option>
               </select>
             </template>
@@ -307,19 +309,19 @@ onMounted(() => {
             </template>
             
             <template v-else>
-              <input type="text" v-model="formData['field_' + field.refid]" :placeholder="'暂不支持的字段类型: ' + field.type" class="form-input" />
+              <input type="text" v-model="formData['field_' + field.refid]" :placeholder="t('dayu.unsupportedField') + ': ' + field.type" class="form-input" />
             </template>
           </div>
           
           <div class="form-group" v-if="activity.plural == 1">
-            <label>{{ activity.pluraltit || '上传图片' }}</label>
+            <label>{{ activity.pluraltit || t('dayu.uploadImage') }}</label>
             <input type="file" multiple @change="handlePluralUpload" class="form-input" />
           </div>
 
-          <button class="submit-btn" @click="submitForm">{{ par.submitname || '提交' }}</button>
+          <button class="submit-btn" @click="submitForm">{{ par.submitname || t('dayu.submitBtn') }}</button>
         </div>
       </div>
-      <div v-else class="loading">加载中...</div>
+      <div v-else class="loading">{{ t('common.loading') }}</div>
     </main>
     
     <TheFooter />

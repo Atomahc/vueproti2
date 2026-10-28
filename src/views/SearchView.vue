@@ -2,6 +2,7 @@
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../components/TheHeader.vue'
 import TheFooter from '../components/TheFooter.vue'
@@ -9,6 +10,7 @@ import TheNavBar from '../components/TheNavBar.vue'
 
 const route = useRoute()
 const router = useRouter()
+const { locale, t } = useI18n()
 
 const keyword = ref(route.query.keyword || '')
 const articles = ref<any[]>([])
@@ -25,7 +27,7 @@ const fetchSearch = async () => {
       keyword: keyword.value,
       platform: '',
       limit: 10,
-      lang: 'zh'
+      lang: locale.value || 'zh'
     })
     if (res.code === 0 && res.data) {
       articles.value = res.data.articles || []
@@ -45,18 +47,22 @@ watch(() => route.query.keyword, (newVal) => {
   fetchSearch()
 })
 
+watch(locale, () => {
+  fetchSearch()
+})
+
 const goToArticle = (item: any) => {
   // 模拟文章详情展示所需的数据结构
   const articleData = {
     title: item.title,
     date: item.publishTime,
-    content: item.content || `<p style="text-align:center; color:#999; margin-top: 50px;">此文章暂无详细内容。</p>`
+    content: item.content || `<p style="text-align:center; color:#999; margin-top: 50px;">${t('article.noContent')}</p>`
   }
   sessionStorage.setItem('currentArticle', JSON.stringify(articleData))
   router.push({
     name: 'article-detail',
     params: { id: item.id || '0' },
-    query: { tab: '搜索结果' }
+    query: { tab: t('search.title') }
   })
 }
 
@@ -80,10 +86,10 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
 
       <div class="search-box-content">
         <div class="results-container">
-          <h2>搜索结果：{{ keyword }}</h2>
+          <h2>{{ t('search.title') }}：{{ keyword }}</h2>
           
           <div v-if="features.length > 0" class="features-section">
-            <h3>相关服务</h3>
+            <h3>{{ t('search.relatedServices') }}</h3>
             <div class="quick-grid">
               <div v-for="(qs, idx) in features" :key="idx" class="quick-card" @click="handleQuickClick(qs.url, qs.linkType === 'url')">
                 <div class="quick-icon-wrapper">
@@ -98,7 +104,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
           </div>
 
           <div v-if="articles.length > 0" class="articles-section">
-            <h3>相关文章</h3>
+            <h3>{{ t('search.relatedArticles') }}</h3>
             <ul class="news-list">
               <li v-for="(item, index) in articles" :key="index" class="news-item" @click="goToArticle(item)">
                 <span class="news-dot">•</span>
@@ -109,7 +115,7 @@ const handleQuickClick = (path: string, isExternal?: boolean) => {
           </div>
           
           <div v-if="features.length === 0 && articles.length === 0 && keyword" class="no-results">
-            暂无搜索结果
+            {{ t('search.noResult') }}
           </div>
         </div>
       </div>

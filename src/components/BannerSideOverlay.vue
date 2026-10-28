@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
+const { t } = useI18n()
 const showIframe = ref(false)
 const iframeUrl = ref('')
 const currentVrId = ref('')
@@ -11,43 +13,43 @@ const isClosingModal = ref(false)
 const isCollapsed = ref(false)
 let closeTimer: ReturnType<typeof setTimeout> | null = null
 
-const vrList = [
+const vrList = computed(() => [
   {
     id: 'silu',
-    title: '丝路长卷',
-    desc: '霍尔果斯·数字城市名片',
+    title: t('home.siluScroll'),
+    desc: t('home.siluScrollDesc'),
     url: 'https://sz.xjhegs.gov.cn:3004',
     iconType: 'scroll'
   },
   {
     id: 'vr-tour',
-    title: 'VR全景游',
-    desc: '口岸/合作中心/景区',
+    title: t('home.vrTour'),
+    desc: t('home.vrTourDesc'),
     url: 'https://www.720yun.com/t/5avkOl8758e?scene_id=50999361',
     iconType: 'vr'
   },
   {
     id: 'xj-image',
-    title: '新疆形象展示平台',
-    desc: '中华文化体验馆',
+    title: t('home.xjImage'),
+    desc: t('home.xjImageDesc'),
     url: 'https://www.720yun.com/vr/e96jtOkaty0',
     iconType: 'pavilion'
   },
   {
     id: '10th-anniv',
-    title: '建市十周年成果展',
-    desc: '非凡十年·风鹏正举',
+    title: t('home.tenthAnniv'),
+    desc: t('home.tenthAnnivDesc'),
     url: 'https://www.720yun.com/vr/188j55kktv9',
     iconType: 'exhibition'
   },
   {
     id: 'points-hall',
-    title: '霍尔果斯积分馆',
-    desc: '720°全景数字展馆',
+    title: t('home.pointsHall'),
+    desc: t('home.pointsHallDesc'),
     url: 'https://www.720yun.com/vr/843j50yfzO4',
     iconType: 'hall'
   }
-]
+])
 
 const SILU_AUTO_OPEN_KEY = 'silu_modal_auto_opened'
 
@@ -59,13 +61,13 @@ const checkAndAutoOpenSilu = () => {
     const hasAutoOpened = sessionStorage.getItem(SILU_AUTO_OPEN_KEY)
     if (forceOpen || !hasAutoOpened) {
       sessionStorage.setItem(SILU_AUTO_OPEN_KEY, '1')
-      const siluItem = vrList.find((item) => item.id === 'silu')
+      const siluItem = vrList.value.find((item) => item.id === 'silu')
       if (siluItem) {
         openIframe(siluItem)
       }
     }
   } catch (e) {
-    const siluItem = vrList.find((item) => item.id === 'silu')
+    const siluItem = vrList.value.find((item) => item.id === 'silu')
     if (siluItem) {
       openIframe(siluItem)
     }
@@ -136,7 +138,7 @@ onUnmounted(() => {
   }
 })
 
-const openIframe = (item: typeof vrList[0]) => {
+const openIframe = (item: (typeof vrList.value)[0]) => {
   currentVrId.value = item.id
   isClosingModal.value = false
   if (closeTimer) {
@@ -271,7 +273,7 @@ const closeIframe = () => {
       <div 
         class="side-collapse-btn" 
         @click.stop="toggleCollapse" 
-        :title="isCollapsed ? '展开导航' : '收起导航'"
+        :title="isCollapsed ? t('vr.expandTitle') : t('vr.collapseTitle')"
       >
         <svg 
           class="collapse-icon"
@@ -287,7 +289,7 @@ const closeIframe = () => {
           <polyline v-if="!isCollapsed" points="15 18 9 12 15 6"></polyline>
           <polyline v-else points="9 18 15 12 9 6"></polyline>
         </svg>
-        <span class="collapse-text">{{ isCollapsed ? '展开' : '收起' }}</span>
+        <span class="collapse-text">{{ isCollapsed ? t('vr.expand') : t('vr.collapse') }}</span>
       </div>
     </div>
 
@@ -303,7 +305,7 @@ const closeIframe = () => {
             class="modal-close-btn" 
             :class="{ 'is-closing': isClosingModal }"
             @click="closeIframe" 
-            title="关闭"
+            :title="t('vr.close')"
             :disabled="isClosingModal"
           >×</button>
           <iframe 
