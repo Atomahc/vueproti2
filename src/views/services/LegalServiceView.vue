@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const minioPrefix = import.meta.env.VITE_MINIO_PREFIX
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { http } from '@/api/request'
 import TheHeader from '../../components/TheHeader.vue'
@@ -14,6 +14,11 @@ import yb3 from '@/assets/other/Group 62.png'
 const yiluColumns = ref<any[]>([])
 
 const { locale, t } = useI18n()
+
+const iframeUrl = computed(() => {
+  const lang = locale.value || 'zh'
+  return `http://192.168.2.8:3003/fawu?ifram=1&lang=${lang}`
+})
 
 const yiluHeader = ref<any>({})
 const intlHeader = ref<any>({})
@@ -304,10 +309,12 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
         </div> -->
 
-         <iframe src="https://sz.xjhegs.gov.cn:3003/fawu?ifram=1" style="width: 
+         <!-- <iframe :src="`https://sz.xjhegs.gov.cn:3003/fawu?ifram=1&lang=${locale || 'zh'}`" :key="locale" style="width: 
+          100%; height: 100%; border: none; height: 648px;"></iframe> -->
+
+         <iframe :src="iframeUrl" :key="locale" style="width: 
           100%; height: 100%; border: none; height: 648px;"></iframe>
 
-  
       </div>
     </main>
 

@@ -69,7 +69,7 @@ export default {
     "vrTour": "VR全景游",
     "vrTourDesc": "口岸/合作中心/景区",
     "siluScroll": "丝路长卷",
-    "siluScrollDesc": "霍尔果斯·数字城市名片",
+    "siluScrollDesc": "数字城市名片",
     "tenthAnniv": "建市十周年成果",
     "tenthAnnivDesc": "非凡十年·风鹏正举",
     "xjImage": "新疆形象展示平台",

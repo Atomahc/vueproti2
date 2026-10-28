@@ -301,6 +301,14 @@ const goToNewsCategory = (categoryName: string) => {
   router.push({ path: '/news', query: { tab: categoryName } })
 }
 
+const siluvr = {
+    id: 'silu',
+    title: t('home.siluScroll'),
+    desc: t('home.siluScrollDesc'),
+    url: 'https://sz.xjhegs.gov.cn:3004',
+    color: '#2979ff',
+    iconType: 'scroll'
+  }
 // ================= 右侧 5 大 VR/3D 入口及全屏弹窗 =================
 const vrList = computed(() => [
   {
@@ -319,14 +327,7 @@ const vrList = computed(() => [
     color: '#00c5c8',
     iconType: 'vr'
   },
-  {
-    id: 'silu',
-    title: t('home.siluScroll'),
-    desc: t('home.siluScrollDesc'),
-    url: 'https://sz.xjhegs.gov.cn:3004',
-    color: '#2979ff',
-    iconType: 'scroll'
-  },
+
   {
     id: '10th-anniv',
     title: t('home.tenthAnniv'),
@@ -750,6 +751,16 @@ onUnmounted(() => {
 
           <!-- 第3列：右侧 (5 大 VR/3D 入口垂直排布) -->
           <div class="col-right">
+
+            <div class="silubox">
+              <div class="juanzhou">
+                  <img src="@/assets/img/juanzhou.png" alt="卷轴">
+              </div>
+              <div>
+                <div style="color: #e4932b;font-weight: bold;font-size: 20px;">{{ siluvr.title }}</div>
+                <div>{{ siluvr.desc }}</div> 
+              </div>
+            </div>
             <div
               v-for="item in vrList"
               :key="item.id"
@@ -896,8 +907,24 @@ onUnmounted(() => {
   width: 100%;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
-
+.juanzhou{
+  width:30%;
+  margin-right: 10px;
+  box-sizing: border-box;
+}
+.silubox{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding: 10px 0px;
+  cursor:pointer
+}
+.juanzhou img{
+  width:100%
+}
 /* 核心白色内容卡片 */
 .hero-box {
   background-color: #f5f5f5;
@@ -1258,7 +1285,6 @@ onUnmounted(() => {
   width: 190px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   gap: 8px;
 }
 
