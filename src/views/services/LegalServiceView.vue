@@ -17,7 +17,7 @@ const { locale, t } = useI18n()
 
 const iframeUrl = computed(() => {
   const lang = locale.value || 'zh'
-  return `http://192.168.2.8:3003/fawu?ifram=1&lang=${lang}`
+  return `https://sz.xjhegs.gov.cn:3003/fawu?ifram=1&lang=${lang}`
 })
 
 const yiluHeader = ref<any>({})

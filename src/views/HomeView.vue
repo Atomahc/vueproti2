@@ -752,7 +752,7 @@ onUnmounted(() => {
           <!-- 第3列：右侧 (5 大 VR/3D 入口垂直排布) -->
           <div class="col-right">
 
-            <div class="silubox">
+            <div class="silubox" @click="openIframe(siluvr)" :title="siluvr.title + ' - ' + siluvr.desc">
               <div class="juanzhou">
                   <img src="@/assets/img/juanzhou.png" alt="卷轴">
               </div>
@@ -912,6 +912,7 @@ onUnmounted(() => {
 .juanzhou{
   width:30%;
   margin-right: 10px;
+  margin-top: 10px;
   box-sizing: border-box;
 }
 .silubox{
