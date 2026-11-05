@@ -1488,7 +1488,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: url('@/assets/img/ddnbs.png') no-repeat center center;
+  background: url('@/assets/img/ddnbs1.jpg') no-repeat center center;
   background-size: 100% 100%;
   padding: 16px 8px;
   box-sizing: border-box;
@@ -1499,6 +1499,21 @@ onUnmounted(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   text-decoration: none;
   color: inherit;
+}
+.vr-card-item:nth-child(2 of .vr-card-item) {
+  background: url('@/assets/img/ddnbs2.jpg') no-repeat center center;
+  background-size: 100% 100%;
+
+}
+.vr-card-item:nth-child(3 of .vr-card-item) {
+  background: url('@/assets/img/ddnbs3.jpg') no-repeat center center;
+  background-size: 100% 100%;
+
+}
+.vr-card-item:nth-child(4 of .vr-card-item) {
+  background: url('@/assets/img/ddnbs4.jpg') no-repeat center center;
+  background-size: 100% 100%;
+
 }
 
 .vr-card-item:hover {
@@ -1539,7 +1554,6 @@ onUnmounted(() => {
 
 .vr-desc {
   font-size: 12px;
-  color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
