@@ -62,7 +62,7 @@ async function request<T = any>(url: string, options: RequestOptions = {}): Prom
   
   // 文章列表等公开接口不传 token，防止部分后端由于传递了无关 token 导致异常
   const noTokenUrls = ['/api-cas/api/get-articles']
-  const shouldAttachToken = token && !noTokenUrls.some(skipUrl => url.includes(skipUrl))
+  const shouldAttachToken = token && !customHeaders.has('Authorization') && !noTokenUrls.some(skipUrl => url.includes(skipUrl))
   
   if (shouldAttachToken) {
     customHeaders.set('Authorization', `Bearer ${token}`)

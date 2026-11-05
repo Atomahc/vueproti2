@@ -94,6 +94,6 @@
 .mobile-only-comp { display: none !important; }
 @media screen and (max-width: 768px) {
   .desktop-only-comp { display: none !important; }
-  .mobile-only-comp { display: block !important; }
+  .mobile-only-comp { display: flex !important; }
 }
 

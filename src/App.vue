@@ -105,37 +105,27 @@ onMounted(() => {
       <RouterView />
     </div>
 
-    <!-- 全局悬浮按钮组 -->
-    <div class="global-floating-group">
-            <!-- 悬浮返回按钮 -->
-      <div v-if="showBackButton" class="global-floating-btn global-back-btn" @click="goBack" :title="t('common.back')">
+    <!-- 全局悬浮返回按钮 (右下角) -->
+    <div v-if="showBackButton" class="global-floating-group">
+      <div class="global-floating-btn global-back-btn" @click="goBack" :title="t('common.back')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
         <span>{{ t('common.back') }}</span>
       </div>
+    </div>
 
-
-
-      <!-- 智能问答按钮 -->
-      <div
-        v-if="showAiButton"
-        class="global-floating-btn global-ai-btn"
-        :class="{ active: isAiChatOpen }"
-        :title="t('common.aiChat')"
-        @click="toggleAiChat"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 8V4H8"></path>
-          <rect width="16" height="12" x="4" y="8" rx="2"></rect>
-          <path d="M2 14h2"></path>
-          <path d="M20 14h2"></path>
-          <path d="M15 13v2"></path>
-          <path d="M9 13v2"></path>
-        </svg>
-        <span>{{ t('common.aiChat') }}</span>
-      </div>
+    <!-- 智能客服悬浮按钮 (右上部分) -->
+    <div
+      v-if="showAiButton"
+      class="global-floating-btn global-ai-btn"
+      :class="{ active: isAiChatOpen }"
+      :title="t('common.aiChat')"
+      @click="toggleAiChat"
+    >
+      <img src="@/assets/img/kefu.png" alt="智能客服" class="global-kefu-img" />
+      <span>{{ t('common.aiChat') }}</span>
     </div>
 
     <!-- 智能问答右下角弹窗 -->
@@ -264,9 +254,7 @@ a {
 .global-floating-btn {
   width: 50px;
   height: 50px;
-  background: #ffffff;
   border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -293,6 +281,30 @@ a {
 .global-back-btn span {
   font-size: 12px;
   font-weight: 500;
+}
+
+/* 智能客服右上悬浮按钮 */
+.global-ai-btn {
+  position: fixed;
+  right: 100px;
+  top: 230px;
+  width: 54px;
+  height: 56px;
+  border-radius: 6px;
+  z-index: 9999;
+  zoom: var(--app-zoom, 1);
+}
+
+.global-kefu-img {
+  width: 180px;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: 2px;
+  transition: transform 0.2s;
+}
+
+.global-ai-btn:hover .global-kefu-img {
+  transform: scale(1.1);
 }
 
 .global-ai-btn span {
@@ -410,6 +422,12 @@ a {
   .global-floating-group {
     right: 20px;
     bottom: 80px;
+  }
+
+  .global-ai-btn {
+    right: 16px;
+    bottom: 50px !important;
+    top: auto;
   }
 
   .ai-chat-window {

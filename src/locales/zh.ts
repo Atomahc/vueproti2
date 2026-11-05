@@ -47,9 +47,9 @@ export default {
     "talentSite": "霍尔果斯人才集团"
   },
   "home": {
-    "policyTitle": "政策解读",
-    "policyTagPolicy": "政策",
-    "policyTagRead": "解读",
+    "policyTitle": "宣传展示",
+    "policyTagPolicy": "宣传",
+    "policyTagRead": "展示",
     "yaowen": "要闻",
     "notice": "通知公告",
     "more": "查看更多 ›",
@@ -181,7 +181,7 @@ export default {
     "close": "关闭",
     "more": "查看更多",
     "detail": "查看详情",
-    "aiChat": "智能问答",
+    "aiChat": "智能客服",
     "loading": "加载中...",
     "noData": "暂无数据",
     "weekdays": {

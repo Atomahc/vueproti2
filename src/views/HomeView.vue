@@ -119,6 +119,7 @@ interface NewsArticle {
 const policyNewsList = ref<NewsArticle[]>([])
 const yaowenNewsList = ref<NewsArticle[]>([])
 const noticeNewsList = ref<NewsArticle[]>([])
+const cityImageNewsList = ref<NewsArticle[]>([])
 
 const defaultPolicyNews = computed<NewsArticle[]>(() => [
   { id: 'p1', title: t('home.defaultPolicy1'), date: '07/06' },
@@ -163,25 +164,16 @@ const formatDate = (dateStr?: string) => {
   return `${month}/${day}`
 }
 
-// 获取政策解读
+// 获取宣传展示 (图文宣传)
 const fetchPolicyNews = async () => {
   try {
     const res: any = await http.get('/api-cas/api/get-articles', {
       owner: 'hgsso',
-      categoryIds: '政策解读',
+      categoryIds: '图文宣传',
       pageSize: 5,
       language: locale.value || 'zh'
     })
-    let list = (res.status === 'ok' && res.data && res.data.length > 0) ? res.data : []
-    if (list.length === 0) {
-      const fallbackRes: any = await http.get('/api-cas/api/get-articles', {
-        owner: 'hgsso',
-        categoryIds: '政策推送',
-        pageSize: 5,
-        language: locale.value || 'zh'
-      })
-      list = (fallbackRes.status === 'ok' && fallbackRes.data) ? fallbackRes.data : []
-    }
+    const list = (res.status === 'ok' && res.data && res.data.length > 0) ? res.data : []
     if (list.length > 0) {
       policyNewsList.value = list.slice(0, 2).map((item: any) => ({
         id: item.name || String(item.id),
@@ -198,27 +190,16 @@ const fetchPolicyNews = async () => {
   }
 }
 
-// 获取要闻 (首条作为核心头条，其余作为列表)
+// 获取重大活动 (首条作为核心头条，其余作为列表)
 const fetchYaowenNews = async () => {
   try {
     const res: any = await http.get('/api-cas/api/get-articles', {
       owner: 'hgsso',
-      categoryIds: '新闻资讯',
+      categoryIds: '重大活动',
       pageSize: 10,
       language: locale.value || 'zh'
     })
-    let list = (res.status === 'ok' && res.data && res.data.length > 0) ? res.data : []
-    if (list.length < 5) {
-      const fallbackRes: any = await http.get('/api-cas/api/get-articles', {
-        owner: 'hgsso',
-        categoryIds: '重大活动',
-        pageSize: 10,
-        language: locale.value || 'zh'
-      })
-      if (fallbackRes.status === 'ok' && fallbackRes.data) {
-        list = [...list, ...fallbackRes.data]
-      }
-    }
+    const list = (res.status === 'ok' && res.data && res.data.length > 0) ? res.data : []
     if (list.length > 0) {
       yaowenNewsList.value = list.slice(0, 5).map((item: any) => ({
         id: item.name || String(item.id),
@@ -254,18 +235,7 @@ const fetchNoticeNews = async () => {
       pageSize: 10,
       language: locale.value || 'zh'
     })
-    let list = (res.status === 'ok' && res.data && res.data.length > 0) ? res.data : []
-    if (list.length < 6) {
-      const fallbackRes: any = await http.get('/api-cas/api/get-articles', {
-        owner: 'hgsso',
-        categoryIds: '城市形象',
-        pageSize: 10,
-        language: locale.value || 'zh'
-      })
-      if (fallbackRes.status === 'ok' && fallbackRes.data) {
-        list = [...list, ...fallbackRes.data]
-      }
-    }
+    const list = (res.status === 'ok' && res.data && res.data.length > 0) ? res.data : []
     if (list.length > 0) {
       noticeNewsList.value = list.slice(0, 6).map((item: any) => ({
         id: item.name || String(item.id),
@@ -279,6 +249,32 @@ const fetchNoticeNews = async () => {
     }
   } catch (e) {
     noticeNewsList.value = defaultNoticeNews.value
+  }
+}
+
+// 获取城市形象 (6条列表)
+const fetchCityImageNews = async () => {
+  try {
+    const res: any = await http.get('/api-cas/api/get-articles', {
+      owner: 'hgsso',
+      categoryIds: '城市形象',
+      pageSize: 10,
+      language: locale.value || 'zh'
+    })
+    const list = (res.status === 'ok' && res.data && res.data.length > 0) ? res.data : []
+    if (list.length > 0) {
+      cityImageNewsList.value = list.slice(0, 6).map((item: any) => ({
+        id: item.name || String(item.id),
+        title: item.displayName || item.title,
+        date: formatDate(item.publishTime || item.createdTime),
+        summary: item.summary || '',
+        originalData: item
+      }))
+    } else {
+      cityImageNewsList.value = defaultNoticeNews.value
+    }
+  } catch (e) {
+    cityImageNewsList.value = defaultNoticeNews.value
   }
 }
 
@@ -342,7 +338,8 @@ const vrList = computed(() => [
     desc: t('home.xjImageDesc'),
     url: 'https://www.720yun.com/vr/e96jtOkaty0',
     color: '#389e0d',
-    iconType: 'pavilion'
+    iconType: 'pavilion',
+    isExternal: true
   }
 ])
 
@@ -377,6 +374,10 @@ const checkAndAutoOpenSilu = () => {
 }
 
 const openIframe = (item: any) => {
+  if (item.id === 'xj-image' || item.isExternal) {
+    window.open(item.url, '_blank')
+    return
+  }
   currentVrId.value = item.id
   isClosingModal.value = false
   if (closeTimer) {
@@ -568,6 +569,7 @@ watch(locale, () => {
   fetchPolicyNews()
   fetchYaowenNews()
   fetchNoticeNews()
+  fetchCityImageNews()
   fetchQuickServices()
 })
 
@@ -577,6 +579,7 @@ onMounted(() => {
   fetchPolicyNews()
   fetchYaowenNews()
   fetchNoticeNews()
+  fetchCityImageNews()
   fetchQuickServices()
   checkAndAutoOpenSilu()
 })
@@ -602,9 +605,44 @@ onUnmounted(() => {
 
       <!-- 主体核心白底卡片 -->
       <div class="hero-box">
-        <!-- 核心 Hero 上半部分：三列布局 (左:Banner+政策解读, 中:要闻+公告, 右:5大VR/3D入口) -->
+        <!-- hero-section 上方：通知公告栏 -->
+        <div class="hero-notice-bar">
+          <div class="notice-bar-badge" @click="goToNewsCategory('通知公告')" :title="t('news.noticeAnnounce')">
+            <svg class="notice-horn-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+            <span class="notice-badge-text">{{ t('home.notice') }}</span>
+          </div>
+          <div class="notice-bar-divider"></div>
+          <div class="notice-bar-content">
+            <swiper
+              v-if="noticeNewsList.length > 0"
+              :modules="[Autoplay]"
+              direction="vertical"
+              :autoplay="{ delay: 3500, disableOnInteraction: false }"
+              :loop="noticeNewsList.length > 1"
+              class="notice-swiper"
+            >
+              <swiper-slide v-for="item in noticeNewsList" :key="item.id">
+                <div class="notice-slide-item" @click="goToArticle(item)">
+                  <span class="notice-item-tag">{{ t('home.notice') }}</span>
+                  <span class="notice-item-title" :title="item.title">{{ item.title }}</span>
+                  <span class="notice-item-date">{{ item.date }}</span>
+                </div>
+              </swiper-slide>
+            </swiper>
+          </div>
+          <div class="notice-bar-more" @click="goToNewsCategory('通知公告')" :title="t('home.more')">
+            <span>{{ t('home.more') }}</span>
+            <svg class="notice-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 核心 Hero 上半部分：布局 (左:Banner+宣传展示, 中:要闻+5大VR/3D入口+公告) -->
         <div class="hero-section">
-          <!-- 第1列：左侧 (Banner 轮播 + 政策解读) -->
+          <!-- 第1列：左侧 (Banner 轮播 + 宣传展示) -->
           <div class="col-left">
             <!-- 轮播图区域 -->
             <div class="banner-card">
@@ -677,9 +715,9 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <!-- 政策解读栏 -->
+            <!-- 宣传展示栏 -->
             <div class="policy-section">
-              <div class="policy-badge" @click="goToNewsCategory('政策解读')" :title="t('news.policyInterpret')">
+              <div class="policy-badge" @click="goToNewsCategory('图文宣传')" :title="t('news.policyInterpret')">
                 <span>{{ t('home.policyTagPolicy') }}</span>
                 <span>{{ t('home.policyTagRead') }}</span>
               </div>
@@ -698,11 +736,11 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- 第2列：中间 (要闻 + 通知公告 双子列并排) -->
+          <!-- 第2列：中间 (要闻 + VR/3D入口 + 通知公告) -->
           <div class="col-middle">
             <!-- 子列 1: 要闻 -->
             <div class="sub-col yaowen-col">
-              <div class="news-tab-badge yaowen-badge" @click="goToNewsCategory('新闻资讯')">
+              <div class="news-tab-badge yaowen-badge" @click="goToNewsCategory('重大活动')">
                 {{ t('news.majorEvents') }}
               </div>
               <div class="yaowen-featured" v-if="featuredYaowen" @click="goToArticle(featuredYaowen)">
@@ -721,19 +759,93 @@ onUnmounted(() => {
                   <span class="news-item-date">{{ item.date }}</span>
                 </li>
               </ul>
-              <div class="col-more-btn" @click="goToNewsCategory('新闻资讯')">
+              <div class="col-more-btn" @click="goToNewsCategory('重大活动')">
                 {{ t('home.more') }}
               </div>
             </div>
 
-            <!-- 子列 2: 通知公告 -->
+            <!-- 中间放置：5 大 VR/3D 入口 (丝路长卷 + 一行2个VR卡片) -->
+            <div class="col-right">
+              <div class="silubox" @click="openIframe(siluvr)" :title="siluvr.title + ' - ' + siluvr.desc">
+                <div class="juanzhou">
+                    <img src="@/assets/img/ddnb1.png" alt="卷轴">
+                </div>
+                <div>
+           
+                </div>
+              </div>
+              <div class="vr-grid">
+                <template v-for="item in vrList" :key="item.id">
+                  <!-- 新疆形象展示平台: 使用 a 链接在站外打开 -->
+                  <a
+                    v-if="item.id === 'xj-image' || item.isExternal"
+                    :href="item.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="vr-card-item"
+                    :title="item.title + ' - ' + item.desc"
+                  >
+                    <div class="vr-icon-box" :style="{ backgroundColor: item.color }">
+                      <!-- 新疆形象展示平台: 三层菱形平台/中华文化馆 -->
+                      <svg v-if="item.iconType === 'pavilion'" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 12l10 5 10-5M2 17l10 5 10-5"/>
+                      </svg>
+                      <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                      </svg>
+                    </div>
+                    <div class="vr-text-box">
+                      <div class="vr-title">{{ item.title }}</div>
+                      <div class="vr-desc">{{ item.desc }}</div>
+                    </div>
+                  </a>
+
+                  <!-- 其它项目: 原有全屏模态弹窗打开 -->
+                  <div
+                    v-else
+                    class="vr-card-item"
+                    @click="openIframe(item)"
+                    :title="item.title + ' - ' + item.desc"
+                  >
+                    <div class="vr-icon-box" :style="{ backgroundColor: item.color }">
+                      <!-- 积分馆: 五角星 -->
+                      <svg v-if="item.iconType === 'hall'" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M12 2.5l2.8 6.5 7 .6-5.3 4.7 1.6 6.9-6.1-3.6-6.1 3.6 1.6-6.9-5.3-4.7 7-.6z"/>
+                      </svg>
+                      <!-- VR全景游: VR全景眼镜/相机 -->
+                      <svg v-else-if="item.iconType === 'vr'" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M21 7H3c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h4.5l1.5-2h6l1.5 2H21c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-14 7c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm10 0c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
+                      </svg>
+                      <!-- 丝路长卷: 画卷/折叠地图 -->
+                      <svg v-else-if="item.iconType === 'scroll'" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 14H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1zm0-4H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1zm0-4H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1z"/>
+                      </svg>
+                      <!-- 建市十周年成果: 奖杯 -->
+                      <svg v-else-if="item.iconType === 'exhibition'" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.82 2.68 3.32 3.16V19H8v2h8v-2h-2.71v-2.9c1.5-.48 2.69-1.66 3.32-3.16 2.47-.31 4.39-2.39 4.39-4.94V7c0-1.1-.9-2-2-2zm-14 3V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+                      </svg>
+                      <!-- 新疆形象展示平台: 三层菱形平台/中华文化馆 -->
+                      <svg v-else-if="item.iconType === 'pavilion'" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 12l10 5 10-5M2 17l10 5 10-5"/>
+                      </svg>
+                    </div>
+                    <div class="vr-text-box">
+                      <div class="vr-title">{{ item.title }}</div>
+                      <div class="vr-desc">{{ item.desc }}</div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- 子列 2: 城市形象 -->
             <div class="sub-col notice-col">
-              <div class="news-tab-badge notice-badge" @click="goToNewsCategory('通知公告')">
+              <div class="news-tab-badge notice-badge" @click="goToNewsCategory('城市形象')">
                 {{ t('news.cityImage') }}
               </div>
               <ul class="sub-news-list notice-list">
                 <li
-                  v-for="item in noticeNewsList"
+                  v-for="item in cityImageNewsList"
                   :key="item.id"
                   class="sub-news-item"
                   @click="goToArticle(item)"
@@ -743,56 +855,8 @@ onUnmounted(() => {
                   <span class="news-item-date">{{ item.date }}</span>
                 </li>
               </ul>
-              <div class="col-more-btn" @click="goToNewsCategory('通知公告')">
+              <div class="col-more-btn" @click="goToNewsCategory('城市形象')">
                 {{ t('home.more') }}
-              </div>
-            </div>
-          </div>
-
-          <!-- 第3列：右侧 (5 大 VR/3D 入口垂直排布) -->
-          <div class="col-right">
-
-            <div class="silubox" @click="openIframe(siluvr)" :title="siluvr.title + ' - ' + siluvr.desc">
-              <div class="juanzhou">
-                  <img src="@/assets/img/juanzhou.png" alt="卷轴">
-              </div>
-              <div>
-                <div style="color: #e4932b;font-weight: bold;font-size: 20px;">{{ siluvr.title }}</div>
-                <div>{{ siluvr.desc }}</div> 
-              </div>
-            </div>
-            <div
-              v-for="item in vrList"
-              :key="item.id"
-              class="vr-card-item"
-              @click="openIframe(item)"
-              :title="item.title + ' - ' + item.desc"
-            >
-              <div class="vr-icon-box" :style="{ backgroundColor: item.color }">
-                <!-- 积分馆: 五角星 -->
-                <svg v-if="item.iconType === 'hall'" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                  <path d="M12 2.5l2.8 6.5 7 .6-5.3 4.7 1.6 6.9-6.1-3.6-6.1 3.6 1.6-6.9-5.3-4.7 7-.6z"/>
-                </svg>
-                <!-- VR全景游: VR全景眼镜/相机 -->
-                <svg v-else-if="item.iconType === 'vr'" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                  <path d="M21 7H3c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h4.5l1.5-2h6l1.5 2H21c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-14 7c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm10 0c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
-                </svg>
-                <!-- 丝路长卷: 画卷/折叠地图 -->
-                <svg v-else-if="item.iconType === 'scroll'" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 14H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1zm0-4H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1zm0-4H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1z"/>
-                </svg>
-                <!-- 建市十周年成果: 奖杯 -->
-                <svg v-else-if="item.iconType === 'exhibition'" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                  <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.82 2.68 3.32 3.16V19H8v2h8v-2h-2.71v-2.9c1.5-.48 2.69-1.66 3.32-3.16 2.47-.31 4.39-2.39 4.39-4.94V7c0-1.1-.9-2-2-2zm-14 3V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
-                </svg>
-                <!-- 新疆形象展示平台: 三层菱形平台/中华文化馆 -->
-                <svg v-else-if="item.iconType === 'pavilion'" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 12l10 5 10-5M2 17l10 5 10-5"/>
-                </svg>
-              </div>
-              <div class="vr-text-box">
-                <div class="vr-title">{{ item.title }}</div>
-                <div class="vr-desc">{{ item.desc }}</div>
               </div>
             </div>
           </div>
@@ -901,7 +965,8 @@ onUnmounted(() => {
   position: relative;
   z-index: 5;
   max-width: 1280px;
-  height:850px;
+  min-height: 850px;
+  height: auto;
   margin: 0 auto;
   padding: 140px 0 40px;
   width: 100%;
@@ -910,17 +975,13 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 .juanzhou{
-  width:30%;
-  margin-right: 10px;
-  margin-top: 10px;
+  width:100%;
   box-sizing: border-box;
 }
 .silubox{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:10px;
-  padding: 10px 0px;
   cursor:pointer
 }
 .juanzhou img{
@@ -934,7 +995,133 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  height:600px
+  min-height: 600px;
+  height: auto;
+}
+
+/* ================== hero-section 上方：通知公告栏 ================== */
+.hero-notice-bar {
+  height: 70px;
+  background: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.notice-bar-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.notice-horn-icon {
+  width: 18px;
+  height: 18px;
+  color: #0066ff;
+}
+
+.notice-badge-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1b4b8a;
+  white-space: nowrap;
+}
+
+.notice-bar-divider {
+  width: 1px;
+  height: 16px;
+  background: #cbd5e1;
+  flex-shrink: 0;
+}
+
+.notice-bar-content {
+  flex: 1;
+  height: 42px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.notice-swiper {
+  width: 100%;
+  height: 42px;
+}
+
+.notice-swiper :deep(.swiper-slide) {
+  height: 42px !important;
+  display: flex;
+  align-items: center;
+}
+
+.notice-slide-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.notice-item-tag {
+  background: #eff6ff;
+  color: #0066ff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.notice-item-title {
+  flex: 1;
+  font-size: 16px;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s;
+}
+
+.notice-slide-item:hover .notice-item-title {
+  color: #0066ff;
+}
+
+.notice-item-date {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.notice-bar-more {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 16px;
+  color: #64748b;
+  cursor: pointer;
+  flex-shrink: 0;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.notice-bar-more:hover {
+  color: #0066ff;
+}
+
+.notice-arrow-icon {
+  width: 14px;
+  height: 14px;
 }
 
 /* 上半部分三列布局 */
@@ -946,8 +1133,8 @@ onUnmounted(() => {
 
 /* ================== 第1列：左侧 (31%) ================== */
 .col-left {
-  flex: 0 0 500px;
-  width: 500px;
+  flex: 0 0 320px;
+  width: 320px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -955,7 +1142,7 @@ onUnmounted(() => {
 
 .banner-card {
   width: 100%;
-  height: 340px;
+  height: 240px;
   position: relative;
   overflow: hidden;
   background: #f1f5f9;
@@ -1070,7 +1257,7 @@ onUnmounted(() => {
   display: none;
 }
 
-/* 政策解读 */
+/* 宣传展示 */
 .policy-section {
   display: flex;
   gap: 12px;
@@ -1081,7 +1268,7 @@ onUnmounted(() => {
 }
 
 .policy-badge {
-  width: 110px;
+  width: 70px;
   background: #00b578;
   color: #ffffff;
   display: flex;
@@ -1178,19 +1365,21 @@ onUnmounted(() => {
 /* 要闻头条大卡片 */
 .yaowen-featured {
   text-align: center;
-  padding-bottom:20px;
+  padding-bottom: 20px;
   cursor: pointer;
   margin-bottom: 4px;
+  min-width: 0;
 }
 
 .featured-title {
   margin: 0 0 6px 0;
   font-size: 16px;
   font-weight: 700;
- 
   color: #0f172a;
   line-height: 1.35;
-  white-space: pre-line;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: color 0.15s;
 }
 
@@ -1280,33 +1469,42 @@ onUnmounted(() => {
   color: #0066ff;
 }
 
-/* ================== 第3列：右侧 5 大 VR/3D 入口 (24%) ================== */
+/* ================== 中间：5 大 VR/3D 入口 (丝路长卷 + 2x2卡片) ================== */
 .col-right {
-  flex: 0 0 190px;
-  width: 190px;
+  flex: 0 0 340px;
+  width: 340px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.vr-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 }
 
 .vr-card-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: #ffffff;
-  padding: 20px 10px;
+  gap: 10px;
+  background: url('@/assets/img/ddnbs.png') no-repeat center center;
+  background-size: 100% 100%;
+  padding: 16px 8px;
+  box-sizing: border-box;
+  min-width: 0;
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  border: 1px solid #f1f5f9;
+  text-decoration: none;
+  color: inherit;
 }
 
 .vr-card-item:hover {
-  background: #f8fafc;
   transform: translateX(2px);
-  border-color: #e2e8f0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  filter: brightness(1.02);
 }
 
 .vr-icon-box {
@@ -1340,8 +1538,8 @@ onUnmounted(() => {
 }
 
 .vr-desc {
-  font-size: 11px;
-  color: #94a3b8;
+  font-size: 12px;
+  color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1429,6 +1627,7 @@ onUnmounted(() => {
 .quick-info {
   flex: 1;
   min-width: 0;
+  max-width: 170px;
 }
 
 .quick-info h4 {
@@ -1484,6 +1683,7 @@ onUnmounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 200px;
 }
 
 /* ================== 全屏 VR 弹窗 ================== */
@@ -1546,7 +1746,7 @@ onUnmounted(() => {
   .hero-section {
     flex-wrap: wrap;
   }
-  .col-left, .col-middle, .col-right {
+  .col-left, .col-middle {
     flex: 1 1 100%;
     width: 100%;
   }
@@ -1561,6 +1761,23 @@ onUnmounted(() => {
   }
   .hero-box {
     padding: 14px;
+  }
+  .hero-notice-bar {
+    height: 38px;
+    padding: 0 10px;
+    gap: 8px;
+  }
+  .notice-swiper {
+    height: 38px;
+  }
+  .notice-swiper :deep(.swiper-slide) {
+    height: 38px !important;
+  }
+  .notice-item-tag {
+    display: none;
+  }
+  .notice-item-date {
+    display: none;
   }
   .hero-section {
     flex-direction: column;
@@ -1604,12 +1821,13 @@ onUnmounted(() => {
   }
   .col-right {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 8px;
   }
   .quick-services-section {
     flex-direction: column;
+    height:auto
   }
   .quick-banner-title {
     width: 100%;

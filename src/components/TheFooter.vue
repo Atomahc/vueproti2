@@ -19,7 +19,6 @@ const { t } = useI18n()
           <div class="footer-links">
             <span class="footer-label">{{ t('footer.links') }}</span>
             <a href="http://www.xjhegs.gov.cn/" target="_blank">{{ t('footer.govSite') }}</a>
-            <a href="http://urumqi.customs.gov.cn/" target="_blank">{{ t('footer.customsSite') }}</a>
             <a href="https://www.horgoseport.com/#/" target="_blank">{{ t('footer.portSite') }}</a>
             <a href="https://hegsrcjt.com/" target="_blank">{{ t('footer.talentSite') }}</a>
           </div>

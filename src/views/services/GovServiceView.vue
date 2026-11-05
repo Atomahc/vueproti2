@@ -39,8 +39,8 @@ const fetchGovServices = async () => {
     if (res.code === 0 && res.data && res.data.gov_service) {
       const govServices = res.data.gov_service
       
-      // 个人办事
-      const personalData = govServices.find((item: any) => item.name === '个人办事' || item.name?.includes('个人'))
+      // 个人办事 为govServices第一个对象
+      const personalData = govServices[0]
       if (personalData && personalData.children) {
         personalCategories.value = personalData.children.map((cat: any, index: number) => ({
           title: cat.name,
@@ -55,8 +55,8 @@ const fetchGovServices = async () => {
         }))
       }
       
-      // 企业办事
-      const enterpriseData = govServices.find((item: any) => item.name === '企业办事' || item.name?.includes('企业办'))
+      // 企业办事 为govServices第二个对象
+      const enterpriseData = govServices[1]
       if (enterpriseData && enterpriseData.children) {
         enterpriseBsCategories.value = enterpriseData.children.map((cat: any, index: number) => ({
           title: cat.name,
@@ -71,12 +71,35 @@ const fetchGovServices = async () => {
         }))
       }
 
-      // 企业服务
-      const enterpriseFw = govServices.find((item: any) => item.name === '企业服务')
+      // 企业服务 为govServices第三个对象
+      const enterpriseFw = govServices[2]
       if (enterpriseFw && enterpriseFw.children) {
         const map: Record<string, any> = {}
-        enterpriseFw.children.forEach((child: any) => {
-          map[child.name] = child
+        const fwKeyMap: Record<number, string> = {
+          22945: '政策匹配推荐',
+          22946: '招商引资服务',
+          22947: '企业信用查询',
+          22948: '营商环境监测',
+          22949: '企业供需对接',
+          22950: '乐享霍尔果斯'
+        }
+        const fwIndexKeys = [
+          '政策匹配推荐',
+          '招商引资服务',
+          '企业信用查询',
+          '营商环境监测',
+          '企业供需对接',
+          '乐享霍尔果斯'
+        ]
+        enterpriseFw.children.forEach((child: any, idx: number) => {
+          if (child.name) {
+            map[child.name] = child
+          }
+          if (fwKeyMap[child.id]) {
+            map[fwKeyMap[child.id]] = child
+          } else if (fwIndexKeys[idx]) {
+            map[fwIndexKeys[idx]] = child
+          }
         })
         enterpriseFwData.value = map
       }
@@ -95,16 +118,19 @@ const fetchEnterpriseArticles = async () => {
       categoryIds: '营商环境监测',
       language: locale.value || 'zh'
     })
-    if (res.status === 'ok' && res.data) {
+    if (res.status === 'ok' && Array.isArray(res.data)) {
       enterpriseArticles.value = res.data.slice(0, 5).map((item: any) => ({
         id: item.name,
         title: item.displayName || item.title,
         date: item.publishTime ? item.publishTime.substring(5, 10).replace('-', '/') : '07/03',
         originalData: item
       }))
+    } else {
+      enterpriseArticles.value = []
     }
   } catch (error) {
     console.error('Fetch enterprise articles failed', error)
+    enterpriseArticles.value = []
   }
 }
 
@@ -118,16 +144,19 @@ const fetchPolicyMatchArticles = async () => {
       recommend: true,
       language: locale.value || 'zh'
     })
-    if (res.status === 'ok' && res.data) {
+    if (res.status === 'ok' && Array.isArray(res.data)) {
       policyMatchArticles.value = res.data.slice(0, 3).map((item: any) => ({
         id: item.name,
         title: item.displayName || item.title,
         date: item.publishTime ? item.publishTime.substring(5, 10).replace('-', '/') : '07/03',
         originalData: item
       }))
+    } else {
+      policyMatchArticles.value = []
     }
   } catch (error) {
     console.error('Fetch policy match articles failed', error)
+    policyMatchArticles.value = []
   }
 }
 
@@ -187,6 +216,7 @@ watch(locale, () => {
   fetchGovServices()
   fetchEnterpriseArticles()
   fetchPolicyMatchArticles()
+  fetchSupplyDemand()
 })
 
 onMounted(() => {
@@ -241,17 +271,17 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <h3>{{ cat.titleDisplay || cat.title }}</h3>
+              <h3 :title="cat.titleDisplay || cat.title">{{ cat.titleDisplay || cat.title }}</h3>
             </div>
             <div class="card-items">
-              <div v-for="(item, i) in cat.items" :key="i" class="item-badge" @click="handleLink(item.url)">
+              <div v-for="(item, i) in cat.items" :key="i" class="item-badge" @click="handleLink(item.url)" :title="item.name">
                 <div class="icon-box" :style="{ backgroundColor: cat.color }">
                   <img v-if="item.icon && (item.icon.includes('/') || item.icon.includes('.'))" :src="item.icon.startsWith('http') ? item.icon : minioPrefix + item.icon" style="width: 40px; height: 40px; object-fit: contain;" />
                   <svg v-else viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path :d="item.icon" />
                   </svg>
                 </div>
-                <span class="item-name">{{ item.name }}</span>
+                <span class="item-name" :title="item.name">{{ item.name }}</span>
               </div>
             </div>
           </div>
@@ -264,17 +294,17 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9" />
               </svg>
-              <h3>{{ cat.title }}</h3>
+              <h3 :title="cat.title">{{ cat.title }}</h3>
             </div>
             <div class="card-items">
-              <div v-for="(item, i) in cat.items" :key="i" class="item-badge" @click="handleLink(item.url)">
+              <div v-for="(item, i) in cat.items" :key="i" class="item-badge" @click="handleLink(item.url)" :title="item.name">
                 <div class="icon-box" :style="{ backgroundColor: cat.color }">
                   <img v-if="item.icon && (item.icon.includes('/') || item.icon.includes('.'))" :src="item.icon.startsWith('http') ? item.icon : minioPrefix + item.icon" style="width: 40px; height: 40px; object-fit: contain; " />
                   <svg v-else viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path :d="item.icon" />
                   </svg>
                 </div>
-                <span class="item-name">{{ item.name }}</span>
+                <span class="item-name" :title="item.name">{{ item.name }}</span>
               </div>
             </div>
           </div>
@@ -661,16 +691,25 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   gap: 8px;
   padding: 12px 16px;
   font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .card-header h3 {
   margin: 0;
   font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1;
 }
 
 .header-icon {
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 .card-items {
@@ -719,7 +758,15 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   color: #334155;
   text-align: center;
   line-height: 1.3;
-  word-break: break-all;
+  width: 100%;
+  max-width: 100%;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 企业服务 (2-3-政企服务) 特有样式 */

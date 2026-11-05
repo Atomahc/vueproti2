@@ -323,6 +323,17 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 </template>
 
 <style scoped>
+@media screen and (max-width: 768px) {
+  .main-content {
+    width: 100% !important;
+    padding: 0 !important;
+  }
+  .content-box {
+    padding: 0 !important;
+  }
+}
+
+
 .bgimg {
   position: absolute;
   bottom: 0;
@@ -565,6 +576,9 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   z-index: 1;
 }
 @media screen and (max-width: 768px) {
+  .mobile-footer-wrapper{
+    padding: 30px 16px 20px 16px;
+  }
   .yilu-grid {
     grid-template-columns: 1fr !important;
   }
@@ -588,7 +602,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   }
   .content-box {
     height: auto !important;
-    padding: 12px !important;
+
   }
   .block-header {
     flex-direction: column;

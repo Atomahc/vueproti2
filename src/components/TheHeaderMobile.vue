@@ -231,6 +231,7 @@ const handleLogout = () => {
   align-items: center;
   padding: 10px 16px;
   height: 50px;
+  width:100%
 }
 
 .mobile-title {

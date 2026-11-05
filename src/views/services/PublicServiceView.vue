@@ -18,6 +18,7 @@ import ss6 from '@/assets/other/ss6.png'
 const ssBgs = [ss1, ss2, ss3, ss4, ss5, ss6]
 // 随手拍表单
 const snapshotSubmitting = ref(false)
+const imageUploading = ref(false)
 const uploadedImages = ref<string[]>([])
 const snapshotForm = ref({
   reportType: '',
@@ -32,16 +33,26 @@ const snapshotForm = ref({
 })
 const router = useRouter()
 
+const formatImageUrl = (url: string) => {
+  if (!url) return ''
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url
+  }
+  const prefix = (minioPrefix || '').replace(/\/+$/, '')
+  const path = url.startsWith('/') ? url : `/${url}`
+  return `${prefix}${path}`
+}
+
 const handleNavigate = (item: any) => {
-  if (item.name === '文旅服务') {
+  if (item.name === '文旅服务' || item.id === 22982) {
     router.push('/service/culture')
     return
   }
-  if (item.name === '青少年活动中心') {
+  if (item.name === '青少年活动中心' || item.id === 22981) {
     router.push('/service/youth-activity')
     return
   }
-  if (item.name === '志愿者服务(霍尔果斯云)' || item.linkType === 'qrcode') {
+  if (item.name === '志愿者服务(霍尔果斯云)' || item.id === 22983 || item.linkType === 'qrcode') {
     openModal(item)
     return
   }
@@ -54,19 +65,51 @@ const handleNavigate = (item: any) => {
     }
   }
 }
-const handleImageUpload = (e: any) => {
-  const file = e.target.files[0]
-  if (!file) return
-  if (uploadedImages.value.length >= 9) {
+const handleImageUpload = async (e: any) => {
+  const files: FileList | null = e.target.files
+  if (!files || files.length === 0) return
+
+  const remainingSlots = 9 - uploadedImages.value.length
+  if (remainingSlots <= 0) {
     alert(t('services.maxImagesLimit'))
+    e.target.value = ''
     return
   }
-  const reader = new FileReader()
-  reader.onload = (event) => {
-    uploadedImages.value.push(event.target?.result as string)
-    snapshotForm.value.imageUrls = JSON.stringify(uploadedImages.value)
+
+  const filesToUpload = Array.from(files).slice(0, remainingSlots)
+  if (files.length > remainingSlots) {
+    alert(t('services.maxImagesLimit'))
   }
-  reader.readAsDataURL(file)
+
+  imageUploading.value = true
+  try {
+    for (const file of filesToUpload) {
+      if (!file.type.startsWith('image/')) {
+        alert('请选择图片格式文件上传')
+        continue
+      }
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res: any = await http.post('/prod-api/sys/file/upload', formData)
+      if (res.code === 0 || String(res.code) === '0' || res.code === 200 || String(res.code) === '200') {
+        const fileUrl = res.data?.url || res.url || (typeof res.data === 'string' ? res.data : '')
+        if (fileUrl) {
+          uploadedImages.value.push(fileUrl)
+        } else {
+          alert(res.msg || '上传成功但未获取到文件地址')
+        }
+      } else {
+        alert(res.msg || '图片上传失败')
+      }
+    }
+    snapshotForm.value.imageUrls = JSON.stringify(uploadedImages.value)
+  } catch (err: any) {
+    alert(err.message || '图片上传异常')
+  } finally {
+    imageUploading.value = false
+    e.target.value = ''
+  }
 }
 
 const removeImage = (index: number) => {
@@ -79,6 +122,10 @@ const submitSnapshotForm = async () => {
     alert(t('services.fillCompleteInfo'))
     return
   }
+  if (imageUploading.value) {
+    alert('图片正在上传中，请稍候')
+    return
+  }
   snapshotSubmitting.value = true
   try {
     const res: any = await http.post('/prod-api/portal/complaint/snapshot/create', null, { params: snapshotForm.value })
@@ -86,7 +133,7 @@ const submitSnapshotForm = async () => {
       alert(t('services.submitSuccess'))
       uploadedImages.value = []
       snapshotForm.value = {
-        reportType: reportTypes.value[0]?.id || '', content: '', imageUrls: '[]', longitude: '', latitude: '', address: '', community: communities.value[0]?.id || '', contactName: '', contactPhone: ''
+        reportType: reportTypes.value[0]?.dictValue || '', content: '', imageUrls: '[]', longitude: '', latitude: '', address: '', community: communities.value[0]?.dictValue || '', contactName: '', contactPhone: ''
       }
     } else {
       alert(t('services.submitFailed') + ': ' + res.msg)
@@ -240,30 +287,28 @@ const fetchConvenience = async () => {
     if (res.code === 0 && res.data && res.data.convenience) {
       const list = res.data.convenience
       
-      const ld = list.find((item: any) => item.name === '劳道智工' || item.name?.includes('劳道')) || list[0]
+      const ld = list[0]
       if (ld) {
         laodaoInfo.value = ld
         laodaoTags.value = ld.children || []
       }
       
-      const zy = list.find((item: any) => item.name?.includes('中亚职通桥'))
+      const zy = list[1]
       if (zy) {
         zhongyaInfo.value = zy
       }
       
-      const sq = list.find((item: any) => item.name === '社区便民')
+      const sq = list[2]
       if (sq) {
         communityServices.value = sq.children || []
       }
       
-      const sh = list.find((item: any) => item.name === '生活服务')
+      const sh = list[3]
       if (sh) {
         lifeServices.value = sh.children || []
       }
 
-      bottomCards.value = list.filter((item: any) => 
-        ['青少年活动中心', '文旅服务', '志愿者服务(霍尔果斯云)'].includes(item.name)
-      )
+      bottomCards.value = list.slice(4, 7)
     }
   } catch(e) {
     console.error('Failed to fetch convenience services', e)
@@ -282,10 +327,10 @@ const fetchDicts = async () => {
       reportTypes.value = res.data[0] || []
       communities.value = res.data[1] || []
       if (reportTypes.value.length > 0 && !snapshotForm.value.reportType) {
-        snapshotForm.value.reportType = reportTypes.value[0].id
+        snapshotForm.value.reportType = reportTypes.value[0].dictValue
       }
       if (communities.value.length > 0 && !snapshotForm.value.community) {
-        snapshotForm.value.community = communities.value[0].id
+        snapshotForm.value.community = communities.value[0].dictValue
       }
     }
   } catch (error) {
@@ -342,8 +387,8 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                   </svg>
                 </div>
                 <div>
-                  <h2>{{ t('services.cityGovernance') }}</h2>
-                  <p class="subtitle">{{ t('services.governanceLoop') }}</p>
+                  <h2 :title="t('services.cityGovernance')">{{ t('services.cityGovernance') }}</h2>
+                  <p class="subtitle" :title="t('services.governanceLoop')">{{ t('services.governanceLoop') }}</p>
                 </div>
               </div>
             </div>
@@ -353,13 +398,13 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                 <div class="col" style="margin-right: 10px;">
                   <label class="form-label">{{ t('services.reportType') }}</label>
                   <select class="shoot-input" v-model="snapshotForm.reportType">
-                    <option v-for="item in reportTypes" :key="item.id" :value="item.id">{{ item.dictLabel }}</option>
+                    <option v-for="item in reportTypes" :key="item.id || item.dictValue" :value="item.dictValue">{{ item.dictLabel }}</option>
                   </select>
                 </div>
                 <div class="col">
                   <label class="form-label">{{ t('services.community') }}</label>
                   <select class="shoot-input" v-model="snapshotForm.community">
-                    <option v-for="item in communities" :key="item.id" :value="item.id">{{ item.dictLabel }}</option>
+                    <option v-for="item in communities" :key="item.id || item.dictValue" :value="item.dictValue">{{ item.dictLabel }}</option>
                   </select>
                 </div>
               </div>
@@ -368,12 +413,12 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <div class="textarea-with-upload">
                 <div class="upload-container">
                   <div v-for="(img, index) in uploadedImages" :key="index" class="upload-item">
-                    <img :src="img" class="upload-preview" />
+                    <img :src="formatImageUrl(img)" class="upload-preview" />
                     <button type="button" class="btn-remove-img" @click="removeImage(index)">×</button>
                   </div>
                   <div class="upload-btn" v-if="uploadedImages.length < 9">
-                    <span>{{ t('services.addImage') }}</span>
-                    <input type="file" accept="image/*" @change="handleImageUpload" />
+                    <span>{{ imageUploading ? '上传中...' : t('services.addImage') }}</span>
+                    <input type="file" accept="image/*" multiple :disabled="imageUploading" @change="handleImageUpload" />
                   </div>
                 </div>
                 <textarea
@@ -403,7 +448,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                 </button>
               </div>
 
-              <button class="submit-btn green" @click="submitSnapshotForm" :disabled="snapshotSubmitting">
+              <button class="submit-btn green" @click="submitSnapshotForm" :disabled="snapshotSubmitting || imageUploading">
                 {{ snapshotSubmitting ? t('services.submitting') : t('services.uploadNow') }}
               </button>
             </div>
@@ -418,14 +463,14 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
             <div class="services-icon-grid">
-              <div v-for="(s, i) in communityServices" :key="i" class="icon-item-box" @click="handleNavigate(s)">
+              <div v-for="(s, i) in communityServices" :key="i" class="icon-item-box" @click="handleNavigate(s)" :title="s.name">
                 <div class="svg-icon-blue">
                   <img v-if="s.bgImage && (s.bgImage.includes('/') || s.bgImage.includes('.'))" :src="s.bgImage.startsWith('http') ? s.bgImage : minioPrefix + s.bgImage " style="width: 36px; height: 36px; object-fit: contain; filter: none;" />
                   <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path :d="s.icon" />
                   </svg>
                 </div>
-                <span>{{ s.name }}</span>
+                <span :title="s.name">{{ s.name }}</span>
               </div>
             </div>
           </div>
@@ -437,14 +482,14 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
             <div class="services-icon-grid">
-              <div v-for="(s, i) in lifeServices" :key="i" class="icon-item-box" @click="handleNavigate(s)">
+              <div v-for="(s, i) in lifeServices" :key="i" class="icon-item-box" @click="handleNavigate(s)" :title="s.name">
                 <div class="svg-icon-blue">
                   <img v-if="s.bgImage && (s.bgImage.includes('/') || s.bgImage.includes('.'))" :src="s.bgImage.startsWith('http') ? s.bgImage : minioPrefix + s.bgImage " style="width: 36px; height: 36px; object-fit: contain; filter: none;" />
                   <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path :d="s.icon" />
                   </svg>
                 </div>
-                <span>{{ s.name }}</span>
+                <span :title="s.name">{{ s.name }}</span>
               </div>
             </div>
           </div>
@@ -458,7 +503,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                     <path d="M12 14l9-5-9-5-9 5 9 5z" />
                   </svg>
                 </div>
-                <h2>{{ laodaoInfo.name ? laodaoInfo.name : t('jobs.laodao') }} · <span>{{ t('services.shortTermJob') }}</span></h2>
+                <h2 :title="(laodaoInfo.name ? laodaoInfo.name : t('jobs.laodao')) + ' · ' + t('services.shortTermJob')">{{ laodaoInfo.name ? laodaoInfo.name : t('jobs.laodao') }} · <span>{{ t('services.shortTermJob') }}</span></h2>
               </div>
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
@@ -501,7 +546,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                     <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
                   </svg>
                 </div>
-                <h2>{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : t('jobs.zhongya') }} · <span>{{ t('services.longTermJob') }}</span></h2>
+                <h2 :title="(zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : t('jobs.zhongya')) + ' · ' + t('services.longTermJob')">{{ zhongyaInfo.name ? zhongyaInfo.name.split('·')[0] : t('jobs.zhongya') }} · <span>{{ t('services.longTermJob') }}</span></h2>
               </div>
               <span class="arrow"><svg t="1787197216878" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6569" width="200" height="200"><path d="M716.617 477.941L355.519 142.045c-14.661-13.091-37.097-12.05-50.488 2.341-13.389 14.392-12.811 36.845 1.306 50.527L639.633 504.95 305.797 828.643a36.097 36.097 0 0 0-9.874 34.718 36.098 36.098 0 0 0 25.137 25.907 36.093 36.093 0 0 0 35.004-8.81l361.099-350.122a36.056 36.056 0 0 0 10.981-26.294 36.052 36.052 0 0 0-11.527-26.063" fill="#333333" p-id="6570"></path></svg></span>
             </div>
@@ -684,12 +729,41 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   border: 1px solid #a7f3d0;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.shoot-card .card-header {
+  min-width: 0;
+  width: 100%;
+}
+
+.shoot-card h2,
+.shoot-card .header-title-box h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
+  display: block;
 }
 
 .header-title-box {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.header-title-box > div:not(.icon-square) {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .header-title-box h2 {
@@ -697,12 +771,25 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   font-weight: 700;
   margin: 0;
   color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
 }
 
+.shoot-card p,
+.shoot-card .header-title-box p.subtitle,
 .header-title-box p.subtitle {
   font-size: 12px;
   color: #059669;
   margin: 2px 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
+  display: block;
 }
 
 .icon-square {
@@ -891,7 +978,9 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
-  margin-top:10px;
+  margin-top: 10px;
+  min-width: 0;
+  gap: 8px;
 }
 
 .card-header-flex h2 {
@@ -899,6 +988,11 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   font-weight: 700;
   margin: 0;
   color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 300px;
 }
 
 .card-header-flex h2 span {
@@ -908,6 +1002,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 .arrow {
   color: #94a3b8;
   font-size: 16px;
+  flex-shrink: 0;
 }
 .arrow svg {
   width: 16px;
@@ -1162,6 +1257,10 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   justify-content: center;
   gap: 8px;
   cursor: pointer;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 4px;
 }
 
 .icon-item-box .svg-icon-blue {
@@ -1187,6 +1286,13 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 .icon-item-box span {
   font-size: 12px;
   color: #334155;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 
 .icon-item-box:hover span {
