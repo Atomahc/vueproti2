@@ -156,10 +156,75 @@ const handleNavigate = (url: string) => {
   }
 }
 
+const getChineseCardName = (card: any): string => {
+  if (!card) return ''
+
+  // 1. 如果已有明确的 ID 映射（来自 zones-tree 接口数据）
+  const idMap: Record<number, string> = {
+    22996: '统计公报',
+    22997: '统计资料汇编',
+    22998: '经济运行分析'
+  }
+  if (card.id && idMap[card.id]) {
+    return idMap[card.id]
+  }
+
+  const name = (card.name || '').trim()
+
+  // 2. 如果包含中文字符，说明已经是中文
+  if (/[\u4e00-\u9fa5]/.test(name)) {
+    return name
+  }
+
+  // 3. 多语言对应中文名称字典
+  const statCardChineseMap: Record<string, string> = {
+    // 统计公报
+    'Statistical Communiqué': '统计公报',
+    'Statistical Bulletin': '统计公报',
+    'Статистический бюллетень': '统计公报',
+    'Статистикалық хабарлама': '统计公报',
+    'Статистикалық бюллетень': '统计公报',
+
+    // 统计资料汇编
+    'Compilation of Statistical Materials': '统计资料汇编',
+    'Сборник статистических материалов': '统计资料汇编',
+    'Статистикалық материалдар жинағы': '统计资料汇编',
+
+    // 统计年鉴
+    'Statistical Yearbook': '统计年鉴',
+    'Статистический ежегодник': '统计年鉴',
+    'Статистикалық жылнама': '统计年鉴',
+    'Статистикалық жылнамалық': '统计年鉴',
+
+    // 经济运行分析
+    'Economic Operation Analysis': '经济运行分析',
+    'Анализ экономической ситуации': '经济运行分析',
+    'Экономикалық жұмыс талдауы': '经济运行分析',
+
+    // 调查数据
+    'Survey Data': '调查数据',
+    'Данные исследований': '调查数据',
+    'Данные опроса': '调查数据',
+    'Зерттеу деректері': '调查数据'
+  }
+
+  if (statCardChineseMap[name]) {
+    return statCardChineseMap[name]
+  }
+
+  // 4. 匹配备份卡片当前语言文案
+  if (name === t('news.statsBulletin')) return '统计公报'
+  if (name === t('dataOpen.statYearbook')) return '统计年鉴'
+  if (name === t('dataOpen.surveyData')) return '调查数据'
+
+  return name
+}
+
 const handleStatCardClick = (card: any) => {
+  const targetName = getChineseCardName(card) || card.name
   router.push({
     name: 'news-list',
-    query: { tab: card.name }
+    query: { tab: targetName }
   })
 }
 

@@ -340,12 +340,12 @@ const fetchDicts = async () => {
 
 const fetchJobs = async () => {
   try {
-    const resLaodao: any = await http.get('/prod-api/portal/job/page', { page: 1, limit: 2, jobType: 1 })
+    const resLaodao: any = await http.get('/prod-api/portal/job/page', { page: 1, limit: 2, jobType: 1, lang: locale.value || 'zh' })
     if (resLaodao.code === 0 || String(resLaodao.code) === '0') {
       laodaoJobs.value = resLaodao.data.list || []
     }
     
-    const resZhongya: any = await http.get('/prod-api/portal/recruitment/page', { page: 1, limit: 2, workType: 1 })
+    const resZhongya: any = await http.get('/prod-api/portal/recruitment/page', { page: 1, limit: 2, workType: 1, lang: locale.value || 'zh' })
     if (resZhongya.code === 0 || String(resZhongya.code) === '0') {
       zhongyaJobs.value = resZhongya.data.list || []
     }
@@ -356,6 +356,7 @@ const fetchJobs = async () => {
 
 watch(locale, () => {
   fetchConvenience()
+  fetchJobs()
 })
 
 onMounted(() => {
@@ -512,20 +513,20 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <div class="job-list-container">
                 <div class="job-item" v-for="(job, idx) in laodaoJobs" :key="idx" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'laodao' } })">
                   <div class="job-item-header">
-                    <span class="job-title" style="font-size: 15px;">{{ job.positionName }}</span>
-                    <span class="job-salary" style="font-size: 14px;" v-if="job.salaryShow">{{ job.salaryShow }}</span>
-                    <span class="job-salary" style="font-size: 14px;" v-else-if="job.salaryMin != null">{{ job.salaryMin }}K-{{ job.salaryMax }}K</span>
-                    <span class="job-salary" style="font-size: 14px;" v-else>{{ t('services.negotiable') }}</span>
+                    <span class="job-title" :title="job.positionName">{{ job.positionName }}</span>
+                    <span class="job-salary" :title="job.salaryShow || (job.salaryMin != null ? `${job.salaryMin}K-${job.salaryMax}K` : t('services.negotiable'))" v-if="job.salaryShow">{{ job.salaryShow }}</span>
+                    <span class="job-salary" :title="`${job.salaryMin}K-${job.salaryMax}K`" v-else-if="job.salaryMin != null">{{ job.salaryMin }}K-{{ job.salaryMax }}K</span>
+                    <span class="job-salary" :title="t('services.negotiable')" v-else>{{ t('services.negotiable') }}</span>
                   </div>
-                  <div class="job-item-tags" style="margin: 6px 0; display: flex; gap: 6px; flex-wrap: wrap;">
-                    <span v-for="(tag, tIdx) in [job.districtName, job.experienceLabel, ...(job.welfareBenefits || [])].filter(Boolean).slice(0, 2)" :key="tIdx" style="background: #f0fdfa; border: 1px solid #ccfbf1; color: #0d9488; font-size: 11px; padding: 2px 6px; border-radius: 4px;">{{ tag }}</span>
+                  <div class="job-item-tags">
+                    <span class="job-tag teal" v-for="(tag, tIdx) in [job.districtName, job.experienceLabel, ...(job.welfareBenefits || [])].filter(Boolean).slice(0, 2)" :key="tIdx" :title="tag">{{ tag }}</span>
                   </div>
-                  <div class="job-item-footer" style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-top: 8px;">
-                    <span style="display: flex; align-items: center; gap: 4px;width: 100px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
+                  <div class="job-item-footer">
+                    <span class="job-location" :title="job.workAddress || t('services.addressUnknown')">
                       <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                      {{ job.workAddress || t('services.addressUnknown') }}
+                      <span class="job-location-text">{{ job.workAddress || t('services.addressUnknown') }}</span>
                     </span>
-                    <span>{{ (job.publishTimeStr || job.createTimeStr || '').split(' ')[0] }}</span>
+                    <span class="job-date">{{ (job.publishTimeStr || job.createTimeStr || '').split(' ')[0] }}</span>
                   </div>
                 </div>
               </div>
@@ -555,20 +556,20 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
               <div class="job-list-container">
                 <div class="job-item yellow" v-for="(job, idx) in zhongyaJobs" :key="idx" @click.stop="router.push({ path: '/service/jobs', query: { tab: 'zhongya' } })">
                   <div class="job-item-header">
-                    <span class="job-title" style="font-size: 15px;">{{ job.title }}</span>
-                    <span class="job-salary" style="font-size: 14px;" v-if="job.salaryShow">{{ job.salaryShow }}</span>
-                    <span class="job-salary" style="font-size: 14px;" v-else-if="job.minSalary != null">{{ job.minSalary }}-{{ job.maxSalary }}</span>
-                    <span class="job-salary" style="font-size: 14px;" v-else>{{ t('services.negotiable') }}</span>
+                    <span class="job-title" :title="job.title">{{ job.title }}</span>
+                    <span class="job-salary" :title="job.salaryShow || (job.minSalary != null ? `${job.minSalary}-${job.maxSalary}` : t('services.negotiable'))" v-if="job.salaryShow">{{ job.salaryShow }}</span>
+                    <span class="job-salary" :title="`${job.minSalary}-${job.maxSalary}`" v-else-if="job.minSalary != null">{{ job.minSalary }}-{{ job.maxSalary }}</span>
+                    <span class="job-salary" :title="t('services.negotiable')" v-else>{{ t('services.negotiable') }}</span>
                   </div>
-                  <div class="job-item-tags" style="margin: 6px 0; display: flex; gap: 6px; flex-wrap: wrap;">
-                    <span v-for="(tag, tIdx) in [job.city, job.experienceLabel, job.educationLabel].filter(Boolean).slice(0, 2)" :key="tIdx" style="background: #fef3c7; border: 1px solid #fde68a; color: #d97706; font-size: 11px; padding: 2px 6px; border-radius: 4px;">{{ tag }}</span>
+                  <div class="job-item-tags">
+                    <span class="job-tag yellow" v-for="(tag, tIdx) in [job.city, job.experienceLabel, job.educationLabel].filter(Boolean).slice(0, 2)" :key="tIdx" :title="tag">{{ tag }}</span>
                   </div>
-                  <div class="job-item-footer" style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-top: 8px;">
-                    <span style="display: flex; align-items: center; gap: 4px;">
+                  <div class="job-item-footer">
+                    <span class="job-location" :title="job.workLocation || job.city || t('services.addressUnknown')">
                       <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                      {{ job.workLocation || job.city || t('services.addressUnknown') }}
+                      <span class="job-location-text">{{ job.workLocation || job.city || t('services.addressUnknown') }}</span>
                     </span>
-                    <span>{{ (job.createDate || '').split(' ')[0] }}</span>
+                    <span class="job-date">{{ (job.createDate || '').split(' ')[0] }}</span>
                   </div>
                 </div>
               </div>
@@ -1031,11 +1032,10 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 }
 
 .job-list-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 12px;
-  flex-flow:wrap
 }
 
 .job-item {
@@ -1045,7 +1045,9 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
-  flex:1
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .job-item:hover {
   background: #ccfbf1;
@@ -1061,23 +1063,103 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 6px;
   margin-bottom: 4px;
+  min-width: 0;
 }
 
 .job-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: #1e293b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 70%;
+  flex: 1;
+  min-width: 0;
 }
 
 .job-salary {
-  font-size: 13px;
+  font-size: 12px;
   color: #ef4444;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  max-width: 48%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.job-item-tags {
+  margin: 6px 0;
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.job-tag {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+  flex: 0 1 auto;
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.job-tag.teal {
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  color: #0d9488;
+}
+
+.job-tag.yellow {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #d97706;
+}
+
+.job-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 8px;
+  min-width: 0;
+}
+
+.job-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.job-location svg {
+  flex-shrink: 0;
+}
+
+.job-location-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.job-date {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 11px;
 }
 
 .job-item-company {

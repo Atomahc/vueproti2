@@ -98,7 +98,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
             <div class="image-cards-grid grid-4">
               <div v-for="(item, i) in foreignServices.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
-                <span class="box-title" style="color: #634F00;">{{ item.name }}</span>
+                <span class="box-title" :title="item.name" style="color: #634F00;">{{ item.name }}</span>
                 <div class="img-wrapper">
                   <img style="height: 180px;" :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
                   <button class="arrow-btn yellownext" >&rarr;</button>
@@ -121,7 +121,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
             <div class="image-cards-grid grid-3">
               <div v-for="(item, i) in passServices.children" :key="i" class="image-item-box" @click="handleNavigate(item.url)">
-                <span class="box-title" style="color: #005562;">{{ item.name }}</span>
+                <span class="box-title" :title="item.name" style="color: #005562;">{{ item.name }}</span>
                 <div class="img-wrapper">
                   <img style="height: 144px;" :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
                   <button class="arrow-btn lightblue" >&rarr;</button>
@@ -150,7 +150,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
                 <img class="acc-bg" :class="{ 'has-banner': !!item.bannerImage }" :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
                 <img class="acc-banner" v-if="item.bannerImage" :src="item.bannerImage ? (item.bannerImage.startsWith('http') ? item.bannerImage : minioPrefix + item.bannerImage) : ''" :alt="item.name" />
                 <div class="acc-content">
-                  <span class="acc-title">{{ item.name }}</span>
+                  <span class="acc-title" :title="item.name">{{ item.name }}</span>
                   <p class="acc-desc">{{ item.linkDesc }}</p>
 
                   <button class="arrow-btn orange" >&rarr;</button>
@@ -179,7 +179,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
             <div class="image-cards-grid grid-5">
               <div v-for="(item, i) in portCloudItems.children" :key="i" class="image-item-box" @click="handleCloudClick(item)">
-                <span class="box-title" style="color: #001A49;">{{ item.name }}</span>
+                <span class="box-title" :title="item.name" style="color: #001A49;">{{ item.name }}</span>
                 <div class="img-wrapper">
                   <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
                   <button class="arrow-btn bluenext" >&rarr;</button>
@@ -201,7 +201,7 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
 
             <div class="image-cards-grid grid-5">
               <div v-for="(item, i) in coopServices.children" :key="i" class="image-item-box" @click="handleCoopClick()">
-                <span class="box-title" style="color: #000741;">{{ item.name }}</span>
+                <span class="box-title" :title="item.name" style="color: #000741;">{{ item.name }}</span>
                 <div class="img-wrapper">
                   <img :src="item.bgImage ? (item.bgImage.startsWith('http') ? item.bgImage : minioPrefix + item.bgImage) : ''" :alt="item.name" />
                   <button class="arrow-btn purplenext" >&rarr;</button>
@@ -281,8 +281,16 @@ import BannerSideOverlay from '@/components/BannerSideOverlay.vue'
   position: absolute;
   top: 10px;
   left: 10px;
+  right: 10px;
   z-index: 111;
-
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  line-height: 1.3;
 }
 .img-wrapper .arrow-btn {
   position: absolute;
@@ -579,8 +587,15 @@ h3 {
 .acc-title {
   font-size: 16px;
   font-weight: bold;
-  display: block;
-  color:#321600
+  color: #321600;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  line-height: 1.3;
 }
 .active .acc-title{
   color:#fff;

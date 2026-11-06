@@ -48,6 +48,7 @@ const fetchConvenience = async () => {
 
 watch(locale, () => {
   fetchConvenience()
+  fetchList()
 })
 
 const fetchList = async () => {
@@ -56,7 +57,8 @@ const fetchList = async () => {
     if (activeTab.value === 'zhongya') {
       const res: any = await http.get('/prod-api/portal/recruitment/page', {
         page: currentPage.value,
-        limit: pageSize.value
+        limit: pageSize.value,
+        lang: locale.value || 'zh'
       })
       if (res.code === 0 || String(res.code) === '0') {
         jobList.value = res.data.list || []
@@ -65,7 +67,8 @@ const fetchList = async () => {
     } else if (activeTab.value === 'laodao') {
       const res: any = await http.get('/prod-api/portal/job/page', {
         page: currentPage.value,
-        limit: pageSize.value
+        limit: pageSize.value,
+        lang: locale.value || 'zh'
       })
       if (res.code === 0 || String(res.code) === '0') {
         jobList.value = res.data.list || []
@@ -74,7 +77,8 @@ const fetchList = async () => {
     } else if (activeTab.value === 'serviceOrder') {
       const res: any = await http.get('/prod-api/portal/service-order/page', {
         page: currentPage.value,
-        limit: pageSize.value
+        limit: pageSize.value,
+        lang: locale.value || 'zh'
       })
       if (res.code === 0 || String(res.code) === '0') {
         jobList.value = res.data.list || []
@@ -94,17 +98,17 @@ const openJobDetail = async (id: number) => {
   jobDetail.value = null
   try {
     if (activeTab.value === 'zhongya') {
-      const res: any = await http.get(`/prod-api/portal/recruitment/${id}`)
+      const res: any = await http.get(`/prod-api/portal/recruitment/${id}`, { lang: locale.value || 'zh' })
       if (res.code === 0 || String(res.code) === '0') {
         jobDetail.value = res.data
       }
     } else if (activeTab.value === 'laodao') {
-      const res: any = await http.get(`/prod-api/portal/job/${id}`)
+      const res: any = await http.get(`/prod-api/portal/job/${id}`, { lang: locale.value || 'zh' })
       if (res.code === 0 || String(res.code) === '0') {
         jobDetail.value = res.data
       }
     } else if (activeTab.value === 'serviceOrder') {
-      const res: any = await http.get(`/prod-api/portal/service-order/${id}`)
+      const res: any = await http.get(`/prod-api/portal/service-order/${id}`, { lang: locale.value || 'zh' })
       if (res.code === 0 || String(res.code) === '0') {
         jobDetail.value = res.data
       }

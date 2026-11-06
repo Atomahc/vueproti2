@@ -33,6 +33,13 @@ async function request<T = any>(url: string, options: RequestOptions = {}): Prom
     }
   }
 
+  // /prod-api/portal/job/page, /prod-api/portal/recruitment/page, /prod-api/portal/course/page 接口添加国际化参数 lang，默认 'zh'，并同步当前选中的语言
+  if (url.includes('/portal/job') || url.includes('/portal/recruitment') || url.includes('/portal/course')) {
+    if (!queryParams.lang) {
+      queryParams.lang = getCurrentLanguage() || 'zh'
+    }
+  }
+
   // 文章接口添加参数 language，默认 'zh'，其他语言 kk ru en，切换语言时同步切换参数
   const isArticleApi = url.includes('/get-articles') || url.includes('/portal/article') || url.includes('/article')
   if (isArticleApi) {
